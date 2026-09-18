@@ -1,0 +1,24 @@
+    /* Modal backdrop */
+    .modal-backdrop {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-backdrop.modal-open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-panel {
+      transform: scale(0.95) translateY(20px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-backdrop.modal-open .modal-panel {
+      transform: scale(1) translateY(0);
+    }
+    /* Reminder bell button */
+    .reminder-btn {
+      transition: all 0.2s ease;
+    }
+    .reminder-btn:hover {
+      transform: scale(1.05);
+    }

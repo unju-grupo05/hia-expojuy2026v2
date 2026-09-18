@@ -1,0 +1,98 @@
+<!-- Noticias & Novedades Section -->
+<section class="w-full py-20 lg:py-28 bg-neutral-surface-light text-on-surface" id="novedades">
+  <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="reveal-on-scroll max-w-2xl mb-12 space-y-2">
+      <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
+        <span class="material-symbols-outlined text-sm">newspaper</span>
+        Prensa & Actualidad
+      </div>
+      <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Últimas Noticias & Comunicados</h2>
+      <p class="text-base text-on-surface-variant">Mantente informado sobre los avances organizativos, acuerdos comerciales y novedades de la ExpoJuy 2026.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Article 1 -->
+      <article class="news-card reveal-on-scroll group" data-news="bioceanico" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Abrir artículo sobre el Corredor Bioceánico">
+        <div class="news-card-media relative overflow-hidden">
+          <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Ciudad Cultural de Jujuy" loading="lazy" src="./Img/ExpoJuy-1.webp">
+          <span class="news-card-badge">Inguracion ExpoJuy 2026</span>
+        </div>
+        <div class="news-card-body">
+          <div class="news-card-date">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            <span>09 Octubre 2026</span>
+          </div>
+          <h3 class="news-card-title">Jujuy da inicio a su tradicional ExpoJuy en su edicion 2026</h3>
+        </div>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="news-card reveal-on-scroll group" data-news="cauchari" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Abrir artículo sobre el Parque Solar Cauchari" style="transition-delay: 100ms;">
+        <div class="news-card-media relative overflow-hidden">
+          <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Parque Solar Cauchari" loading="lazy" src="./Img/Cauchari.jpg">
+          <span class="news-card-badge">Energías Limpias</span>
+        </div>
+        <div class="news-card-body">
+          <div class="news-card-date">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            <span>02 Agosto 2026</span>
+          </div>
+          <h3 class="news-card-title">El Parque Solar Cauchari expondrá sus proyectos de expansión e hidrógeno verde en el Pabellón de Energías</h3>
+        </div>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="news-card reveal-on-scroll group" data-news="ventanilla" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Abrir artículo sobre la ventanilla única digital" style="transition-delay: 200ms;">
+        <div class="news-card-media relative overflow-hidden">
+          <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt="Tren Solar de la Quebrada" loading="lazy" src="./Img/Expojuy-8.webp">
+          <span class="news-card-badge">¡En vivo desde la ExpoJuy! 🎙️</span>
+        </div>
+        <div class="news-card-body">
+          <div class="news-card-date">
+            <span class="material-symbols-outlined text-sm">calendar_today</span>
+            <span>10 Octubre 2026</span>
+          </div>
+          <h3 class="news-card-title">Cobertura técnica y streaming en directo con la gente de @Coso. ¡Sumate a la transmisión!</h3>
+        </div>
+      </article>
+    </div>
+
+    <!-- Modal Informativo de Novedades (2 columnas; overlay centrado) -->
+    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-opacity duration-300" id="news-modal" role="dialog" aria-modal="true" aria-labelledby="news-modal-title">
+      <div class="absolute inset-0 bg-brand-slate-dark/75 backdrop-blur-md" id="news-modal-backdrop"></div>
+
+      <div class="news-modal-card relative w-full max-w-4xl max-h-[88vh] rounded-3xl bg-white dark:bg-[#151221] shadow-2xl overflow-hidden grid grid-cols-1 grid-rows-[auto_1fr] md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:grid-rows-1">
+        <!-- Columna izquierda / lateral: imagen de portada -->
+        <div class="relative h-56 md:h-auto md:min-h-[480px] overflow-hidden bg-brand-slate-dark">
+          <img id="news-modal-image" class="absolute inset-0 w-full h-full object-cover" alt="Imagen de la novedad" src="./Img/Cultural.png">
+          <div class="absolute inset-0 bg-gradient-to-t from-brand-slate-dark/85 via-transparent to-transparent md:bg-gradient-to-r"></div>
+          <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/50 text-brand-cyan-electric text-[10px] font-black uppercase tracking-widest border border-brand-cyan-electric/40 backdrop-blur-md" id="news-modal-badge">Novedad</span>
+        </div>
+
+        <!-- Columna derecha / principal: contenido del comunicado -->
+        <div class="relative p-6 sm:p-8 lg:p-10 overflow-y-auto">
+          <button class="absolute top-4 right-4 w-10 h-10 inline-flex items-center justify-center rounded-full text-on-surface-variant dark:text-brand-lavender-soft bg-surface-container hover:bg-primary/10 hover:text-primary transition-colors" id="news-modal-close" type="button" aria-label="Cerrar artículo">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary dark:text-brand-lavender-soft mb-3 pr-10" id="news-modal-date"></div>
+
+          <h3 class="font-display text-2xl sm:text-3xl font-extrabold text-brand-slate-dark dark:text-white tracking-tight mb-5" id="news-modal-title"></h3>
+
+          <div class="space-y-4 text-sm text-on-surface-variant dark:text-[#c6bfd8] leading-relaxed" id="news-modal-body"></div>
+
+          <div class="flex flex-wrap gap-3 pt-6 mt-6 border-t border-slate-100 dark:border-white/10">
+            <button class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-brand-cyan-electric hover:bg-[#32e2f0] text-brand-slate-dark font-display text-xs font-bold uppercase tracking-wider transition-all shadow-md dark:!text-brand-slate-dark" id="news-modal-share" type="button">
+              <span class="material-symbols-outlined text-sm">share</span>
+              <span>Compartir novedad</span>
+            </button>
+            <button class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-transparent border-2 border-primary/30 hover:border-primary dark:border-brand-lavender-soft/40 text-primary dark:text-brand-lavender-soft font-display text-xs font-bold uppercase tracking-wider transition-all" id="news-modal-copy" type="button">
+              <span class="material-symbols-outlined text-sm">link</span>
+              <span>Copiar enlace</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
