@@ -1,0 +1,150 @@
+    /* ============ PLANO FERIAL 3D (THREE.JS + PIN + CONTROLES) ============ */
+    #map-3d-wrapper {
+      position: relative;
+      width: 100%;
+      height: 540px;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      background: #090d12;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0, 240, 255, 0.22);
+    }
+    @media (min-width: 640px) {
+      #map-3d-wrapper { height: 600px; }
+    }
+    @media (min-width: 1024px) {
+      #map-3d-wrapper { height: 640px; }
+    }
+    #masterplanCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      outline: none;
+    }
+
+    /* Barra Superior Flotante 3D */
+    .map-3d-topbar {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      background: rgba(14, 20, 28, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.65);
+      max-width: calc(100% - 24px);
+    }
+    .map-3d-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: all 0.25s ease;
+    }
+    .map-3d-btn:hover {
+      background: rgba(0, 240, 255, 0.15);
+      color: #ffffff;
+      border-color: #00f0ff;
+    }
+    .map-3d-btn.active {
+      background: rgba(0, 240, 255, 0.22);
+      color: #00f0ff;
+      border-color: #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+    }
+    .map-3d-btn.roof-btn.active {
+      background: rgba(255, 123, 0, 0.2);
+      color: #ff7b00;
+      border-color: #ff7b00;
+      box-shadow: 0 0 12px rgba(255, 123, 0, 0.35);
+    }
+
+    /* Pin Flotante Screen-Space */
+    #floating-pin {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      transform: translate(-50%, -100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: 15;
+    }
+    #floating-pin.visible {
+      opacity: 1;
+    }
+    .pin-tag {
+      background: #0d131a;
+      border: 1px solid #ff7b00;
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 5px 12px;
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(255, 123, 0, 0.45);
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .pin-stem {
+      width: 2px;
+      height: 28px;
+      background: linear-gradient(to bottom, #ff7b00, transparent);
+    }
+    .pin-base-dot {
+      width: 6px;
+      height: 6px;
+      background: #ff7b00;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ff7b00;
+    }
+    .map-sector {
+      transition: transform 0.2s ease, filter 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+    .map-sector:hover {
+      filter: brightness(1.15);
+      transform: scale(1.02);
+    }
+    .map-sector.selected-sector {
+      stroke: #00C2D1 !important;
+      stroke-width: 3px !important;
+      filter: drop-shadow(0 0 8px rgba(0,194,209,0.6));
+    }
+    .map-zoom-control {
+      width: 2.4rem;
+      height: 2.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.95);
+      color: #1A1226;
+      border-radius: 0.65rem;
+      cursor: pointer;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+      transition: all 0.2s ease;
+    }
+    html.dark .map-zoom-control { background: #221c33; color: #e7e2f3; }
+    .map-zoom-control:hover { background: #00C2D1; color: #0a0a15; }
