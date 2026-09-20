@@ -1,0 +1,33 @@
+    /* ============ Aurora (fondos animados sutiles) ============ */
+    .aurora-blob {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(80px);
+      opacity: 0.55;
+      pointer-events: none;
+      will-change: transform;
+    }
+    .aurora-1 {
+      width: 420px;
+      height: 420px;
+      top: -120px;
+      left: -80px;
+      background: radial-gradient(circle at 30% 40%, rgba(0,194,209,0.6), transparent 70%);
+      animation: auroraFloat 16s ease-in-out infinite alternate;
+    }
+    .aurora-2 {
+      width: 480px;
+      height: 480px;
+      bottom: -140px;
+      right: -100px;
+      background: radial-gradient(circle at 60% 60%, rgba(139,92,246,0.45), transparent 70%);
+      animation: auroraFloat 20s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes auroraFloat {
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
+      50%  { transform: translate3d(30px, 20px, 0) scale(1.15); }
+      100% { transform: translate3d(-20px, -15px, 0) scale(0.95); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .aurora-blob { animation: none; }
+    }
