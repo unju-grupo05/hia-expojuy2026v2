@@ -1,13 +1,4 @@
-import {
-  Component,
-  OnInit,
-  AfterViewInit,
-  OnDestroy,
-  Inject,
-  PLATFORM_ID,
-  ElementRef,
-  ViewChild
-} from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, ElementRef, ViewChild } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EjesComponent } from '../ejes/ejes.component';
@@ -109,6 +100,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeListeners: Array<() => void> = [];
 
   @ViewChild(PredioComponent) predioComponent!: PredioComponent;
+  @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
@@ -124,10 +116,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
+    window.scrollTo(0, 0);
     gsap.registerPlugin(ScrollTrigger);
 
+    this.initSplashIntro();
+    this.iniciarVideoFondo();
     this.initLenisSmoothScroll();
-    this.initScrubbedBentoGallery();
     this.initHeroParallax();
     this.revealHeroLayers();
     this.initSponsors3DScroll();
@@ -150,6 +144,66 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 200);
   }
 
+ private initSplashIntro(): void {
+    const splash = document.getElementById('splash-intro');
+    const logo = document.getElementById('splash-logo');
+    const badge = document.getElementById('splash-badge');
+
+    if (!splash || !logo) {
+      this.revealHeroLayers();
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // 1. ELIMINAR EL OVERLAY DEL DOM para que no ocupe ni afecte el flujo del scroll
+        splash.remove(); 
+        document.body.style.overflow = '';
+
+        // 2. Anclar la pantalla arriba de todo de forma estricta
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+
+        if (this.lenisInstance) {
+          this.lenisInstance.scrollTo(0, { immediate: true });
+        }
+
+        // 3. Forzar a GSAP a recalcular las alturas reales desde y=0
+        ScrollTrigger.refresh();
+
+        this.revealHeroLayers();
+      }
+    });
+
+    tl.to(logo, {
+      opacity: 1,
+      scale: 1,
+      duration: 0.6,
+      ease: 'back.out(1.7)'
+    })
+    .to(badge, {
+      opacity: 0,
+      y: 10,
+      duration: 0.3,
+      delay: 0.3
+    })
+    .to(logo, {
+      scale: 14,
+      opacity: 0,
+      filter: 'blur(20px)',
+      duration: 0.7,
+      ease: 'expo.in'
+    }, 'zoom')
+    .to(splash, {
+      opacity: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, 'zoom+=0.1');
+  }
+
   ngOnDestroy(): void {
     if (this.lenisInstance) {
       this.lenisInstance.destroy();
@@ -170,7 +224,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   private bindWindowGlobals(): void {
     const w = window as any;
-    w.skipBentoIntro = this.skipBentoIntro.bind(this);
     w.selectPase = this.selectPase.bind(this);
     w.selectModalidad = this.selectModalidad.bind(this);
     w.handlePaseSubmit = this.handlePaseSubmit.bind(this);
@@ -181,6 +234,19 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     w.closeSponsorModal = this.closeSponsorModal.bind(this);
   }
 
+  // =========================================================================
+  // REPRODUCCIÓN CONTINUA DEL VIDEO DE FONDO
+  // =========================================================================
+  private iniciarVideoFondo(): void {
+    if (this.bgVideo?.nativeElement) {
+      const video = this.bgVideo.nativeElement;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.play().catch(() => {
+        window.addEventListener('click', () => video.play(), { once: true });
+      });
+    }
+  }
 
   // =========================================================================
   // 1. LENIS SMOOTH SCROLL + INTEGRACIÓN CON GSAP TICKER
@@ -192,10 +258,15 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: 0.85,
       smoothWheel: true,
       syncTouch: false,
-      touchMultiplier: 1.0
+      touchMultiplier: 1.0,
+      infinite: false // Evita comportamientos infinitos o de rebote
     });
 
-    lenis.on('scroll', () => {
+    lenis.on('scroll', (e: any) => {
+      // Si el usuario intenta scrollear hacia arriba del inicio (scroll < 0), forzar posición a 0
+      if (e.scroll <= 0) {
+        window.scrollTo(0, 0);
+      }
       ScrollTrigger.update();
     });
 
@@ -383,17 +454,16 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
       pNodes.forEach(node => {
         const depth = parseFloat(node.getAttribute('data-depth') || '0.04');
-        const transX = mouseX * depth * 320;
-        const transY = mouseY * depth * 320;
-        const rot = mouseX * 8;
-        node.style.transform = `translate3d(${transX}px, ${transY}px, 0) rotate(${rot}deg)`;
+        const transX = mouseX * depth * 240;
+        const transY = mouseY * depth * 240;
+        node.style.transform = `translate3d(${transX}px, ${transY}px, 0)`;
       });
     });
 
     hero.addEventListener('mouseleave', () => {
       pNodes.forEach(node => {
-        node.style.transform = 'translate3d(0, 0, 0) rotate(0deg)';
-        node.style.transition = 'transform 0.5s ease-out';
+        node.style.transform = 'translate3d(0, 0, 0)';
+        node.style.transition = 'transform 0.4s ease-out';
       });
     });
 
@@ -403,7 +473,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     });
   }
-
 
   // =========================================================================
   // 5. SPONSORS 3D PARALLAX & INFINITE SCROLL
@@ -435,7 +504,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       .to(col2, { y: isMobile ? -450 : -1020, ease: 'none' }, 0)
       .to(col3, { y: isMobile ? -250 : -520, ease: 'none' }, 0);
   }
-
 
   // =========================================================================
   // 7. CANVAS DE PARTICULAS (STARDUST)
@@ -587,7 +655,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   // =========================================================================
   // 11. FAQ ACCORDION TOGGLE
   // =========================================================================
@@ -607,7 +674,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       if (icon) icon.style.transform = 'rotate(180deg)';
     }
   }
-
 
   // =========================================================================
   // 13. COUNTDOWN TIMER
@@ -670,7 +736,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     updateIcon();
   }
-
 
   // =========================================================================
   // 16. MOBILE HAMBURGER MENU
@@ -855,9 +920,8 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-
   // =========================================================================
-  // 19. COUNTUP & BLURTEXT (React-Bits Replica en GSAP)
+  // 19. COUNTUP & BLURTEXT
   // =========================================================================
   private initTextEffects(): void {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
