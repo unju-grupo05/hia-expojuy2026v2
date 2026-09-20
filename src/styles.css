@@ -46,7 +46,6 @@
     50% { transform: translateY(-8px); }
   }
 }
-
     @layer base {
       /* El scroll suave queda gestionado por Lenis; no usamos scroll-behavior
          nativo para evitar interferencias con el smooth scroller. */
@@ -243,14 +242,6 @@
       color: #ffffff;
       border-color: #6b5f95;
     }
-
-
-
-
-
-
-
-
 
     /* ============ RESPONSIVE: pantallas muy estrechas (p. ej. Galaxy Z Fold) ============ */
     @media (max-width: 399px) {
