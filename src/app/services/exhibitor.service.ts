@@ -1,7 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { Exhibitor, ExhibitorResponse } from '../components/models/exhibitor.model';
+
+export interface Exhibitor {
+  id: string;
+  name: string;
+  stand: string;
+  category: 'mineria' | 'energia' | 'agro' | 'tecnologia' | 'logistica';
+  subtitle: string;
+  description: string;
+  origin: string;
+  verified?: boolean;
+}
+
+export interface ExhibitorResponse {
+  items: Exhibitor[];
+  total: number;
+  hasMore: boolean;
+  page: number;
+}
 
 @Injectable({
   providedIn: 'root'
