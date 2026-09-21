@@ -1,0 +1,62 @@
+<aside class="social-sidebar" [class.is-open]="isOpen" aria-label="Menú flotante de redes y ajustes">
+  <button
+    type="button"
+    class="social-sidebar__fab"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-label]="isOpen ? 'Cerrar menú de redes y ajustes' : 'Abrir menú de redes y ajustes'"
+    (click)="toggleMenu()"
+  >
+    <span class="material-symbols-outlined">add</span>
+  </button>
+
+  <button
+    type="button"
+    class="social-sidebar__item social-sidebar__gear"
+    [class.is-active]="panelOpen"
+    [attr.aria-expanded]="panelOpen"
+    aria-label="Abrir ajustes"
+    (click)="togglePanel()"
+  >
+    <span class="material-symbols-outlined">settings</span>
+  </button>
+
+  <a
+    *ngFor="let net of socials"
+    class="social-sidebar__item social-sidebar__link"
+    [href]="net.url"
+    target="_blank"
+    rel="noopener noreferrer"
+    [attr.aria-label]="net.label"
+    [title]="net.label"
+  >
+    <i class="bx {{ net.icon }}"></i>
+  </a>
+
+  <div
+    class="social-sidebar__panel"
+    [class.social-sidebar__panel--open]="panelOpen"
+    role="dialog"
+    aria-label="Panel de ajustes"
+  >
+    <p class="social-sidebar__panel-title">Ajustes de la página</p>
+    <p class="social-sidebar__panel-hint">Personalizá la experiencia visual del portal.</p>
+
+    <div class="social-sidebar__row">
+      <div>
+        <p class="social-sidebar__panel-title">Fondo de estrellas</p>
+        <p class="social-sidebar__panel-hint">Mostrar el canvas Stardust</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        class="social-sidebar__switch"
+        [class.is-on]="stardustEnabled"
+        [attr.aria-checked]="stardustEnabled"
+        aria-label="Activar o desactivar el fondo de estrellas"
+        (click)="toggleStardust()"
+      >
+        <span class="social-sidebar__switch-thumb"></span>
+      </button>
+    </div>
+  </div>
+</aside>

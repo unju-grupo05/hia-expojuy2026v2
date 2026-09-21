@@ -23,5 +23,7 @@ describe('AppComponent', () => {
     expect(compiled.querySelector('app-portal-layout')).toBeTruthy();
     expect(compiled.querySelector('app-header')).toBeTruthy();
     expect(compiled.querySelector('app-footer')).toBeTruthy();
+    expect(compiled.querySelector('app-stardust')).toBeTruthy();
+    expect(compiled.querySelector('app-social-sidebar')).toBeTruthy();
   });
 });

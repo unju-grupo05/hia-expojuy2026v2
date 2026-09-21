@@ -46,15 +46,67 @@
     50% { transform: translateY(-8px); }
   }
 }
+    /* =====================================================
+       VARIABLES DE TEMA GLOBALES
+       Fuente única de color para componentes (claro :root /
+       oscuro html.dark). El modo oscuro se activa con la clase
+       `dark` en <html> (gestión desde el Theme Detector y el
+       toggle del header).
+       ===================================================== */
+    :root {
+      --ej-bg: #F8F9FD;
+      --ej-surface: #FFFFFF;
+      --ej-surface-low: #f6f2ff;
+      --ej-surface-container: #f0ecf9;
+      --ej-surface-high: #eae6f3;
+      --ej-surface-tint: #F2EDF9;
+      --ej-text: #1b1b23;
+      --ej-text-muted: #4a4550;
+      --ej-text-faint: #7b7481;
+      --ej-border: #e5e0ee;
+      --ej-primary: #5E3A8C;
+      --ej-primary-deep: #320c64;
+      --ej-cyan: #00C2D1;
+      --ej-cyan-ink: #0a0a15;
+      --ej-fuchsia: #E879F9;
+      --ej-lavender: #B299D3;
+      --ej-slate-dark: #1A1226;
+    }
+
+    html.dark {
+      --ej-bg: #0e0c16;
+      --ej-surface: #161320;
+      --ej-surface-low: #151221;
+      --ej-surface-container: #1a1628;
+      --ej-surface-high: #221c33;
+      --ej-surface-tint: #241c3a;
+      --ej-text: #e7e2f3;
+      --ej-text-muted: #c6bfd8;
+      --ej-text-faint: #9a93ae;
+      --ej-border: #2c2541;
+      --ej-primary: #bda3e2;
+      --ej-primary-deep: #c8b2ec;
+      --ej-cyan: #00C2D1;
+      --ej-cyan-ink: #0a0a15;
+      --ej-fuchsia: #F6C2FB;
+      --ej-lavender: #B299D3;
+      --ej-slate-dark: #1A1226;
+    }
+
     @layer base {
       /* El scroll suave queda gestionado por Lenis; no usamos scroll-behavior
          nativo para evitar interferencias con el smooth scroller. */
-      body { overscroll-behavior: none; }
+      body {
+        overscroll-behavior: none;
+        background-color: var(--ej-bg);
+        color: var(--ej-text);
+        transition: background-color 0.35s ease, color 0.35s ease;
+      }
     }
     ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #F8F9FD; }
-    ::-webkit-scrollbar-thumb { background: #B299D3; border-radius: 9999px; }
-    ::-webkit-scrollbar-thumb:hover { background: #5E3A8C; }
+    ::-webkit-scrollbar-track { background: var(--ej-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--ej-lavender); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ej-primary); }
 
 
     /* Scroll reveal progressive utility */
@@ -86,28 +138,28 @@
     html.dark { color-scheme: dark; }
 
     /* --- Superficies --- */
-    .dark .bg-white { background-color: #161320; }
+    .dark .bg-white { background-color: var(--ej-surface); }
     .dark .bg-white\/90 { background-color: rgba(20, 17, 31, 0.92); }
-    .dark .bg-neutral-surface-light { background-color: #0e0c16; }
-    .dark .bg-surface-container-low { background-color: #151221; }
-    .dark .bg-surface-container { background-color: #1a1628; }
-    .dark .bg-surface-container-high { background-color: #221c33; }
-    .dark .bg-brand-lavender-surface { background-color: #241c3a; }
-    .dark .bg-slate-50 { background-color: #1a1727; }
-    .dark .bg-slate-100 { background-color: #221d33; }
-    .dark .bg-slate-200 { background-color: #2b2540; }
+    .dark .bg-neutral-surface-light { background-color: var(--ej-bg); }
+    .dark .bg-surface-container-low { background-color: var(--ej-surface-low); }
+    .dark .bg-surface-container { background-color: var(--ej-surface-container); }
+    .dark .bg-surface-container-high { background-color: var(--ej-surface-high); }
+    .dark .bg-brand-lavender-surface { background-color: var(--ej-surface-tint); }
+    .dark .bg-slate-50 { background-color: var(--ej-surface-low); }
+    .dark .bg-slate-100 { background-color: var(--ej-surface-container); }
+    .dark .bg-slate-200 { background-color: var(--ej-surface-high); }
     .dark .bg-emerald-50 { background-color: #0c1f17; }
 
     /* --- Textos --- */
-    .dark .text-brand-slate-dark { color: #ece7f7; }
+    .dark .text-brand-slate-dark { color: var(--ej-text); }
     .dark .text-brand-slate-dark\/90 { color: rgba(236, 231, 247, 0.92); }
-    .dark .text-on-surface { color: #e7e2f3; }
-    .dark .text-on-surface-variant { color: #c6bfd8; }
-    .dark .text-outline { color: #9a93ae; }
-    .dark .text-primary { color: #bda3e2; }
-    .dark .text-primary-dark { color: #c8b2ec; }
-    .dark .text-slate-500 { color: #a7a0be; }
-    .dark .text-slate-600 { color: #b3acc9; }
+    .dark .text-on-surface { color: var(--ej-text); }
+    .dark .text-on-surface-variant { color: var(--ej-text-muted); }
+    .dark .text-outline { color: var(--ej-text-faint); }
+    .dark .text-primary { color: var(--ej-primary); }
+    .dark .text-primary-dark { color: var(--ej-primary-deep); }
+    .dark .text-slate-500 { color: var(--ej-text-faint); }
+    .dark .text-slate-600 { color: var(--ej-text-muted); }
     .dark .text-emerald-700 { color: #6ee7b7; }
     .dark .text-emerald-800 { color: #6ee7b7; }
     /* brand-cyan-accessible (#00838F) cae a ~3.6:1 sobre fondos oscuros; en dark se
@@ -125,29 +177,29 @@
     }
 
     /* --- Bordes --- */
-    .dark .border-slate-100 { border-color: #241f36; }
-    .dark .border-slate-200 { border-color: #2c2541; }
+    .dark .border-slate-100 { border-color: var(--ej-border); }
+    .dark .border-slate-200 { border-color: var(--ej-border); }
     .dark .border-slate-200\/80 { border-color: rgba(44, 37, 65, 0.8); }
     .dark .border-emerald-200 { border-color: #1c4233; }
 
     /* Los botones cian conservan su texto oscuro en modo oscuro */
-    .dark .bg-brand-cyan-electric { color: #0a0a15; }
+    .dark .bg-brand-cyan-electric { color: var(--ej-cyan-ink); }
 
     /* Scrollbar y sobre fondo oscuro */
-    .dark ::-webkit-scrollbar-track { background: #0e0c16; }
-    .dark ::-webkit-scrollbar-thumb { background: #4a3f6b; }
-    .dark ::-webkit-scrollbar-thumb:hover { background: #5E3A8C; }
+    .dark ::-webkit-scrollbar-track { background: var(--ej-bg); }
+    .dark ::-webkit-scrollbar-thumb { background: var(--ej-border); }
+    .dark ::-webkit-scrollbar-thumb:hover { background: var(--ej-primary); }
 
     /* Navbar active link state */
     .nav-item-active {
-      color: #5E3A8C !important;
+      color: var(--ej-primary) !important;
     }
     .nav-item-active::after {
       width: 100% !important;
-      background-color: #00C2D1 !important;
+      background-color: var(--ej-cyan) !important;
     }
     html.dark .nav-item-active {
-      color: #B299D3 !important;
+      color: var(--ej-lavender) !important;
     }
 
 
@@ -155,7 +207,7 @@
     /* Tab switcher for unified form */
     .tab-switcher {
       display: flex;
-      background: #f0ecf9;
+      background: var(--ej-surface-container);
       border-radius: 1rem;
       padding: 4px;
       gap: 4px;
@@ -173,23 +225,23 @@
       cursor: pointer;
     }
     .tab-switcher button.active-tab {
-      background: #1A1226;
-      color: #00C2D1;
+      background: var(--ej-slate-dark);
+      color: var(--ej-cyan);
       box-shadow: 0 2px 8px rgba(0, 194, 209, 0.2);
     }
     .tab-switcher button:not(.active-tab) {
       background: transparent;
-      color: #7b7481;
+      color: var(--ej-text-faint);
     }
     html.dark .tab-switcher {
-      background: #221c33;
+      background: var(--ej-surface-high);
     }
     html.dark .tab-switcher button.active-tab {
-      background: #5E3A8C;
+      background: var(--ej-primary);
       color: #FFFFFF;
     }
     html.dark .tab-switcher button:not(.active-tab) {
-      color: #9a93ae;
+      color: var(--ej-text-faint);
     }
 
 
@@ -206,7 +258,7 @@
     .map-filter-btn.active-filter,
     .filter-btn.active-filter,
     .day-tab.active-day {
-      background: #5E3A8C !important;
+      background: var(--ej-primary) !important;
       color: #ffffff !important;
       border-color: transparent !important;
       box-shadow: none !important;
@@ -222,8 +274,8 @@
     .day-tab:not(.active-day):hover,
     .day-tab:not(.active-day):focus,
     .day-tab:not(.active-day):active {
-      background: #ece7f5;
-      color: #1a1226;
+      background: var(--ej-surface-high);
+      color: var(--ej-slate-dark);
       border-color: #b9aedc;
     }
 
@@ -238,7 +290,7 @@
     html.dark .day-tab:not(.active-day):hover,
     html.dark .day-tab:not(.active-day):focus,
     html.dark .day-tab:not(.active-day):active {
-      background: #2a2340;
+      background: var(--ej-surface-high);
       color: #ffffff;
       border-color: #6b5f95;
     }
