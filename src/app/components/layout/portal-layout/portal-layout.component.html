@@ -1,55 +1,64 @@
-<canvas id="stars-canvas"></canvas>
-
 <app-header />
 
 <!-- Barra de progreso de lectura global -->
-<div class="fixed top-0 left-0 w-full h-[3px] z-50 pointer-events-none bg-transparent">
+<div class="fixed top-0 left-0 w-full h-[3px] z-[60] pointer-events-none bg-transparent">
   <div class="h-full bg-gradient-to-r from-brand-cyan-electric via-brand-cyan-accessible to-primary w-0 shadow-[0_0_12px_rgba(0,194,209,0.85)] transition-all duration-100 ease-out" id="reading-progress"></div>
 </div>
 
-<!-- Minimalist, Translucent Vertical Side-Rail Section Tracker (Desktop) -->
-<aside class="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-end pointer-events-auto">
-  <nav aria-label="Navegación de secciones" class="flex flex-col items-end gap-3.5 py-2 px-1">
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="hero-section" href="#hero-section" title="Inicio">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Inicio</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+<!-- Side-Rail Tracker: PUNTOS A LA IZQUIERDA CON TOOLTIP REVELABLE AL HOVER -->
+<aside class="fixed left-5 top-1/2 -translate-y-1/2 z-40 hidden xl:flex flex-col items-start pointer-events-auto transition-opacity duration-300">
+  <nav aria-label="Navegación de secciones" class="flex flex-col items-start gap-3.5 py-2 px-1">
+    
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="hero-section" href="#hero-section" title="Inicio">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Inicio</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="sobre-expojuy" href="#sobre-expojuy" title="Pilares">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Pilares</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="sobre-expojuy" href="#sobre-expojuy" title="Pilares">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Ejes 2026</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="mapa" href="#mapa" title="Predio Ferial">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Predio</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="mapa" href="#mapa" title="Predio Ferial">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Predio</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="ubicacion" href="#ubicacion" title="Dónde estamos">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Ubicación</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="ubicacion" href="#ubicacion" title="Dónde estamos">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Ubicación</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="expositores" href="#expositores" title="Expositores">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Expositores</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="expositores" href="#expositores" title="Expositores">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Expositores</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="agenda" href="#agenda" title="Agenda">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Agenda</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="agenda" href="#agenda" title="Agenda">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Agenda</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="novedades" href="#novedades" title="Novedades">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Novedades</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="novedades" href="#novedades" title="Novedades">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Novedades</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="galeria" href="#galeria" title="Galería">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Galería</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="galeria" href="#galeria" title="Galería">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Galería</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="entradas" href="#entradas" title="Entradas">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Entradas</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="entradas" href="#entradas" title="Entradas">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Entradas</span>
     </a>
-    <a class="rail-indicator group flex items-center gap-2.5 text-right transition-all" data-nav-target="acreditaciones-section" href="#acreditaciones-section" title="Acreditaciones">
-      <span class="rail-label text-[10px] font-bold tracking-wider uppercase opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-brand-slate-dark/90 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded shadow-xs">Acreditación</span>
-      <span class="rail-dot w-2 h-2 rounded-full bg-slate-400/60 transition-all duration-300 group-hover:scale-125"></span>
+
+    <a class="rail-indicator group flex items-center gap-3 transition-all cursor-pointer h-6" data-nav-target="acreditaciones-section" href="#acreditaciones-section" title="Acreditaciones">
+      <span class="rail-dot shrink-0 w-2.5 h-2.5 rounded-full bg-slate-400/60 dark:bg-slate-600 transition-all duration-300 group-hover:scale-150 group-hover:bg-brand-cyan-electric"></span>
+      <span class="rail-label whitespace-nowrap text-[10px] font-bold tracking-wider uppercase opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 text-slate-800 dark:text-white bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-md shadow-md border border-slate-200 dark:border-slate-700 pointer-events-none">Acreditación</span>
     </a>
+
   </nav>
 </aside>
 

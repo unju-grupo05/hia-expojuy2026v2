@@ -2,6 +2,26 @@
     #hero-bg {
       height: calc(100% + 80px);
     }
+
+    /* Ocultar elementos flotantes laterales e inferiores cuando el menú móvil está abierto */
+      body[style*="overflow: hidden"] aside,
+      body.chat-open aside {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.2s ease-out;
+      }
+
+    /* Compatibilidad de desenfoque de cristal para navegadores iOS/Safari más antiguos */
+    #mobile-menu > div {
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+
+    /* Evitar que el menú exceda la pantalla del celular */
+    #mobile-menu nav {
+      max-height: calc(70vh - 120px);
+    }
+
     /* Elimina cualquier espacio o rebote por encima del contenido */
       html, body {
         margin: 0 !important;
@@ -15,6 +35,19 @@
         margin-top: 0 !important;
         top: 0 !important;
       }
+
+    /* Ocultar barra de desplazamiento estándar manteniendo la funcionalidad de scroll */
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    html, body {
+      -ms-overflow-style: none !important;  /* IE and Edge */
+      scrollbar-width: none !important;  /* Firefox */
+    }
 
       /* Asegura que el canvas estelar no empuje el layout */
       #stars-canvas {

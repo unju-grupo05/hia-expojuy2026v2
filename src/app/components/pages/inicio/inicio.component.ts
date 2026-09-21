@@ -596,33 +596,54 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   private initReadingProgressBar(): void {
     const readingBar = document.getElementById('reading-progress');
-    const sections = ['hero-section', 'sobre-expojuy', 'mapa', 'ubicacion', 'expositores', 'agenda', 'noticias', 'galeria', 'sponsors-section', 'entradas', 'contacto-section'];
+    const sections = ['hero-section', 'sobre-expojuy', 'mapa', 'ubicacion', 'expositores', 'agenda', 'novedades', 'galeria', 'entradas', 'acreditaciones-section'];
     const railIndicators = document.querySelectorAll('.rail-indicator');
+    const navItems = document.querySelectorAll('header nav a.nav-item');
 
     window.addEventListener('scroll', () => {
       const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+      
       if (readingBar) {
         readingBar.style.width = scrolled + '%';
       }
 
-      const scrollPos = window.scrollY + 200;
+      const scrollPos = window.scrollY + 280; // Offset para detectar la sección activa
+
       sections.forEach((secId, idx) => {
         const el = document.getElementById(secId);
         if (el) {
           const top = el.offsetTop;
           const h = el.offsetHeight;
           if (scrollPos >= top && scrollPos < top + h) {
+            
+            // 1. Sincronizar Puntos de la Izquierda (Side-Rail Tracker)
             railIndicators.forEach((r, rIdx) => {
-              if (rIdx === idx) {
-                r.classList.add('bg-brand-cyan-electric', 'scale-125');
-                r.classList.remove('bg-slate-300', 'dark:bg-slate-700');
-              } else {
-                r.classList.remove('bg-brand-cyan-electric', 'scale-125');
-                r.classList.add('bg-slate-300', 'dark:bg-slate-700');
+              const dot = r.querySelector('.rail-dot');
+              if (dot) {
+                if (rIdx === idx) {
+                  dot.classList.add('bg-brand-cyan-electric', 'scale-150');
+                  dot.classList.remove('bg-slate-400/60', 'dark:bg-slate-600');
+                } else {
+                  dot.classList.remove('bg-brand-cyan-electric', 'scale-150');
+                  dot.classList.add('bg-slate-400/60', 'dark:bg-slate-600');
+                }
               }
             });
+
+            // 2. Sincronizar Enlaces del Menú Superior Navbar
+            navItems.forEach(item => {
+              const href = (item as HTMLAnchorElement).getAttribute('href')?.replace('#', '');
+              if (href === secId) {
+                item.classList.add('text-brand-cyan-electric');
+                item.classList.remove('text-slate-700', 'dark:text-white', 'dark:text-purple-300');
+              } else {
+                item.classList.remove('text-brand-cyan-electric');
+                item.classList.add('text-slate-700', 'dark:text-purple-300');
+              }
+            });
+
           }
         }
       });
