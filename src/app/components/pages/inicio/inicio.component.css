@@ -55,18 +55,6 @@ html, body {
   scrollbar-width: none !important;  /* Firefox */
 }
 
-/* Asegura que el canvas estelar no empuje el layout */
-#stars-canvas {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 1;
-}
-
-
 /* ============ PachAI: Asistente Virtual Flotante ============ */
 .chatbot-root {
   position: fixed;
@@ -122,7 +110,7 @@ html, body {
   max-height: calc(100vh - 8rem);
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: var(--ej-surface);
   border: 1px solid rgba(94, 58, 140, 0.2);
   border-radius: 1.25rem;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
@@ -133,7 +121,7 @@ html, body {
   transform-origin: bottom right;
   transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s ease;
 }
-html.dark .chatbot-panel { background: #1a1628; border-color: rgba(0, 194, 209, 0.25); }
+html.dark .chatbot-panel { background: var(--ej-surface); border-color: rgba(0, 194, 209, 0.25); }
 .chatbot-panel.is-open {
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -208,9 +196,9 @@ html.dark .chatbot-panel { background: #1a1628; border-color: rgba(0, 194, 209, 
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  background: #f8f9fd;
+  background: var(--ej-bg);
 }
-html.dark .chatbot-messages { background: #0e0c16; }
+html.dark .chatbot-messages { background: var(--ej-bg); }
 
 .chatbot-message {
   max-width: 82%;
@@ -227,18 +215,18 @@ html.dark .chatbot-messages { background: #0e0c16; }
 }
 .chatbot-message--user {
   align-self: flex-end;
-  background: linear-gradient(135deg, #5E3A8C, #320C64);
+  background: linear-gradient(135deg, var(--ej-primary), var(--ej-primary-deep));
   color: #fff;
   border-bottom-right-radius: 0.3rem;
 }
 .chatbot-message--bot {
   align-self: flex-start;
-  background: #ffffff;
-  color: #1b1b23;
+  background: var(--ej-surface);
+  color: var(--ej-text);
   border: 1px solid rgba(94, 58, 140, 0.15);
   border-bottom-left-radius: 0.3rem;
 }
-html.dark .chatbot-message--bot { background: #221c33; color: #e7e2f3; }
+html.dark .chatbot-message--bot { background: var(--ej-surface-high); color: var(--ej-text); }
 
 .chatbot-message--typing {
   display: flex;
@@ -250,10 +238,10 @@ html.dark .chatbot-message--bot { background: #221c33; color: #e7e2f3; }
   width: 0.45rem;
   height: 0.45rem;
   border-radius: 9999px;
-  background: #5E3A8C;
+  background: var(--ej-primary);
   animation: chatbotBlink 1.2s infinite both;
 }
-html.dark .chatbot-message--typing span { background: #00C2D1; }
+html.dark .chatbot-message--typing span { background: var(--ej-cyan); }
 .chatbot-message--typing span:nth-child(2) { animation-delay: 0.2s; }
 .chatbot-message--typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes chatbotBlink {
@@ -267,23 +255,23 @@ html.dark .chatbot-message--typing span { background: #00C2D1; }
   gap: 0.5rem;
   padding: 0.85rem 1rem;
   border-top: 1px solid rgba(94, 58, 140, 0.15);
-  background: #ffffff;
+  background: var(--ej-surface);
 }
-html.dark .chatbot-input-row { background: #1a1628; }
+html.dark .chatbot-input-row { background: var(--ej-surface-container); }
 .chatbot-input-row input {
   flex: 1;
   border: 1px solid rgba(94, 58, 140, 0.25);
   border-radius: 0.75rem;
   padding: 0.6rem 0.85rem;
   font-size: 0.85rem;
-  background: #f8f9fd;
-  color: #1b1b23;
+  background: var(--ej-bg);
+  color: var(--ej-text);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-html.dark .chatbot-input-row input { background: #221c33; color: #e7e2f3; border-color: rgba(0, 194, 209, 0.3); }
+html.dark .chatbot-input-row input { background: var(--ej-surface-high); color: var(--ej-text); border-color: rgba(0, 194, 209, 0.3); }
 .chatbot-input-row input:focus {
-  border-color: #00C2D1;
+  border-color: var(--ej-cyan);
   box-shadow: 0 0 0 3px rgba(0, 194, 209, 0.15);
 }
 .chatbot-input-row button {
@@ -311,14 +299,14 @@ html.dark .chatbot-input-row input { background: #221c33; color: #e7e2f3; border
   cursor: pointer;
   flex-shrink: 0;
   background: rgba(94, 58, 140, 0.12);
-  color: #5E3A8C;
+  color: var(--ej-primary);
   font-size: 1.1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
-html.dark .chatbot-mic { background: rgba(0, 194, 209, 0.15); color: #00C2D1; }
+html.dark .chatbot-mic { background: rgba(0, 194, 209, 0.15); color: var(--ej-cyan); }
 .chatbot-mic:hover { transform: scale(1.05); background: rgba(94, 58, 140, 0.22); }
 html.dark .chatbot-mic:hover { background: rgba(0, 194, 209, 0.25); }
 .chatbot-mic.is-recording {
@@ -351,28 +339,28 @@ html.chat-open .chatbot-panel { pointer-events: auto; }
   transform: translateY(-1px);
 }
 .pase-pill:not(.active-pase) {
-  background: #fff;
-  color: #4a4550;
-  border-color: #e5e0ee;
+  background: var(--ej-surface);
+  color: var(--ej-text-muted);
+  border-color: var(--ej-border);
 }
 html.dark .pase-pill:not(.active-pase) {
-  background: #221c33;
-  color: #c6bfd8;
-  border-color: #2c2541;
+  background: var(--ej-surface-high);
+  color: var(--ej-text-muted);
+  border-color: var(--ej-border);
 }
 html.dark .pase-pill.active-pase {
-  background: linear-gradient(135deg, #7a4fb3, #5E3A8C);
+  background: linear-gradient(135deg, #7a4fb3, var(--ej-primary));
 }
 
 /* Modalidad switch */
 .modalidad-switch {
   display: flex;
-  background: #f0ecf9;
+  background: var(--ej-surface-container);
   border-radius: 9999px;
   padding: 4px;
   gap: 4px;
 }
-html.dark .modalidad-switch { background: #221c33; }
+html.dark .modalidad-switch { background: var(--ej-surface-high); }
 .modalidad-switch button {
   flex: 1;
   padding: 10px 16px;
@@ -384,19 +372,19 @@ html.dark .modalidad-switch { background: #221c33; }
   cursor: pointer;
 }
 .modalidad-switch button.active-modo {
-  background: #00C2D1;
-  color: #0a0a15;
+  background: var(--ej-cyan);
+  color: var(--ej-cyan-ink);
   box-shadow: 0 2px 10px rgba(0,194,209,0.35);
 }
 html.dark .modalidad-switch button.active-modo {
-  background: #00C2D1;
-  color: #0a0a15;
+  background: var(--ej-cyan);
+  color: var(--ej-cyan-ink);
 }
 .modalidad-switch button:not(.active-modo) {
   background: transparent;
-  color: #7b7481;
+  color: var(--ej-text-faint);
 }
-html.dark .modalidad-switch button:not(.active-modo) { color: #9a93ae; }
+html.dark .modalidad-switch button:not(.active-modo) { color: var(--ej-text-faint); }
 
 /* Digital pass ticket */
 .pass-ticket {
@@ -517,6 +505,36 @@ html.dark .modalidad-switch button:not(.active-modo) { color: #9a93ae; }
   accent-color: var(--pf-accent, #00C2D1);
 }
 
+/* Modo oscuro: la tarjeta de pase deja los fondos crema/blancos
+   y pasa a la paleta púrpura profunda (#120E1E / #1A1628). */
+html.dark .pase-info-card {
+  background-color: #120e1e !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.45) !important;
+}
+html.dark .pase-info-card input {
+  background-color: #1a1628 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+html.dark .pase-info-card input::placeholder {
+  color: var(--ej-text-faint);
+}
+html.dark .pase-info-card input[type="checkbox"] {
+  background-color: transparent !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+}
+html.dark .pase-info-card .text-on-surface-variant {
+  color: #c6bfd8 !important;
+}
+html.dark .pase-info-card [class*="text-outline"] {
+  color: var(--ej-text-muted) !important;
+}
+html.dark .pase-info-card [class*="text-brand-slate-dark"] {
+  color: var(--ej-text) !important;
+}
+
 /* Transición de Oleaje/Fluido */
 @keyframes passFadeSweep {
   0%   { opacity: 1; transform: scale(1); }
@@ -589,7 +607,7 @@ html.dark .modalidad-switch button:not(.active-modo) { color: #9a93ae; }
   padding: 10px;
   text-align: center;
   background: rgba(255, 255, 255, 0.5);
-  color: #4a4550;
+  color: var(--ej-text-muted);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -600,7 +618,7 @@ html.dark .modalidad-switch button:not(.active-modo) { color: #9a93ae; }
 }
 .qr-lock .qr-lock-icon {
   font-size: 28px;
-  color: #7b7481;
+  color: var(--ej-text-faint);
 }
 .qr-lock.is-locked .qr-lock-overlay {
   opacity: 1;
@@ -609,6 +627,77 @@ html.dark .modalidad-switch button:not(.active-modo) { color: #9a93ae; }
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 9999px;
-  background: #f8f9fd;
+  background: var(--ej-bg);
 }
-html.dark .pass-ticket-notch { background: #0e0c16; }
+
+/* ============ MODO OSCURO PARA PASE INFO CARD ============ */
+
+/* Sobrescribe las variables dinámicas inyectadas por JS cuando el tema oscuro está activo */
+:host-context(.dark) .pase-info-card,
+.dark .pase-info-card,
+html.dark .pase-info-card {
+  --pf-tint: #120e1e !important;
+  --pf-ink: #ffffff !important;
+  --pf-border: rgba(255, 255, 255, 0.15) !important;
+  --pf-shadow: 0 20px 55px rgba(0, 0, 0, 0.6) !important;
+  
+  background-color: var(--pf-tint) !important;
+  color: #ffffff !important;
+  border-color: var(--pf-border) !important;
+}
+
+/* Ajustes específicos de tema por tipo de pase */
+:host-context(.dark) .pase-info-card[data-theme="empresarial"],
+.dark .pase-info-card[data-theme="empresarial"],
+html.dark .pase-info-card[data-theme="empresarial"] {
+  --pf-tint: #181326 !important;
+  --pf-border: rgba(212, 175, 55, 0.35) !important;
+}
+
+:host-context(.dark) .pase-info-card[data-theme="full"],
+.dark .pase-info-card[data-theme="full"],
+html.dark .pase-info-card[data-theme="full"] {
+  --pf-tint: #1a122d !important;
+  --pf-border: rgba(139, 92, 246, 0.35) !important;
+}
+
+:host-context(.dark) .pase-info-card[data-theme="general"],
+.dark .pase-info-card[data-theme="general"],
+html.dark .pase-info-card[data-theme="general"] {
+  --pf-tint: #0e1726 !important;
+  --pf-border: rgba(0, 194, 209, 0.35) !important;
+}
+
+/* Forzar legibilidad de textos, listas e inputs */
+:host-context(.dark) .pase-info-card h3,
+:host-context(.dark) .pase-info-card h4,
+:host-context(.dark) .pase-info-card #pase-detail-precio,
+.dark .pase-info-card h3,
+.dark .pase-info-card h4,
+.dark .pase-info-card #pase-detail-precio,
+html.dark .pase-info-card h3,
+html.dark .pase-info-card h4,
+html.dark .pase-info-card #pase-detail-precio {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .pase-info-card #pase-detail-beneficios li,
+.dark .pase-info-card #pase-detail-beneficios li,
+html.dark .pase-info-card #pase-detail-beneficios li {
+  color: #c6bfd8 !important;
+}
+
+/* Campos de entrada de formulario */
+:host-context(.dark) .pase-info-card input[type="email"],
+.dark .pase-info-card input[type="email"],
+html.dark .pase-info-card input[type="email"] {
+  background-color: #1a1628 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+:host-context(.dark) .pase-info-card input[type="email"]::placeholder,
+.dark .pase-info-card input[type="email"]::placeholder,
+html.dark .pase-info-card input[type="email"]::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}

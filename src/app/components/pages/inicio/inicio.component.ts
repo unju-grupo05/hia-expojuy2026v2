@@ -43,9 +43,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(UbicacionPredioHubComponent) predioComponent!: UbicacionPredioHubComponent;
 
   private lenisInstance: Lenis | null = null;
-  private animFrameId: number | null = null;
   private countdownInterval: any = null;
-  private resizeListeners: Array<() => void> = [];
 
   public paseActual = 'empresarial';
   public ticketType = 'individual';
@@ -108,7 +106,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initLenisSmoothScroll();
     this.initHeroParallax();
     this.revealHeroLayers();
-    this.initStardustCanvas();
     this.initHeroCursorParallax();
     this.initReadingProgressBar();
     this.initScrollReveal();
@@ -129,13 +126,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       this.lenisInstance.destroy();
       this.lenisInstance = null;
     }
-    if (this.animFrameId) {
-      cancelAnimationFrame(this.animFrameId);
-    }
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
     }
-    this.resizeListeners.forEach(fn => fn());
     ScrollTrigger.getAll().forEach(t => t.kill());
   }
 
@@ -367,92 +360,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
         node.style.transition = 'none';
       });
     });
-  }
-
-  // =========================================================================
-  // CANVAS DE PARTICULAS (STARDUST)
-  // =========================================================================
-  private initStardustCanvas(): void {
-    const canvas = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
-
-    const onResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-    };
-    window.addEventListener('resize', onResize);
-    this.resizeListeners.push(() => window.removeEventListener('resize', onResize));
-
-    const particleCount = 65;
-    const particles: Array<{
-      x: number;
-      y: number;
-      radius: number;
-      color: string;
-      vx: number;
-      vy: number;
-      baseAlpha: number;
-      pulse: number;
-    }> = [];
-    const colors = ['#00C2D1', '#9D4EDD', '#5E3A8C', '#B299D3', '#FFFFFF'];
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        radius: Math.random() * 1.8 + 0.6,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.4,
-        baseAlpha: Math.random() * 0.5 + 0.2,
-        pulse: Math.random() * Math.PI
-      });
-    }
-
-    let lastScrollY = window.scrollY;
-    let scrollSpeed = 0;
-
-    window.addEventListener('scroll', () => {
-      const currentY = window.scrollY;
-      scrollSpeed = Math.abs(currentY - lastScrollY) * 0.08;
-      lastScrollY = currentY;
-    }, { passive: true });
-
-    const animate = () => {
-      ctx.clearRect(0, 0, width, height);
-      scrollSpeed *= 0.94;
-
-      particles.forEach(p => {
-        p.x += p.vx + (p.vx > 0 ? scrollSpeed : -scrollSpeed) * 0.4;
-        p.y += p.vy - scrollSpeed * 0.5;
-        p.pulse += 0.025;
-
-        if (p.x < 0) p.x = width;
-        if (p.x > width) p.x = 0;
-        if (p.y < 0) p.y = height;
-        if (p.y > height) p.y = 0;
-
-        const currentAlpha = p.baseAlpha + Math.sin(p.pulse) * 0.2;
-        ctx.save();
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, currentAlpha));
-        ctx.fillStyle = p.color;
-        ctx.shadowBlur = p.radius * 4;
-        ctx.shadowColor = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-
-      this.animFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
   }
 
   // =========================================================================
