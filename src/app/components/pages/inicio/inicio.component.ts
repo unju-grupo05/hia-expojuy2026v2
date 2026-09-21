@@ -2,8 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, Eleme
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EjesComponent } from '../ejes/ejes.component';
-import { PredioComponent } from '../predio/predio.component';
-import { UbicacionComponent } from '../ubicacion/ubicacion.component';
+import { UbicacionPredioHubComponent } from '../ubicacion-predio-hub/ubicacion-predio-hub';
 import { ExpositoresComponent } from '../expositores/expositores.component';
 import { AgendaComponent } from '../agenda/agenda.component';
 import { NovedadesComponent } from '../novedades/novedades.component';
@@ -20,8 +19,7 @@ import * as QRCode from 'qrcode';
     CommonModule,
     FormsModule,
     EjesComponent,
-    PredioComponent,
-    UbicacionComponent,
+    UbicacionPredioHubComponent,
     ExpositoresComponent,
     AgendaComponent,
     NovedadesComponent,
@@ -99,7 +97,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private countdownInterval: any = null;
   private resizeListeners: Array<() => void> = [];
 
-  @ViewChild(PredioComponent) predioComponent!: PredioComponent;
+  @ViewChild(UbicacionPredioHubComponent) predioComponent!: UbicacionPredioHubComponent;
   @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
 
   constructor(
@@ -137,14 +135,13 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initChatbot();
     this.initSponsorModals();
 
-    // Estado inicial de pases y selección de sector en el mapa 3D
+    // Estado inicial de pases
     setTimeout(() => {
       this.selectPase('empresarial');
-      this.predioComponent?.selectSectorMapa('a');
     }, 200);
   }
 
- private initSplashIntro(): void {
+  private initSplashIntro(): void {
     const splash = document.getElementById('splash-intro');
     const logo = document.getElementById('splash-logo');
     const badge = document.getElementById('splash-badge');
@@ -158,11 +155,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // 1. ELIMINAR EL OVERLAY DEL DOM para que no ocupe ni afecte el flujo del scroll
         splash.remove(); 
         document.body.style.overflow = '';
 
-        // 2. Anclar la pantalla arriba de todo de forma estricta
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
@@ -171,9 +166,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
           this.lenisInstance.scrollTo(0, { immediate: true });
         }
 
-        // 3. Forzar a GSAP a recalcular las alturas reales desde y=0
         ScrollTrigger.refresh();
-
         this.revealHeroLayers();
       }
     });
@@ -249,7 +242,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 1. LENIS SMOOTH SCROLL + INTEGRACIÓN CON GSAP TICKER
+  // 1. LENIS SMOOTH SCROLL
   // =========================================================================
   private initLenisSmoothScroll(): void {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -259,11 +252,10 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       smoothWheel: true,
       syncTouch: false,
       touchMultiplier: 1.0,
-      infinite: false // Evita comportamientos infinitos o de rebote
+      infinite: false
     });
 
     lenis.on('scroll', (e: any) => {
-      // Si el usuario intenta scrollear hacia arriba del inicio (scroll < 0), forzar posición a 0
       if (e.scroll <= 0) {
         window.scrollTo(0, 0);
       }
@@ -281,7 +273,23 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   smoothScrollTo(target: string | HTMLElement, options?: { offset?: number; duration?: number }): void {
     const opts = options || {};
-    const el = typeof target === 'string' ? document.querySelector(target) as HTMLElement : target;
+    let el: HTMLElement | null = null;
+
+    if (typeof target === 'string') {
+      // Manejo especial si la navegación busca #mapa o #ubicacion en el componente unificado
+      if (target === '#mapa' || target === '#ubicacion') {
+        el = document.getElementById('mapa-ubicacion');
+        if (this.predioComponent) {
+          const tabToSet = target === '#ubicacion' ? 'ubicacion' : 'predio';
+          this.predioComponent.switchTab(tabToSet);
+        }
+      } else {
+        el = document.querySelector(target) as HTMLElement;
+      }
+    } else {
+      el = target;
+    }
+
     if (!el) return;
 
     if (this.lenisInstance && typeof this.lenisInstance.scrollTo === 'function') {
@@ -291,100 +299,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     } else {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  // =========================================================================
-  // 2. GSAP SCRUBBED BENTO GALLERY INTRO
-  // =========================================================================
-  private initScrubbedBentoGallery(): void {
-    const wrapper = document.getElementById('bento-wrapper');
-    const stage = document.getElementById('bento-stage');
-    const grid = document.getElementById('bento-grid');
-    const centerEmblem = document.getElementById('bento-center-emblem');
-    const prompt = document.getElementById('bento-prompt');
-    const cards = document.querySelectorAll('.bento-card');
-
-    if (!wrapper || !stage || !grid) return;
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
-      this.revealHeroLayers();
-      return;
-    }
-
-    const bentoTL = gsap.timeline({
-      scrollTrigger: {
-        trigger: wrapper,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.8,
-        pin: stage,
-        anticipatePin: 1,
-        onLeave: () => {
-          stage.style.pointerEvents = 'none';
-          this.revealHeroLayers();
-        },
-        onEnterBack: () => {
-          stage.style.pointerEvents = 'auto';
-        }
-      }
-    });
-
-    bentoTL.to(prompt, { opacity: 0, y: -24, duration: 0.25 }, 0);
-    bentoTL.to(grid, { scale: 4.8, ease: 'power2.inOut', duration: 1.8 }, 0);
-    bentoTL.to(cards, { opacity: 0.1, filter: 'blur(12px)', ease: 'power2.inOut', duration: 1.4 }, 0.1);
-    bentoTL.to(centerEmblem, { scale: 2.8, opacity: 0, ease: 'power3.in', duration: 0.9 }, 1.1);
-    bentoTL.to(stage, { opacity: 0, visibility: 'hidden', duration: 0.35, ease: 'none' }, 1.8);
-
-    // Navegación táctil amortiguada
-    let touchStartY = 0;
-    let touchStartX = 0;
-    let isTouchingStage = false;
-
-    stage.addEventListener('touchstart', (e: TouchEvent) => {
-      if (e.touches && e.touches.length === 1) {
-        touchStartY = e.touches[0].clientY;
-        touchStartX = e.touches[0].clientX;
-        isTouchingStage = true;
-      }
-    }, { passive: true });
-
-    stage.addEventListener('touchmove', (e: TouchEvent) => {
-      if (!isTouchingStage || !e.touches || e.touches.length !== 1) return;
-      const currentY = e.touches[0].clientY;
-      const currentX = e.touches[0].clientX;
-      const deltaY = touchStartY - currentY;
-      const deltaX = touchStartX - currentX;
-
-      if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 2) {
-        touchStartY = currentY;
-        touchStartX = currentX;
-        const dampedDelta = Math.sign(deltaY) * Math.min(Math.abs(deltaY), 35);
-        const maxBentoScroll = wrapper.offsetTop + wrapper.offsetHeight;
-        const currentScroll = window.scrollY;
-        const targetY = Math.max(0, Math.min(maxBentoScroll, currentScroll + dampedDelta));
-
-        window.scrollTo({ top: targetY, behavior: 'auto' });
-        if (this.lenisInstance) {
-          this.lenisInstance.scrollTo(targetY, { immediate: true });
-        }
-      }
-    }, { passive: true });
-
-    const handleTouchEnd = () => { isTouchingStage = false; };
-    stage.addEventListener('touchend', handleTouchEnd, { passive: true });
-    stage.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-  }
-
-  skipBentoIntro(): void {
-    const hero = document.getElementById('hero-section');
-    if (hero) {
-      if (this.lenisInstance) {
-        this.lenisInstance.scrollTo(hero, { offset: 0, duration: 1.2 });
-      } else {
-        hero.scrollIntoView({ behavior: 'smooth' });
-      }
     }
   }
 
@@ -596,7 +510,21 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   private initReadingProgressBar(): void {
     const readingBar = document.getElementById('reading-progress');
-    const sections = ['hero-section', 'sobre-expojuy', 'mapa', 'ubicacion', 'expositores', 'agenda', 'novedades', 'galeria', 'entradas', 'acreditaciones-section'];
+
+    // Mapeo actualizado de secciones integrando mapa-ubicacion
+    const sectionMap = [
+      { navTarget: 'hero-section', elementId: 'hero-section' },
+      { navTarget: 'sobre-expojuy', elementId: 'sobre-expojuy' },
+      { navTarget: 'mapa', elementId: 'mapa-ubicacion' },
+      { navTarget: 'ubicacion', elementId: 'mapa-ubicacion' },
+      { navTarget: 'expositores', elementId: 'expositores' },
+      { navTarget: 'agenda', elementId: 'agenda' },
+      { navTarget: 'novedades', elementId: 'novedades' },
+      { navTarget: 'galeria', elementId: 'galeria' },
+      { navTarget: 'entradas', elementId: 'entradas' },
+      { navTarget: 'acreditaciones-section', elementId: 'acreditaciones-section' }
+    ];
+
     const railIndicators = document.querySelectorAll('.rail-indicator');
     const navItems = document.querySelectorAll('header nav a.nav-item');
 
@@ -604,25 +532,27 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
       const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
       const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-      
+
       if (readingBar) {
         readingBar.style.width = scrolled + '%';
       }
 
-      const scrollPos = window.scrollY + 280; // Offset para detectar la sección activa
+      const scrollPos = window.scrollY + 280;
 
-      sections.forEach((secId, idx) => {
-        const el = document.getElementById(secId);
+      sectionMap.forEach((item) => {
+        const el = document.getElementById(item.elementId);
         if (el) {
           const top = el.offsetTop;
           const h = el.offsetHeight;
+
           if (scrollPos >= top && scrollPos < top + h) {
             
-            // 1. Sincronizar Puntos de la Izquierda (Side-Rail Tracker)
-            railIndicators.forEach((r, rIdx) => {
+            // Sincronizar side-rail activo
+            railIndicators.forEach((r) => {
+              const target = r.getAttribute('data-nav-target');
               const dot = r.querySelector('.rail-dot');
               if (dot) {
-                if (rIdx === idx) {
+                if (target === item.navTarget) {
                   dot.classList.add('bg-brand-cyan-electric', 'scale-150');
                   dot.classList.remove('bg-slate-400/60', 'dark:bg-slate-600');
                 } else {
@@ -632,15 +562,15 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
               }
             });
 
-            // 2. Sincronizar Enlaces del Menú Superior Navbar
-            navItems.forEach(item => {
-              const href = (item as HTMLAnchorElement).getAttribute('href')?.replace('#', '');
-              if (href === secId) {
-                item.classList.add('text-brand-cyan-electric');
-                item.classList.remove('text-slate-700', 'dark:text-white', 'dark:text-purple-300');
+            // Sincronizar enlaces de header
+            navItems.forEach((navEl) => {
+              const href = (navEl as HTMLAnchorElement).getAttribute('href')?.replace('#', '');
+              if (href === item.navTarget) {
+                navEl.classList.add('text-brand-cyan-electric');
+                navEl.classList.remove('text-slate-700', 'dark:text-white', 'dark:text-purple-300');
               } else {
-                item.classList.remove('text-brand-cyan-electric');
-                item.classList.add('text-slate-700', 'dark:text-purple-300');
+                navEl.classList.remove('text-brand-cyan-electric');
+                navEl.classList.add('text-slate-700', 'dark:text-purple-300');
               }
             });
 

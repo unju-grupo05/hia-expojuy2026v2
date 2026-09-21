@@ -148,3 +148,19 @@
     }
     html.dark .map-zoom-control { background: #221c33; color: #e7e2f3; }
     .map-zoom-control:hover { background: #00C2D1; color: #0a0a15; }
+
+    /* Botón Activo del Switch */
+    .tab-switch-btn.active-tab {
+      background: #00C2D1 !important;
+      color: #0a0a15 !important;
+      box-shadow: 0 4px 15px rgba(0, 194, 209, 0.4);
+    }
+
+    /* Ocultar barra de scroll horizontal en filtros */
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-none {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
