@@ -7,10 +7,19 @@ import { ExpositoresComponent } from '../expositores/expositores.component';
 import { AgendaComponent } from '../agenda/agenda.component';
 import { NovedadesComponent } from '../novedades/novedades.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
+import { Sponsors } from '../sponsors/sponsors';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import * as QRCode from 'qrcode';
+
+interface PaseDetail {
+  nombre: string;
+  precioIndividual: number;
+  precioGrupal: number;
+  vigencia: string;
+  beneficios: string[];
+}
 
 @Component({
   selector: 'app-inicio',
@@ -23,93 +32,69 @@ import * as QRCode from 'qrcode';
     ExpositoresComponent,
     AgendaComponent,
     NovedadesComponent,
-    GaleriaComponent
+    GaleriaComponent,
+    Sponsors
   ],
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild(UbicacionPredioHubComponent) predioComponent!: UbicacionPredioHubComponent;
 
-  // Entradas / Pases state
-  private paseActual = 'empresarial';
-  private ticketType = 'individual';
-  private readonly pasesData: Record<string, {
-    nombre: string;
-    precioIndividual: number;
-    precioGrupal: number;
-    vigencia: string;
-    beneficios: string[];
-  }> = {
-    general: {
-      nombre: 'Pase General',
-      precioIndividual: 15000,
-      precioGrupal: 12000,
-      vigencia: '1 día · acceso general',
-      beneficios: [
-        'Acceso al predio por 1 día ferial',
-        'Recorrido por todos los pabellones',
-        'Charlas abiertas y muestra comercial',
-        'App oficial de la feria con agenda',
-        'Acceso a zonas gastronómicas'
-      ]
-    },
-    full: {
-      nombre: 'Pase Full',
-      precioIndividual: 38000,
-      precioGrupal: 29000,
-      vigencia: '4 días · acceso completo',
-      beneficios: [
-        'Acceso los 4 días a todos los sectores',
-        'Conferencias plenarias y workshops',
-        'Pabellones del Corredor Bioceánico',
-        'Rondas de negocios (cupos disponibles)',
-        'Networking & coworking en la feria',
-        'Material descargable de expositores'
-      ]
-    },
-    empresarial: {
-      nombre: 'Pase Empresarial',
-      precioIndividual: 60000,
-      precioGrupal: 48000,
-      vigencia: '4 días · acceso premium',
-      beneficios: [
-        'Todo lo incluido del Pase Full',
-        'Sala VIP Empresarial con catering',
-        'Rondas de negocios B2B prioritarias',
-        'Espacios de matchmaking corporativo',
-        'Atención de anfitriones personales',
-        'Credencial nominada con QR premium'
-      ]
-    }
-  };
-
-  // Chatbot PachAI state
-  private chatMessages: Array<{ sender: 'bot' | 'user'; text: string }> = [
-    {
-      sender: 'bot',
-      text: '¡Hola! Soy PachAI, el asistente virtual de ExpoJuy 2026. Puedo orientarte sobre expositores, agenda, ubicación del predio o acreditación. ¿En qué te ayudo?'
-    }
-  ];
-
-  // Instancias y suscripciones de limpieza
   private lenisInstance: Lenis | null = null;
   private animFrameId: number | null = null;
   private countdownInterval: any = null;
   private resizeListeners: Array<() => void> = [];
 
-  @ViewChild(UbicacionPredioHubComponent) predioComponent!: UbicacionPredioHubComponent;
-  @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
+  public paseActual = 'empresarial';
+  public ticketType = 'individual';
 
-  constructor(
-    @Inject(PLATFORM_ID) private readonly platformId: Object,
-    private readonly elRef: ElementRef
-  ) {}
+  public chatMessages: Array<{ sender: 'user' | 'bot'; text: string }> = [
+    { sender: 'bot', text: '¡Hola! Soy PachAI, tu asistente virtual de ExpoJuy 2026. ¿En qué puedo ayudarte hoy?' }
+  ];
 
-  ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.bindWindowGlobals();
+  public pasesData: Record<string, PaseDetail> = {
+    general: {
+      nombre: 'Pase General',
+      precioIndividual: 5000,
+      precioGrupal: 4000,
+      vigencia: 'Acceso 1 Día',
+      beneficios: [
+        'Acceso libre a pabellones de expositores',
+        'Ingreso a patio gastronómico y espectáculos',
+        'Credencial digital con código QR'
+      ]
+    },
+    empresarial: {
+      nombre: 'Pase Ejecutivo',
+      precioIndividual: 12000,
+      precioGrupal: 9500,
+      vigencia: 'Acceso Full Evento (10 días)',
+      beneficios: [
+        'Acceso prioritario sin filas a todos los pabellones',
+        'Ingreso al Lounge VIP y área de Coworking',
+        'Participación en Rondas de Negocios',
+        'Catálogo digital de Expositores con contactos directos'
+      ]
+    },
+    vip: {
+      nombre: 'Pase VIP / Summit',
+      precioIndividual: 25000,
+      precioGrupal: 20000,
+      vigencia: 'Acceso Total + Conferencias',
+      beneficios: [
+        'Todos los beneficios del Pase Ejecutivo',
+        'Asiento reservado en Conferencias Plenarias y Summits',
+        'Cocktail exclusivo de Apertura y Networking',
+        'Estacionamiento preferencial dentro del predio'
+      ]
     }
-  }
+  };
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -117,12 +102,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     window.scrollTo(0, 0);
     gsap.registerPlugin(ScrollTrigger);
 
+    this.bindWindowGlobals();
     this.initSplashIntro();
     this.iniciarVideoFondo();
     this.initLenisSmoothScroll();
     this.initHeroParallax();
     this.revealHeroLayers();
-    this.initSponsors3DScroll();
     this.initStardustCanvas();
     this.initHeroCursorParallax();
     this.initReadingProgressBar();
@@ -133,14 +118,44 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initEntradasAndQr();
     this.initTextEffects();
     this.initChatbot();
-    this.initSponsorModals();
 
-    // Estado inicial de pases
     setTimeout(() => {
       this.selectPase('empresarial');
     }, 200);
   }
 
+  ngOnDestroy(): void {
+    if (this.lenisInstance) {
+      this.lenisInstance.destroy();
+      this.lenisInstance = null;
+    }
+    if (this.animFrameId) {
+      cancelAnimationFrame(this.animFrameId);
+    }
+    if (this.countdownInterval) {
+      clearInterval(this.countdownInterval);
+    }
+    this.resizeListeners.forEach(fn => fn());
+    ScrollTrigger.getAll().forEach(t => t.kill());
+  }
+
+  // =========================================================================
+  // BINDING DE MÉTODOS GLOBALES EN WINDOW
+  // =========================================================================
+  private bindWindowGlobals(): void {
+    const w = window as any;
+    w.selectPase = this.selectPase.bind(this);
+    w.selectModalidad = this.selectModalidad.bind(this);
+    w.handlePaseSubmit = this.handlePaseSubmit.bind(this);
+    w.toggleFaq = this.toggleFaq.bind(this);
+    w.smoothScrollTo = this.smoothScrollTo.bind(this);
+    w.toggleChatbot = this.toggleChatbot.bind(this);
+    w.closeChatbot = this.closeChatbot.bind(this);
+  }
+
+  // =========================================================================
+  // SPLASH INTRO & VIDEO DE FONDO
+  // =========================================================================
   private initSplashIntro(): void {
     const splash = document.getElementById('splash-intro');
     const logo = document.getElementById('splash-logo');
@@ -155,7 +170,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const tl = gsap.timeline({
       onComplete: () => {
-        splash.remove(); 
+        splash.remove();
         document.body.style.overflow = '';
 
         window.scrollTo(0, 0);
@@ -197,39 +212,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 'zoom+=0.1');
   }
 
-  ngOnDestroy(): void {
-    if (this.lenisInstance) {
-      this.lenisInstance.destroy();
-      this.lenisInstance = null;
-    }
-    if (this.animFrameId) {
-      cancelAnimationFrame(this.animFrameId);
-    }
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
-    this.resizeListeners.forEach(fn => window.removeEventListener('resize', fn));
-    ScrollTrigger.getAll().forEach(t => t.kill());
-  }
-
-  // =========================================================================
-  // BINDING DE MÉTODOS GLOBALES EN WINDOW
-  // =========================================================================
-  private bindWindowGlobals(): void {
-    const w = window as any;
-    w.selectPase = this.selectPase.bind(this);
-    w.selectModalidad = this.selectModalidad.bind(this);
-    w.handlePaseSubmit = this.handlePaseSubmit.bind(this);
-    w.toggleFaq = this.toggleFaq.bind(this);
-    w.smoothScrollTo = this.smoothScrollTo.bind(this);
-    w.toggleChatbot = this.toggleChatbot.bind(this);
-    w.closeChatbot = this.closeChatbot.bind(this);
-    w.closeSponsorModal = this.closeSponsorModal.bind(this);
-  }
-
-  // =========================================================================
-  // REPRODUCCIÓN CONTINUA DEL VIDEO DE FONDO
-  // =========================================================================
   private iniciarVideoFondo(): void {
     if (this.bgVideo?.nativeElement) {
       const video = this.bgVideo.nativeElement;
@@ -242,7 +224,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 1. LENIS SMOOTH SCROLL
+  // LENIS SMOOTH SCROLL
   // =========================================================================
   private initLenisSmoothScroll(): void {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -271,12 +253,11 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     (window as any).lenis = lenis;
   }
 
-  smoothScrollTo(target: string | HTMLElement, options?: { offset?: number; duration?: number }): void {
+  public smoothScrollTo(target: string | HTMLElement, options?: { offset?: number; duration?: number }): void {
     const opts = options || {};
     let el: HTMLElement | null = null;
 
     if (typeof target === 'string') {
-      // Manejo especial si la navegación busca #mapa o #ubicacion en el componente unificado
       if (target === '#mapa' || target === '#ubicacion') {
         el = document.getElementById('mapa-ubicacion');
         if (this.predioComponent) {
@@ -303,9 +284,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 3. HERO LAYERS & PARALLAX
+  // HERO LAYERS & PARALLAX
   // =========================================================================
-  revealHeroLayers(): void {
+  public revealHeroLayers(): void {
     const hero = document.getElementById('hero-section');
     if (!hero) return;
     const layers = Array.from(hero.querySelectorAll('.hero-layer')) as HTMLElement[];
@@ -389,38 +370,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 5. SPONSORS 3D PARALLAX & INFINITE SCROLL
-  // =========================================================================
-  private initSponsors3DScroll(): void {
-    const section = document.getElementById('sponsors-section');
-    if (!section) return;
-
-    const col1 = section.querySelector('.sponsor-col-1');
-    const col2 = section.querySelector('.sponsor-col-2');
-    const col3 = section.querySelector('.sponsor-col-3');
-    if (!col1 || !col2 || !col3) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const isMobile = window.innerWidth < 768;
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: section,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 1.2,
-        invalidateOnRefresh: true
-      }
-    });
-
-    tl.to(col1, { y: isMobile ? -300 : -650, ease: 'none' }, 0)
-      .to(col2, { y: isMobile ? -450 : -1020, ease: 'none' }, 0)
-      .to(col3, { y: isMobile ? -250 : -520, ease: 'none' }, 0);
-  }
-
-  // =========================================================================
-  // 7. CANVAS DE PARTICULAS (STARDUST)
+  // CANVAS DE PARTICULAS (STARDUST)
   // =========================================================================
   private initStardustCanvas(): void {
     const canvas = document.getElementById('stars-canvas') as HTMLCanvasElement | null;
@@ -506,12 +456,11 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 8. PROGRESS BAR & SIDE RAIL
+  // PROGRESS BAR & SIDE RAIL
   // =========================================================================
   private initReadingProgressBar(): void {
     const readingBar = document.getElementById('reading-progress');
 
-    // Mapeo actualizado de secciones integrando mapa-ubicacion
     const sectionMap = [
       { navTarget: 'hero-section', elementId: 'hero-section' },
       { navTarget: 'sobre-expojuy', elementId: 'sobre-expojuy' },
@@ -546,8 +495,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
           const h = el.offsetHeight;
 
           if (scrollPos >= top && scrollPos < top + h) {
-            
-            // Sincronizar side-rail activo
             railIndicators.forEach((r) => {
               const target = r.getAttribute('data-nav-target');
               const dot = r.querySelector('.rail-dot');
@@ -562,7 +509,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
               }
             });
 
-            // Sincronizar enlaces de header
             navItems.forEach((navEl) => {
               const href = (navEl as HTMLAnchorElement).getAttribute('href')?.replace('#', '');
               if (href === item.navTarget) {
@@ -581,7 +527,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 9. SCROLL REVEAL (INTERSECTION OBSERVER)
+  // SCROLL REVEAL (INTERSECTION OBSERVER)
   // =========================================================================
   private initScrollReveal(): void {
     const reveals = document.querySelectorAll('.reveal-on-scroll');
@@ -607,9 +553,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 11. FAQ ACCORDION TOGGLE
+  // FAQ ACCORDION TOGGLE
   // =========================================================================
-  toggleFaq(event: Event): void {
+  public toggleFaq(event: Event): void {
     const btn = (event.target as HTMLElement).closest('button');
     if (!btn) return;
     const body = btn.nextElementSibling as HTMLElement | null;
@@ -627,7 +573,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 13. COUNTDOWN TIMER
+  // COUNTDOWN TIMER
   // =========================================================================
   private initCountdown(): void {
     const targetDate = new Date('2026-10-09T09:00:00-03:00').getTime();
@@ -659,7 +605,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 14. DARK MODE TOGGLE
+  // DARK MODE TOGGLE
   // =========================================================================
   private initDarkMode(): void {
     const toggleBtn = document.getElementById('theme-toggle');
@@ -689,7 +635,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 16. MOBILE HAMBURGER MENU
+  // MOBILE HAMBURGER MENU
   // =========================================================================
   private initMobileMenu(): void {
     const mobileMenu = document.getElementById('mobile-menu');
@@ -734,13 +680,13 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 17. ENTRADAS, PASES & DIGITAL PASS QR
+  // ENTRADAS, PASES & DIGITAL PASS QR
   // =========================================================================
   private initEntradasAndQr(): void {
     this.selectPase('empresarial');
   }
 
-  selectPase(paseId: string): void {
+  public selectPase(paseId: string): void {
     this.paseActual = paseId;
     document.querySelectorAll('.pase-pill').forEach(p => p.classList.remove('active-pase'));
     const btn = document.getElementById('pase-pill-' + paseId);
@@ -750,7 +696,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyPassTheme(paseId);
   }
 
-  selectModalidad(modo: string): void {
+  public selectModalidad(modo: string): void {
     this.ticketType = modo;
     document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('active-modo'));
     const btn = document.getElementById('modo-' + this.ticketType);
@@ -836,7 +782,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  handlePaseSubmit(e: Event): void {
+  public handlePaseSubmit(e: Event): void {
     e.preventDefault();
     const input = document.getElementById('pase-name-input') as HTMLInputElement | null;
     const nombre = (input && input.value.trim()) ? input.value.trim() : 'Visitante ExpoJuy';
@@ -860,7 +806,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  handleRegistrationSubmit(e: Event): void {
+  public handleRegistrationSubmit(e: Event): void {
     e.preventDefault();
     const form = document.getElementById('acreditacion-form');
     const success = document.getElementById('acreditacion-success');
@@ -872,12 +818,11 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 19. COUNTUP & BLURTEXT
+  // COUNTUP & BLURTEXT
   // =========================================================================
   private initTextEffects(): void {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // CountUp
     const counters = Array.from(document.querySelectorAll('.count-up')) as HTMLElement[];
     if (counters.length) {
       if (reduced) {
@@ -907,7 +852,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    // BlurText Split
     document.querySelectorAll('.blur-split').forEach(h => {
       if (reduced) return;
       const text = (h.textContent || '').replace(/\s+/g, ' ').trim();
@@ -962,13 +906,13 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // 20. PACHAI CHATBOT FLOTANTE
+  // PACHAI CHATBOT FLOTANTE
   // =========================================================================
   private initChatbot(): void {
     this.renderChatMessages();
   }
 
-  toggleChatbot(): void {
+  public toggleChatbot(): void {
     const panel = document.getElementById('chatbot-panel');
     const launcher = document.getElementById('chatbot-launcher');
     if (!panel || !launcher) return;
@@ -986,7 +930,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  closeChatbot(): void {
+  public closeChatbot(): void {
     const panel = document.getElementById('chatbot-panel');
     const launcher = document.getElementById('chatbot-launcher');
     if (!panel || !launcher) return;
@@ -997,7 +941,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     document.body.classList.remove('chat-open');
   }
 
-  sendChatMessage(event: Event): void {
+  public sendChatMessage(event: Event): void {
     event.preventDefault();
     const input = document.getElementById('chatbot-input') as HTMLInputElement | null;
     if (!input) return;
@@ -1017,7 +961,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 750);
   }
 
-  toggleVoiceInput(): void {
+  public toggleVoiceInput(): void {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       this.chatMessages.push({
@@ -1107,66 +1051,5 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     return 'Te puedo ayudar con expositores, agenda, ubicación del predio o acreditaciones. ¿Querés que profundicemos en alguno de esos temas?';
-  }
-
-  // =========================================================================
-  // 21. SPONSOR MODALS
-  // =========================================================================
-  private initSponsorModals(): void {
-    const modal = document.getElementById('sponsor-modal');
-    if (!modal) return;
-
-    document.querySelectorAll('.sponsor-card-3d').forEach(card => {
-      card.addEventListener('click', () => this.openSponsorModal(card as HTMLElement));
-      card.addEventListener('keydown', (e: Event) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Enter' || ke.key === ' ') {
-          ke.preventDefault();
-          this.openSponsorModal(card as HTMLElement);
-        }
-      });
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-        this.closeSponsorModal();
-      }
-    });
-  }
-
-  openSponsorModal(card: HTMLElement): void {
-    const modal = document.getElementById('sponsor-modal');
-    const img = document.getElementById('modal-image') as HTMLImageElement | null;
-    const name = document.getElementById('modal-name');
-    const role = document.getElementById('modal-role');
-    const desc = document.getElementById('modal-description');
-    const link = document.getElementById('modal-link') as HTMLAnchorElement | null;
-
-    if (!modal) return;
-
-    if (img) {
-      img.src = card.dataset['img'] || '';
-      img.alt = card.dataset['name'] || '';
-    }
-    if (name) name.textContent = card.dataset['name'] || '';
-    if (role) role.textContent = card.dataset['role'] || '';
-    if (desc) desc.textContent = card.dataset['desc'] || '';
-    if (link) link.href = card.dataset['website'] || 'https://expojuy.com.ar';
-
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    if (this.lenisInstance) this.lenisInstance.stop();
-
-    const closeBtn = document.getElementById('sponsor-modal-close');
-    if (closeBtn) closeBtn.focus();
-  }
-
-  closeSponsorModal(): void {
-    const modal = document.getElementById('sponsor-modal');
-    if (modal) {
-      modal.classList.add('hidden');
-      document.body.style.overflow = '';
-      if (this.lenisInstance) this.lenisInstance.start();
-    }
   }
 }
