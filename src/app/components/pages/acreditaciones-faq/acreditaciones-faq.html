@@ -1,0 +1,121 @@
+<!-- FAQ & Acreditaciones Form Section -->
+<section class="w-full py-20 lg:py-28 bg-surface-container-low text-on-surface" id="acreditaciones-section">
+  <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+      
+      <!-- Left: Collapsible FAQ Accordion -->
+      <div class="reveal-on-scroll lg:col-span-6 space-y-6">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-widest text-primary">Respuestas Clave</span>
+          <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Preguntas Frecuentes</h2>
+          <p class="text-sm sm:text-base text-on-surface-variant mt-1">Conoce cómo participar como visitante profesional o expositor.</p>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <!-- FAQ 1 -->
+          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+              <span>¿Cómo funciona el sistema de acreditación digital?</span>
+              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
+              <p class="pb-5 leading-relaxed">
+                Al enviar tu formulario recibirás una credencial digital nominada con código QR criptográfico. Podrás sincronizarla con Apple Wallet o Google Wallet para ingresar por los molinetes inteligentes de acceso rápido en Ciudad Cultural sin esperas.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+              <span>¿Existe transporte oficial hacia el predio?</span>
+              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
+              <p class="pb-5 leading-relaxed">
+                Sí. La organización provee shuttles ejecutivos eléctricos con salidas cada 20 minutos desde el Aeropuerto Horacio Guzmán y los hoteles céntricos de San Salvador de Jujuy directo a las dársenas del predio ferial.
+              </p>
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+              <span>¿Cuáles son los beneficios para empresas expositoras?</span>
+              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+            </button>
+            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
+              <p class="pb-5 leading-relaxed">
+                Los expositores cuentan con exención temporal arancelaria de muestras (aduanas integradas), acceso a salas B2B climatizadas, catálogo internacional de negocios y pauta institucional en la app oficial de la feria.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Acreditación & Postulación Form -->
+      <div class="reveal-on-scroll lg:col-span-6 p-7 sm:p-8 rounded-3xl bg-white border border-primary/10 shadow-xl space-y-6" id="contacto-section" style="transition-delay: 150ms;">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-brand-cyan-accessible">Registro Online</span>
+            <h3 class="font-display text-2xl font-bold text-brand-slate-dark">Acreditaciones & Postulaciones</h3>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible text-xs font-bold">Pase B2B Activo</span>
+        </div>
+
+        <form class="space-y-4" id="acreditacion-form" (submit)="handleRegistrationSubmit($event)">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Nombre Completo</label>
+              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Ej. Camila Morales" required="" type="text">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Empresa u Organismo</label>
+              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Ej. Litio Andino SA" required="" type="text">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Correo Corporativo</label>
+              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="nombre@empresa.com" required="" type="email">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Perfil de Interés</label>
+              <select class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric text-on-surface">
+                <option value="visitante">Visitante Profesional / Comprador</option>
+                <option value="expositor">Quiero ser Expositor de Stand</option>
+                <option value="sponsor">Quiero ser Sponsor Oficial</option>
+                <option value="prensa">Prensa & Medios Acreditados</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Mensaje o Rubro Específico</label>
+            <textarea class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Indica el área de tu empresa o requerimiento de stand..." rows="3"></textarea>
+          </div>
+
+          <div class="flex items-center gap-2 pt-1">
+            <input class="w-4 h-4 rounded text-primary focus:ring-brand-cyan-electric" id="terms-check" required="" type="checkbox">
+            <label class="text-xs text-on-surface-variant" for="terms-check">Acepto los términos de acreditación digital y la política de privacidad oficial.</label>
+          </div>
+
+          <button class="w-full py-4 rounded-2xl bg-brand-slate-dark hover:bg-primary text-white font-display text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-2" type="submit">
+            <span>Confirmar Solicitud de Acreditación</span>
+            <span class="material-symbols-outlined text-base">verified</span>
+          </button>
+        </form>
+
+        <div class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium" id="form-success">
+          <div class="flex items-center gap-2 font-bold mb-1">
+            <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
+            <span>¡Acreditación Generada con Éxito!</span>
+          </div>
+          <p>Hemos enviado tu credencial nominada con código QR de acceso prioritario a tu correo electrónico.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>

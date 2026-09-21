@@ -1,0 +1,151 @@
+<!-- Entradas — Landing de Pases, Tarifas y Pase Digital QR -->
+<section class="w-full py-20 lg:py-28 bg-neutral-surface-light text-on-surface relative overflow-hidden" id="entradas">
+  <div class="absolute top-0 left-1/4 w-96 h-96 bg-brand-cyan-electric/5 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="reveal-on-scroll text-center max-w-3xl mx-auto mb-12 space-y-3">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/30 text-xs font-bold uppercase tracking-wider">
+        <span class="material-symbols-outlined text-sm">confirmation_number</span>
+        Entradas Digitales · ExpoJuy 2026
+      </div>
+      <h2 class="blur-split font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-slate-dark tracking-tight">
+        Tu pase a ExpoJuy 2026
+      </h2>
+      <p class="text-base text-on-surface-variant leading-relaxed max-w-2xl mx-auto">
+        Elegí el nivel de acceso que va con vos. Todas las entradas son digitales: recibís tu QR en el portal y lo mostrás en los accesos del predio.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+      <!-- Columna Izquierda: Selector de Pases -->
+      <div class="reveal-on-scroll lg:col-span-7 space-y-6">
+        <!-- Nivel de Pase -->
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="text-xs font-bold uppercase tracking-wider text-outline">Nivel de acceso</span>
+          <button type="button" class="pase-pill px-5 py-2.5 rounded-full text-sm font-bold border" id="pase-pill-general" (click)="selectPase('general')">General</button>
+          <button type="button" class="pase-pill px-5 py-2.5 rounded-full text-sm font-bold border" id="pase-pill-full" (click)="selectPase('full')">Full</button>
+          <button type="button" class="pase-pill active-pase px-5 py-2.5 rounded-full text-sm font-bold border" id="pase-pill-empresarial" (click)="selectPase('empresarial')">Empresarial</button>
+        </div>
+
+        <!-- Modalidad -->
+        <div class="modalidad-switch max-w-md" id="modalidad-switch">
+          <button type="button" class="modo-btn active-modo" id="modo-individual" (click)="selectModalidad('individual')">Individual</button>
+          <button type="button" class="modo-btn" id="modo-group" (click)="selectModalidad('group')">Grupal (4+ personas · descuento)</button>
+        </div>
+
+        <!-- Tarjeta Detallada del Pase -->
+        <div class="pase-info-card p-7 sm:p-8 rounded-3xl border border-primary/10 shadow-xl" id="pase-info-card" data-theme="empresarial">
+          <div class="flex items-center justify-between mb-1">
+            <h3 class="font-display text-2xl font-bold text-brand-slate-dark" id="pase-detail-nombre">Pase Empresarial</h3>
+            <span class="px-3 py-1 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible text-xs font-bold">Recomendado</span>
+          </div>
+          <p class="text-xs font-semibold text-brand-cyan-accessible uppercase tracking-wider" id="pase-detail-vigencia">Por persona · 4 días · acceso premium</p>
+
+          <div class="mt-5 flex items-end gap-2">
+            <span class="font-display text-5xl font-black text-brand-slate-dark" id="pase-detail-precio">$60.000</span>
+            <span class="text-xs text-on-surface-variant pb-2" id="pase-detail-precio-unit">por persona</span>
+          </div>
+
+          <div class="mt-3 inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1.5 hidden" id="pase-detail-grupal-note">
+            <span class="material-symbols-outlined text-sm">groups</span>
+            Promoción grupal aplicada: ahorrás 20% por persona
+          </div>
+
+          <div class="my-6 border-t border-slate-100"></div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-brand-slate-dark mb-3">Beneficios incluidos</h4>
+          <ul class="space-y-2.5" id="pase-detail-beneficios"></ul>
+
+          <form class="mt-6 space-y-4" (submit)="handlePaseSubmit($event)">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Correo Electronico</label>
+              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="pase-name-input" placeholder="Ej. camila@empresa.com" required="" type="email">
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <input class="w-4 h-4 rounded text-primary focus:ring-brand-cyan-electric" id="pase-terms" required="" type="checkbox">
+              <label class="text-xs text-on-surface-variant" for="pase-terms">Acepto los términos de compra, la política de reembolso y la política de privacidad oficial.</label>
+            </div>
+
+            <button class="w-full py-4 rounded-2xl bg-brand-cyan-electric hover:bg-[#3be0ee] text-brand-slate-dark font-display text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-2" id="pase-submit-btn" type="submit">
+              <span>Registrarme y obtener mi QR</span>
+              <span class="material-symbols-outlined text-base">qr_code_2</span>
+            </button>
+          </form>
+
+          <div class="hidden mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium" id="pase-form-success">
+            <div class="flex items-center gap-2 font-bold mb-1">
+              <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
+              <span>¡Tu pase digital fue generado!</span>
+            </div>
+            <p>Mostrá el QR de tu credencial en los accesos del predio. Te lo enviamos también a tu correo.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Vista Previa Credencial Digital QR -->
+      <div class="reveal-on-scroll lg:col-span-5 lg:sticky lg:top-28" style="transition-delay: 150ms;">
+        <div class="text-center mb-5">
+          <span class="text-xs font-bold uppercase tracking-widest text-brand-cyan-accessible">Vista previa de tu</span>
+          <h3 class="font-display text-2xl font-bold text-brand-slate-dark">Pase Digital</h3>
+        </div>
+
+        <!-- Pass Ticket -->
+        <div class="pass-ticket relative rounded-3xl text-white shadow-2xl overflow-hidden" id="pass-ticket" data-theme="empresarial">
+          <div class="pass-deco-glow absolute -top-16 -right-16 w-48 h-48 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="p-7">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <img src="./Img/expojuy26_isologotipo.png" alt="ExpoJuy Logo" class="h-9 w-auto">
+                <div>
+                  <div class="font-display font-extrabold leading-none pass-gold-text">ExpoJuy 2026</div>
+                  <div class="text-[9px] uppercase tracking-widest text-brand-cyan-electric mt-0.5">Acceso Digital</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/10 border border-white/20" id="pass-tipo">Pase Empresarial</span>
+            </div>
+
+            <!-- Data -->
+            <div class="mt-6 space-y-3 text-sm">
+              <div class="flex items-center justify-between border-t border-white/15 pt-3">
+                <span class="text-white/60 text-xs">Participante</span>
+                <span class="font-bold text-white text-xs" id="pass-name">Visitante ExpoJuy</span>
+              </div>
+              <div class="flex items-center justify-between border-t border-white/15 pt-3">
+                <span class="text-white/60 text-xs">Evento</span>
+                <span class="font-bold text-white text-xs">09 - 12 Octubre 2026</span>
+              </div>
+              <div class="flex items-center justify-between border-t border-white/15 pt-3">
+                <span class="text-white/60 text-xs">Sector</span>
+                <span class="font-bold text-white text-xs">Ciudad Cultural, Jujuy</span>
+              </div>
+            </div>
+
+            <!-- QR -->
+            <div class="mt-6 flex flex-col items-center">
+              <div class="bg-white rounded-2xl p-3 shadow-lg qr-lock is-locked" id="qrcode-wrap">
+                <div id="qrcode"></div>
+                <div class="qr-lock-overlay">
+                  <span class="material-symbols-outlined qr-lock-icon">lock</span>
+                  <span>Completa tus datos para liberar tu QR</span>
+                </div>
+              </div>
+              <span class="text-[10px] text-white/60 mt-2 uppercase tracking-widest">Código QR de acceso</span>
+            </div>
+          </div>
+
+          <!-- Notches & Separator -->
+          <div class="pass-ticket-notch absolute -left-4 top-1/2 -translate-y-1/2"></div>
+          <div class="pass-ticket-notch absolute -right-4 top-1/2 -translate-y-1/2"></div>
+          <div class="border-t-2 border-dashed border-white/20 mx-0"></div>
+
+          <div class="px-7 py-4 flex items-center justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-brand-cyan-electric">Ingreso con QR</span>
+            <span class="material-symbols-outlined text-brand-cyan-electric">qr_code</span>
+          </div>
+        </div>
+
+        <p class="text-center text-xs text-on-surface-variant mt-4">Mostrá este código en las dársenas de acceso. Sin filas, con acceso prioritario.</p>
+      </div>
+    </div>
+  </div>
+</section>
