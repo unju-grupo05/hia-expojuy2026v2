@@ -1,147 +1,101 @@
-    /* ============ NOVEDADES: CARDS IMAGEN-DOMINANTE + SPOTLIGHT + MODAL ============ */
-    .news-card {
-      position: relative;
-      aspect-ratio: 4 / 5;
-      border-radius: 1.5rem;
-      border: 1px solid rgba(15, 23, 42, 0.08);
-      background: #ffffff;
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-      --mouse-x: 50%;
-      --mouse-y: 50%;
-      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out,
-                  opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
-    }
-    .news-card:hover,
-    .news-card:focus-visible {
-      transform: translateY(-4px);
-      border-color: rgba(0, 194, 209, 0.6);
-      box-shadow: 0 0 0 1px rgba(0, 194, 209, 0.25), 0 16px 40px rgba(0, 194, 209, 0.14), 0 10px 26px rgba(15, 23, 42, 0.1);
-      outline: none;
-    }
-    /* La fotografía ocupa el 65% superior de la card (predominio visual) */
-    .news-card-media {
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 65%;
-      overflow: hidden;
-      background: #f1f5f9;
-    }
-    .news-card-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .news-card:hover .news-card-media img { transform: scale(1.05); }
-    /* Banda inferior: fecha discreta + título */
-    .news-card-body {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 35%;
-      padding: 0.85rem 1.1rem 1.15rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      gap: 0.4rem;
-      z-index: 3;
-    }
-    .news-card-body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(15, 23, 42, 0.06), transparent);
-      pointer-events: none;
-    }
-    .news-card-body > * { position: relative; }
-    .news-card-date {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: #5f6b7d;
-    }
-    .news-card-date .material-symbols-outlined { font-size: 1rem; color: #0b8ba3; }
-    .news-card-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      font-size: 1.02rem;
-      line-height: 1.3;
-      color: #101828;
-      letter-spacing: -0.01em;
-    }
-    .news-card-badge {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      z-index: 4;
-      padding: 0.3rem 0.85rem;
-      border-radius: 9999px;
-      font-size: 0.62rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #090614;
-      background: rgba(0, 194, 209, 0.92);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-    }
-    /* ==== Efecto Spotlight: luz radial que sigue al cursor (--mouse-x / --mouse-y) ==== */
-    .news-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.35s ease; /* se desvanece suavemente al salir */
-      background: radial-gradient(
-        circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-        rgba(0, 194, 209, 0.24),
-        rgba(122, 82, 218, 0.12) 42%,
-        transparent 70%
-      );
-    }
-    .news-card:hover::after { opacity: 1; }
-    /* ===== Novedades: Tema Oscuro (override) =====
-       Fondo violeta profundo + borde tenue blanco translúcido (especificación theme).
-       El texto (título/date) ya está mapeado a tonos claros por los overrides .dark. */
-    .dark .news-card {
-      border-color: rgba(255, 255, 255, 0.1);
-      background: #241a3a;
-      box-shadow: 0 14px 34px rgba(14, 12, 22, 0.35);
-    }
-    .dark .news-card:hover,
-    .dark .news-card:focus-visible {
-      border-color: rgba(0, 194, 209, 0.5);
-      box-shadow: 0 0 0 1px rgba(0, 194, 209, 0.25), 0 22px 48px rgba(0, 194, 209, 0.16), 0 10px 26px rgba(14, 12, 22, 0.4);
-    }
-    .dark .news-card-media { background: #0e0c16; }
-    .dark .news-card-body::before {
-      background: linear-gradient(to top, rgba(7, 5, 13, 0.55), transparent);
-    }
-    .dark .news-card-date { color: rgba(226, 232, 240, 0.85); }
-    .dark .news-card-date .material-symbols-outlined { color: rgba(0, 194, 209, 0.85); }
-    .dark .news-card-title { color: #f5f2ff; }
-    /* Modal informativo (2 columnas). Transición AnimatePresence eq.: opacity + scale 0.95 → 1 */
-    #news-modal {
-      transition: opacity 0.3s ease;
-    }
-    #news-modal.news-modal-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    #news-modal .news-modal-card {
-      transform: scale(0.95);
-      opacity: 0;
-      transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.25s ease;
-    }
-    #news-modal.news-modal-open .news-modal-card {
-      transform: scale(1);
-      opacity: 1;
-    }
+/* ============ NOVEDADES: CARDS BENTO & DARK MODE FIX ============ */
+.news-card {
+  position: relative;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.news-card:hover,
+.news-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: rgba(0, 194, 209, 0.6);
+  box-shadow: 0 16px 40px rgba(0, 194, 209, 0.14);
+  outline: none;
+}
+
+/* Badges y Fechas */
+.news-card-badge {
+  display: inline-block;
+  padding: 0.3rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #090614;
+  background: rgba(0, 194, 209, 0.95);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.news-card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.news-card-date .material-symbols-outlined {
+  font-size: 1rem;
+  color: #00C2D1;
+}
+
+.news-card-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+/* ===== CORRECCIÓN MODO OSCURO (REPARACIÓN DE TARJETAS BLANCAS) ===== */
+:host-context(.dark) .news-card,
+.dark .news-card {
+  background-color: #151026 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+:host-context(.dark) .news-card:hover,
+.dark .news-card:hover {
+  border-color: rgba(0, 194, 209, 0.5) !important;
+  box-shadow: 0 0 20px rgba(0, 194, 209, 0.2);
+}
+
+:host-context(.dark) .news-card-title,
+.dark .news-card-title {
+  color: #f8fafc !important;
+}
+
+:host-context(.dark) .news-card-date,
+.dark .news-card-date {
+  color: #94a3b8 !important;
+}
+
+:host-context(.dark) .news-card-media,
+.dark .news-card-media {
+  background-color: #090712 !important;
+}
+
+/* Modal Informativo */
+#news-modal.news-modal-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#news-modal .news-modal-card {
+  transform: scale(0.95);
+  opacity: 0;
+  transition: transform 0.35s ease, opacity 0.25s ease;
+}
+
+#news-modal.news-modal-open .news-modal-card {
+  transform: scale(1);
+  opacity: 1;
+}
