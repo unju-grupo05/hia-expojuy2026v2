@@ -1,0 +1,236 @@
+<section class="w-full py-16 lg:py-24 bg-surface-container-low text-on-surface relative overflow-hidden" id="mapa-ubicacion">
+  <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Encabezado y Switch de Pestañas Principal -->
+    <div class="reveal-on-scroll flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+      <div class="max-w-xl space-y-2">
+        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-cyan-accessible">
+          <span class="material-symbols-outlined text-sm">explore</span>
+          Navegación y Accesos ExpoJuy 2026
+        </div>
+        <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">
+          {{ activeTab === 'predio' ? 'Mapa Interactivo del Predio' : 'Ubicación y Cómo Llegar' }}
+        </h2>
+        <p class="text-sm sm:text-base text-on-surface-variant">
+          {{ activeTab === 'predio' 
+              ? 'Explorá el masterplan ferial 3D, encontrá stands por rubro y consultá los sectores.' 
+              : 'Ubicación estratégica en la Ciudad Cultural, accesos viales y transporte público.' }}
+        </p>
+      </div>
+
+      <!-- Switch de Pestañas Seguro -->
+      <div class="inline-flex p-1.5 rounded-2xl bg-slate-200/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-300 dark:border-slate-700 shrink-0 self-start md:self-auto">
+        <button 
+          type="button"
+          (click)="switchTab('predio')"
+          [class.active-tab]="activeTab === 'predio'"
+          class="tab-switch-btn flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 text-slate-600 dark:text-slate-300">
+          <span class="material-symbols-outlined text-lg">apartment</span>
+          <span>Predio Ferial (3D)</span>
+        </button>
+
+        <button 
+          type="button"
+          (click)="switchTab('ubicacion')"
+          [class.active-tab]="activeTab === 'ubicacion'"
+          class="tab-switch-btn flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-300 text-slate-600 dark:text-slate-300">
+          <span class="material-symbols-outlined text-lg">location_on</span>
+          <span>Mapa de Ubicación</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- VISTA 1: PLANO INTERACTIVO DEL PREDIO (THREE.JS) -->
+    <div [class.hidden]="activeTab !== 'predio'" class="space-y-6">
+      
+      <!-- Filtros de Rubro -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        <div class="relative flex-1 max-w-xl">
+          <span class="material-symbols-outlined absolute left-4 top-3 text-outline text-lg">search</span>
+          <input 
+            class="w-full pl-11 pr-4 py-2.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" 
+            id="map-search" 
+            (input)="searchMapStand()" 
+            placeholder="¿Dónde está...? Stand, sector o expositor" 
+            type="text">
+        </div>
+
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
+          <button class="map-filter-btn active-filter px-3.5 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-slate-800 text-on-surface-variant border border-slate-200 dark:border-slate-700 transition-all" data-filter="all" (click)="setMapFilter('all')">Todos</button>
+          <button class="map-filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-on-surface-variant border border-slate-200 dark:border-slate-700 transition-all" data-filter="mineria" (click)="setMapFilter('mineria')">Minería</button>
+          <button class="map-filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-on-surface-variant border border-slate-200 dark:border-slate-700 transition-all" data-filter="energia" (click)="setMapFilter('energia')">Energía</button>
+          <button class="map-filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-on-surface-variant border border-slate-200 dark:border-slate-700 transition-all" data-filter="tecnologia" (click)="setMapFilter('tecnologia')">Tecnología</button>
+          <button class="map-filter-btn px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white dark:bg-slate-800 text-on-surface-variant border border-slate-200 dark:border-slate-700 transition-all" data-filter="agro" (click)="setMapFilter('agro')">Agroindustria</button>
+        </div>
+      </div>
+
+      <!-- Layout 3D + Ficha Lateral -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Contenedor Mapa 3D (Ocupa 8 columnas en pantallas grandes) -->
+        <div class="lg:col-span-8 p-4 sm:p-6 rounded-3xl bg-white dark:bg-[#0f0b1a] border border-primary/10 shadow-md">
+          <div id="map-3d-wrapper">
+            <canvas id="masterplanCanvas" class="cursor-grab active:cursor-grabbing"></canvas>
+
+            <div id="floating-pin" class="pointer-events-none">
+              <div class="pin-tag" id="pin-tag-text">STAND EXPOJUY</div>
+              <div class="pin-stem"></div>
+              <div class="pin-base-dot"></div>
+            </div>
+
+            <div class="map-3d-topbar">
+              <button class="map-3d-btn active" id="btnViewIso" type="button">📐 3D Isométrico</button>
+              <button class="map-3d-btn" id="btnViewTop" type="button">🗺️ 2D Cenital</button>
+              <button class="map-3d-btn" id="btnViewEntrance" type="button">🚪 Entrada</button>
+              <button class="map-3d-btn roof-btn active" id="btnToggleRoof" type="button">⛺ Techo: ON</button>
+            </div>
+
+            <div class="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
+              <button class="map-zoom-control" id="btnZoomIn3D" aria-label="Acercar"><span class="material-symbols-outlined text-lg">add</span></button>
+              <button class="map-zoom-control" id="btnZoomOut3D" aria-label="Alejar"><span class="material-symbols-outlined text-lg">remove</span></button>
+              <button class="map-zoom-control" id="btnResetView3D" aria-label="Reiniciar vista"><span class="material-symbols-outlined text-lg">fit_screen</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Lateral de Ficha del Sector (Ocupa 4 columnas al lado derecho) -->
+        <div class="lg:col-span-4 p-6 rounded-3xl bg-white dark:bg-[#120d21] border border-primary/10 shadow-lg space-y-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-primary text-white tracking-wide">Sector Seleccionado</span>
+            <span class="material-symbols-outlined text-brand-cyan-accessible">sensors</span>
+          </div>
+
+          <div>
+            <h3 class="font-display text-2xl font-bold text-brand-slate-dark dark:text-white" id="map-info-nombre">Sector A — Cubiertos</h3>
+            <p class="text-xs font-bold uppercase tracking-wider text-brand-cyan-accessible mt-1" id="map-info-tematica">Minería, Litio y Energías</p>
+            <p class="text-sm text-on-surface-variant dark:text-slate-300 mt-2 leading-relaxed" id="map-info-desc">
+              Pabellón principal climatizado con 140 stands dedicados a Minería & Litio y tecnología industrial.
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-slate-dark dark:text-white mb-2">Expositores Confirmados</h4>
+            <ul class="flex flex-wrap gap-1.5" id="map-info-expositores"></ul>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-brand-slate-dark dark:text-white mb-2">Actividades en este Espacio</h4>
+            <ul class="space-y-2" id="map-info-actividades"></ul>
+          </div>
+        </div>
+
+      </div>
+
+    </div> <!-- CIERRE DE LA VISTA 1 AGREGADO AQUÍ -->
+
+    <!-- VISTA 2: MAPA 2D VECTORIAL ESTILIZADO CON ACCESO A GOOGLE MAPS -->
+    <div [class.hidden]="activeTab !== 'ubicacion'" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+      
+      <!-- Tarjeta Interactiva del Mapa Vectorial 2D -->
+      <div class="lg:col-span-8 flex flex-col justify-center">
+        <div class="relative w-full h-[440px] sm:h-[500px] rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl bg-[#E8ECEF] dark:bg-[#121622] group select-none transition-all duration-300">
+          
+          <!-- Fondo Vectorial 2D -->
+          <svg class="absolute inset-0 w-full h-full object-cover opacity-95 dark:opacity-60 pointer-events-none" viewBox="0 0 800 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="800" height="520" class="fill-[#EBF0F3] dark:fill-[#0E121B]" />
+
+            <path d="M0,0 L210,0 L110,520 L0,520 Z" class="fill-[#E1E6EB] dark:fill-[#141A26]" />
+            <path d="M620,0 L800,0 L800,520 L510,520 Z" class="fill-[#E1E6EB] dark:fill-[#141A26]" />
+
+            <polygon points="260,80 520,180 430,440 180,340" class="fill-brand-cyan-electric/15 stroke-brand-cyan-electric" stroke-width="2.5" stroke-dasharray="6 6" />
+
+            <rect x="320" y="190" width="70" height="35" transform="rotate(20 320 190)" class="fill-slate-300 dark:fill-slate-700 stroke-slate-400 dark:stroke-slate-600" rx="3" />
+            <rect x="290" y="270" width="60" height="30" transform="rotate(20 290 270)" class="fill-slate-300 dark:fill-slate-700 stroke-slate-400 dark:stroke-slate-600" rx="3" />
+            <rect x="260" y="340" width="50" height="25" transform="rotate(20 260 340)" class="fill-slate-300 dark:fill-slate-700 stroke-slate-400 dark:stroke-slate-600" rx="3" />
+
+            <path d="M-10,130 L220,-20" class="stroke-white dark:stroke-slate-800" stroke-width="14" />
+            <path d="M-10,130 L220,-20" class="stroke-slate-300 dark:stroke-slate-700" stroke-width="8" />
+            <text x="70" y="50" transform="rotate(-34 70 50)" class="fill-slate-500 dark:fill-slate-400 text-[9px] font-bold tracking-wider font-sans uppercase">Curupaití</text>
+
+            <path d="M120,-10 L680,180" class="stroke-white dark:stroke-slate-800" stroke-width="18" />
+            <path d="M120,-10 L680,180" class="stroke-slate-300 dark:stroke-slate-700" stroke-width="12" />
+            <text x="320" y="60" transform="rotate(18 320 60)" class="fill-slate-500 dark:fill-slate-400 text-[10px] font-bold tracking-wider font-sans uppercase">Zorrilla de San Martín</text>
+
+            <path d="M-20,380 L380,-20" class="stroke-white dark:stroke-slate-800" stroke-width="28" />
+            <path d="M-20,380 L380,-20" class="stroke-slate-300 dark:stroke-slate-700" stroke-width="20" />
+            <path d="M-20,380 L380,-20" class="stroke-[#A3B8CC] dark:stroke-slate-900" stroke-width="3" />
+            <text x="110" y="210" transform="rotate(-45 110 210)" class="fill-slate-600 dark:fill-slate-300 text-[10px] font-extrabold tracking-widest font-sans uppercase">Av. de los Estudiantes</text>
+
+            <path d="M310,540 L700,20" class="stroke-white dark:stroke-slate-800" stroke-width="22" />
+            <path d="M310,540 L700,20" class="stroke-slate-300 dark:stroke-slate-700" stroke-width="14" />
+            <text x="490" y="300" transform="rotate(-53 490 300)" class="fill-slate-600 dark:fill-slate-300 text-[10px] font-extrabold tracking-widest font-sans uppercase">Av. de las Carrozas</text>
+
+            <ellipse cx="330" cy="115" rx="18" ry="14" class="fill-slate-300 dark:fill-slate-700 stroke-white dark:stroke-slate-800" stroke-width="5" />
+            <ellipse cx="180" cy="385" rx="16" ry="12" class="fill-slate-300 dark:fill-slate-700 stroke-white dark:stroke-slate-800" stroke-width="5" />
+
+            <text x="330" y="310" class="fill-brand-cyan-accessible dark:fill-brand-cyan-electric text-[12px] font-extrabold tracking-widest font-sans uppercase">Predio Ciudad Cultural</text>
+          </svg>
+
+          <!-- Pin Flotante Interactivo Central -->
+          <a href="https://maps.app.goo.gl/nqbHeuuaThDJd9b5A" target="_blank" rel="noopener" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex flex-col items-center group/pin cursor-pointer transition-transform duration-300 hover:scale-105">
+            <div class="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/95 dark:bg-[#181328]/95 border border-slate-200 dark:border-white/15 shadow-[0_12px_30px_rgba(0,0,0,0.25)] backdrop-blur-md">
+              <div class="w-9 h-9 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-md border border-brand-cyan-electric/40">
+                <img src="./Img/expojuy26_isologotipo.png" alt="ExpoJuy Logo" class="h-5 w-auto">
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs font-extrabold text-slate-900 dark:text-white leading-tight">Ciudad Cultural</span>
+                <span class="text-[10px] font-medium text-slate-500 dark:text-slate-400">Av. Bolivia · San Salvador de Jujuy</span>
+              </div>
+            </div>
+            <div class="w-3 h-3 bg-white dark:bg-[#181328] rotate-45 -mt-1.5 border-r border-b border-slate-200 dark:border-white/15"></div>
+            <div class="w-8 h-2 bg-black/20 dark:bg-black/50 rounded-full blur-xs mt-1"></div>
+          </a>
+
+          <!-- Botones de Acción -->
+          <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 z-10">
+            <a href="https://maps.app.goo.gl/nqbHeuuaThDJd9b5A" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 hover:bg-white dark:hover:bg-slate-900 backdrop-blur-md text-xs font-bold text-slate-700 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-sm text-brand-cyan-accessible">open_in_new</span>
+              <span>Ver en Google Maps</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tarjeta Informativa de la Ciudad Cultural -->
+      <div class="lg:col-span-4 flex flex-col justify-between gap-6 p-7 sm:p-8 rounded-3xl bg-white dark:bg-[#120d21] border border-primary/10 shadow-lg">
+        <div class="space-y-5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold px-3 py-1 rounded-full bg-primary text-white tracking-wide">Predio Principal</span>
+            <span class="material-symbols-outlined text-brand-cyan-accessible">pin_drop</span>
+          </div>
+
+          <div>
+            <h3 class="font-display text-2xl font-bold text-brand-slate-dark dark:text-white">Ciudad Cultural</h3>
+            <p class="text-sm text-on-surface-variant dark:text-slate-300 mt-2 leading-relaxed">
+              Av. Bolivia esq. Río Xibi Xibi, San Salvador de Jujuy. Accesos directos por Av. Bolivia y Ruta Nacional 9.
+            </p>
+          </div>
+
+          <ul class="space-y-3.5 pt-4 border-t border-slate-100 dark:border-slate-800 text-sm">
+            <li class="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+              <span class="material-symbols-outlined text-brand-cyan-accessible text-xl">directions_bus</span>
+              <span>Shuttles y líneas urbanas en Av. Bolivia</span>
+            </li>
+            <li class="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+              <span class="material-symbols-outlined text-brand-cyan-accessible text-xl">local_parking</span>
+              <span>Estacionamiento para 1.200 vehículos</span>
+            </li>
+            <li class="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+              <span class="material-symbols-outlined text-brand-cyan-accessible text-xl">event</span>
+              <span>09 al 12 de octubre · Ciudad Cultural</span>
+            </li>
+          </ul>
+        </div>
+
+        <a class="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-brand-slate-dark hover:bg-primary text-white font-display text-xs font-bold uppercase tracking-wider transition-colors shadow-md" 
+           href="https://maps.app.goo.gl/nqbHeuuaThDJd9b5A" target="_blank" rel="noopener">
+          <span>Abrir en Google Maps GPS</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</section>
