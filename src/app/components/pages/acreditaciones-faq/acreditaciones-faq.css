@@ -1,0 +1,87 @@
+/* Estilos para el Acordeón FAQ */
+.faq-item {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.faq-item.active {
+  border-color: var(--ej-cyan, #00C2D1);
+  box-shadow: 0 10px 25px rgba(0, 194, 209, 0.12);
+}
+
+.faq-answer {
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* MODO OSCURO PARA PREGUNTAS Y FORMULARIO */
+:host-context(.dark) .faq-item,
+.dark .faq-item,
+html.dark .faq-item {
+  background-color: #161224 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+:host-context(.dark) .faq-item button,
+.dark .faq-item button,
+html.dark .faq-item button {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) .faq-answer p,
+.dark .faq-answer p,
+html.dark .faq-answer p {
+  color: #c6bfd8 !important;
+}
+
+:host-context(.dark) #contacto-section,
+.dark #contacto-section,
+html.dark #contacto-section {
+  background-color: #161224 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+:host-context(.dark) #contacto-section h3,
+.dark #contacto-section h3,
+html.dark #contacto-section h3 {
+  color: #ffffff !important;
+}
+
+:host-context(.dark) #contacto-section input,
+:host-context(.dark) #contacto-section select,
+:host-context(.dark) #contacto-section textarea,
+.dark #contacto-section input,
+.dark #contacto-section select,
+.dark #contacto-section textarea,
+html.dark #contacto-section input,
+html.dark #contacto-section select,
+html.dark #contacto-section textarea {
+  background-color: #1d1830 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+:host-context(.dark) #contacto-section input::placeholder,
+:host-context(.dark) #contacto-section textarea::placeholder,
+.dark #contacto-section input::placeholder,
+.dark #contacto-section textarea::placeholder,
+html.dark #contacto-section input::placeholder,
+html.dark #contacto-section textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Animaciones de Scroll */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

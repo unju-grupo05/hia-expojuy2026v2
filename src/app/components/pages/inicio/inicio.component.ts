@@ -7,19 +7,12 @@ import { ExpositoresComponent } from '../expositores/expositores.component';
 import { AgendaComponent } from '../agenda/agenda.component';
 import { NovedadesComponent } from '../novedades/novedades.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
+import { Entradas } from '../entradas/entradas';
+import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import * as QRCode from 'qrcode';
-
-interface PaseDetail {
-  nombre: string;
-  precioIndividual: number;
-  precioGrupal: number;
-  vigencia: string;
-  beneficios: string[];
-}
 
 @Component({
   selector: 'app-inicio',
@@ -33,6 +26,8 @@ interface PaseDetail {
     AgendaComponent,
     NovedadesComponent,
     GaleriaComponent,
+    Entradas,
+    AcreditacionesFaq,
     Sponsors
   ],
   templateUrl: './inicio.component.html',
@@ -45,50 +40,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private lenisInstance: Lenis | null = null;
   private countdownInterval: any = null;
 
-  public paseActual = 'empresarial';
-  public ticketType = 'individual';
-
   public chatMessages: Array<{ sender: 'user' | 'bot'; text: string }> = [
     { sender: 'bot', text: '¡Hola! Soy PachAI, tu asistente virtual de ExpoJuy 2026. ¿En qué puedo ayudarte hoy?' }
   ];
-
-  public pasesData: Record<string, PaseDetail> = {
-    general: {
-      nombre: 'Pase General',
-      precioIndividual: 5000,
-      precioGrupal: 4000,
-      vigencia: 'Acceso 1 Día',
-      beneficios: [
-        'Acceso libre a pabellones de expositores',
-        'Ingreso a patio gastronómico y espectáculos',
-        'Credencial digital con código QR'
-      ]
-    },
-    empresarial: {
-      nombre: 'Pase Ejecutivo',
-      precioIndividual: 12000,
-      precioGrupal: 9500,
-      vigencia: 'Acceso Full Evento (10 días)',
-      beneficios: [
-        'Acceso prioritario sin filas a todos los pabellones',
-        'Ingreso al Lounge VIP y área de Coworking',
-        'Participación en Rondas de Negocios',
-        'Catálogo digital de Expositores con contactos directos'
-      ]
-    },
-    vip: {
-      nombre: 'Pase VIP / Summit',
-      precioIndividual: 25000,
-      precioGrupal: 20000,
-      vigencia: 'Acceso Total + Conferencias',
-      beneficios: [
-        'Todos los beneficios del Pase Ejecutivo',
-        'Asiento reservado en Conferencias Plenarias y Summits',
-        'Cocktail exclusivo de Apertura y Networking',
-        'Estacionamiento preferencial dentro del predio'
-      ]
-    }
-  };
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
@@ -112,13 +66,8 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initCountdown();
     this.initDarkMode();
     this.initMobileMenu();
-    this.initEntradasAndQr();
     this.initTextEffects();
     this.initChatbot();
-
-    setTimeout(() => {
-      this.selectPase('empresarial');
-    }, 200);
   }
 
   ngOnDestroy(): void {
@@ -137,10 +86,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   private bindWindowGlobals(): void {
     const w = window as any;
-    w.selectPase = this.selectPase.bind(this);
-    w.selectModalidad = this.selectModalidad.bind(this);
-    w.handlePaseSubmit = this.handlePaseSubmit.bind(this);
-    w.toggleFaq = this.toggleFaq.bind(this);
     w.smoothScrollTo = this.smoothScrollTo.bind(this);
     w.toggleChatbot = this.toggleChatbot.bind(this);
     w.closeChatbot = this.closeChatbot.bind(this);
@@ -460,26 +405,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // =========================================================================
-  // FAQ ACCORDION TOGGLE
-  // =========================================================================
-  public toggleFaq(event: Event): void {
-    const btn = (event.target as HTMLElement).closest('button');
-    if (!btn) return;
-    const body = btn.nextElementSibling as HTMLElement | null;
-    const icon = btn.querySelector('.faq-icon') as HTMLElement | null;
-    if (!body) return;
-
-    const isClosed = body.classList.contains('hidden');
-    document.querySelectorAll('.faq-body').forEach(b => b.classList.add('hidden'));
-    document.querySelectorAll('.faq-icon').forEach(i => (i as HTMLElement).style.transform = 'rotate(0deg)');
-
-    if (isClosed) {
-      body.classList.remove('hidden');
-      if (icon) icon.style.transform = 'rotate(180deg)';
-    }
-  }
-
-  // =========================================================================
   // COUNTDOWN TIMER
   // =========================================================================
   private initCountdown(): void {
@@ -584,144 +509,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
     });
-  }
-
-  // =========================================================================
-  // ENTRADAS, PASES & DIGITAL PASS QR
-  // =========================================================================
-  private initEntradasAndQr(): void {
-    this.selectPase('empresarial');
-  }
-
-  public selectPase(paseId: string): void {
-    this.paseActual = paseId;
-    document.querySelectorAll('.pase-pill').forEach(p => p.classList.remove('active-pase'));
-    const btn = document.getElementById('pase-pill-' + paseId);
-    if (btn) btn.classList.add('active-pase');
-    this.renderPaseDetail();
-    this.generatePassQR();
-    this.applyPassTheme(paseId);
-  }
-
-  public selectModalidad(modo: string): void {
-    this.ticketType = modo;
-    document.querySelectorAll('.modo-btn').forEach(b => b.classList.remove('active-modo'));
-    const btn = document.getElementById('modo-' + this.ticketType);
-    if (btn) btn.classList.add('active-modo');
-    this.renderPaseDetail();
-    this.generatePassQR();
-  }
-
-  private applyPassTheme(paseId: string): void {
-    const ticket = document.getElementById('pass-ticket');
-    const infoCard = document.getElementById('pase-info-card');
-
-    if (ticket) ticket.setAttribute('data-theme', paseId);
-    if (infoCard) infoCard.setAttribute('data-theme', paseId);
-
-    [ticket, infoCard].forEach(el => {
-      if (!el) return;
-      el.classList.remove('pass-waving');
-      void el.offsetWidth;
-      el.classList.add('pass-waving');
-      el.addEventListener('animationend', () => el.classList.remove('pass-waving'), { once: true });
-    });
-  }
-
-  private renderPaseDetail(): void {
-    const pase = this.pasesData[this.paseActual];
-    if (!pase) return;
-
-    const isGroup = this.ticketType === 'group';
-    const precio = isGroup ? pase.precioGrupal : pase.precioIndividual;
-
-    const nombreEl = document.getElementById('pase-detail-nombre');
-    const precioEl = document.getElementById('pase-detail-precio');
-    const vigenciaEl = document.getElementById('pase-detail-vigencia');
-    const precioUnitEl = document.getElementById('pase-detail-precio-unit');
-    const listEl = document.getElementById('pase-detail-beneficios');
-    const noteEl = document.getElementById('pase-detail-grupal-note');
-
-    if (nombreEl) nombreEl.textContent = pase.nombre;
-    if (precioEl) precioEl.textContent = '$' + precio.toLocaleString('es-AR');
-    if (vigenciaEl) vigenciaEl.textContent = 'Por persona · ' + pase.vigencia;
-    if (precioUnitEl) precioUnitEl.textContent = '$' + precio.toLocaleString('es-AR') + ' por persona';
-
-    if (listEl) {
-      listEl.innerHTML = '';
-      pase.beneficios.forEach(b => {
-        const li = document.createElement('li');
-        li.className = 'flex items-start gap-2 text-sm text-on-surface-variant';
-        li.innerHTML = '<span class="material-symbols-outlined text-brand-cyan-electric text-[17px] mt-0.5">check_circle</span>' + b;
-        listEl.appendChild(li);
-      });
-    }
-
-    if (noteEl) {
-      if (isGroup) noteEl.classList.remove('hidden');
-      else noteEl.classList.add('hidden');
-    }
-  }
-
-  private generatePassQR(nombre?: string): void {
-    const qrContainer = document.getElementById('qrcode');
-    if (!qrContainer) return;
-
-    const pase = this.pasesData[this.paseActual] || this.pasesData['empresarial'];
-    const modo = this.ticketType === 'group' ? 'GRUPAL' : 'INDIVIDUAL';
-    const data = 'EXPOJUY-2026|' + pase.nombre + '|' + modo + '|' + (nombre ? nombre.toUpperCase() : 'VISITANTE') + '|09-12-10-2026';
-
-    qrContainer.innerHTML = '<canvas id="qrcode-canvas"></canvas>';
-    const canvas = document.getElementById('qrcode-canvas') as HTMLCanvasElement;
-    if (canvas) {
-      QRCode.toCanvas(canvas, data, {
-        width: 132,
-        margin: 1,
-        color: {
-          dark: '#1A1226',
-          light: '#FFFFFF'
-        }
-      }, (error) => {
-        if (error) {
-          qrContainer.textContent = 'QR';
-        }
-      });
-    }
-  }
-
-  public handlePaseSubmit(e: Event): void {
-    e.preventDefault();
-    const input = document.getElementById('pase-name-input') as HTMLInputElement | null;
-    const nombre = (input && input.value.trim()) ? input.value.trim() : 'Visitante ExpoJuy';
-
-    const passName = document.getElementById('pass-name');
-    const passTipo = document.getElementById('pass-tipo');
-    if (passName) passName.textContent = nombre;
-    if (passTipo) passTipo.textContent = this.pasesData[this.paseActual].nombre;
-
-    this.generatePassQR(nombre);
-
-    const wrap = document.getElementById('qrcode-wrap');
-    if (wrap) wrap.classList.remove('is-locked');
-
-    const success = document.getElementById('pase-form-success');
-    if (success) {
-      success.classList.remove('hidden');
-      setTimeout(() => {
-        this.smoothScrollTo(success, { offset: 0 });
-      }, 150);
-    }
-  }
-
-  public handleRegistrationSubmit(e: Event): void {
-    e.preventDefault();
-    const form = document.getElementById('acreditacion-form');
-    const success = document.getElementById('acreditacion-success');
-    if (form) form.classList.add('hidden');
-    if (success) {
-      success.classList.remove('hidden');
-      this.smoothScrollTo(success, { offset: -100 });
-    }
   }
 
   // =========================================================================
