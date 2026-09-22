@@ -1,118 +1,83 @@
-<!-- FAQ & Acreditaciones Form Section -->
+<!-- FAQ Section: Preguntas Frecuentes Oficiales ExpoJuy -->
 <section class="w-full py-20 lg:py-28 bg-surface-container-low text-on-surface" id="acreditaciones-section">
-  <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
+  <div class="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Encabezado -->
+    <div class="reveal-on-scroll text-center max-w-2xl mx-auto mb-12 space-y-3">
+      <span class="text-xs font-bold uppercase tracking-widest text-primary">Información Oficial</span>
+      <h2 class="blur-split font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-slate-dark tracking-tight">
+        Preguntas Frecuentes
+      </h2>
+      <p class="text-sm sm:text-base text-on-surface-variant">
+        Todo lo que necesitas saber sobre la muestra empresarial, industrial, minera y cultural más importante del NOA.
+      </p>
+    </div>
+
+    <!-- Lista de Preguntas Frecuentes -->
+    <div class="reveal-on-scroll space-y-4">
       
-      <!-- Left: Collapsible FAQ Accordion -->
-      <div class="reveal-on-scroll lg:col-span-6 space-y-6">
-        <div>
-          <span class="text-xs font-bold uppercase tracking-widest text-primary">Respuestas Clave</span>
-          <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Preguntas Frecuentes</h2>
-          <p class="text-sm sm:text-base text-on-surface-variant mt-1">Conoce cómo participar como visitante profesional o expositor.</p>
-        </div>
-
-        <div class="space-y-3 pt-2">
-          <!-- FAQ 1 -->
-          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
-            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
-              <span>¿Cómo funciona el sistema de acreditación digital?</span>
-              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
-            </button>
-            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
-              <p class="pb-5 leading-relaxed">
-                Al enviar tu formulario recibirás una credencial digital nominada con código QR criptográfico. Podrás sincronizarla con Apple Wallet o Google Wallet para ingresar por los molinetes inteligentes de acceso rápido en Ciudad Cultural sin esperas.
-              </p>
-            </div>
-          </div>
-
-          <!-- FAQ 2 -->
-          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
-            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
-              <span>¿Existe transporte oficial hacia el predio?</span>
-              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
-            </button>
-            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
-              <p class="pb-5 leading-relaxed">
-                Sí. La organización provee shuttles ejecutivos eléctricos con salidas cada 20 minutos desde el Aeropuerto Horacio Guzmán y los hoteles céntricos de San Salvador de Jujuy directo a las dársenas del predio ferial.
-              </p>
-            </div>
-          </div>
-
-          <!-- FAQ 3 -->
-          <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
-            <button class="w-full p-5 flex items-center justify-between text-left font-display text-base font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
-              <span>¿Cuáles son los beneficios para empresas expositoras?</span>
-              <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
-            </button>
-            <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 text-xs sm:text-sm text-on-surface-variant">
-              <p class="pb-5 leading-relaxed">
-                Los expositores cuentan con exención temporal arancelaria de muestras (aduanas integradas), acceso a salas B2B climatizadas, catálogo internacional de negocios y pauta institucional en la app oficial de la feria.
-              </p>
-            </div>
-          </div>
+      <!-- FAQ 1 -->
+      <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+        <button class="w-full p-5 sm:p-6 flex items-center justify-between text-left font-display text-base sm:text-lg font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+          <span>¿Qué es la ExpoJuy y cuál es su objetivo principal?</span>
+          <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 sm:px-6 text-xs sm:text-sm text-on-surface-variant">
+          <p class="pb-6 leading-relaxed">
+            La ExpoJuy es la feria multisectorial internacional más relevante de la provincia de Jujuy. Organizada por la Cámara de Comercio Exterior de Jujuy, sirve como vitrina para exponer el potencial económico, industrial, minero, agroindustrial, turístico y cultural de la región, promoviendo el comercio local y la integración dentro del Corredor Bioceánico.
+          </p>
         </div>
       </div>
 
-      <!-- Right: Acreditación & Postulación Form -->
-      <div class="reveal-on-scroll lg:col-span-6 p-7 sm:p-8 rounded-3xl bg-white border border-primary/10 shadow-xl space-y-6" id="contacto-section" style="transition-delay: 150ms;">
-        <div class="flex items-center justify-between mb-4">
-          <div>
-            <span class="text-xs font-bold uppercase tracking-widest text-brand-cyan-accessible">Registro Online</span>
-            <h3 class="font-display text-2xl font-bold text-brand-slate-dark">Acreditaciones & Postulaciones</h3>
-          </div>
-          <span class="px-3 py-1 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible text-xs font-bold">Pase B2B Activo</span>
+      <!-- FAQ 2 -->
+      <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+        <button class="w-full p-5 sm:p-6 flex items-center justify-between text-left font-display text-base sm:text-lg font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+          <span>¿Dónde se realiza la exposición y cómo llegar al predio?</span>
+          <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 sm:px-6 text-xs sm:text-sm text-on-surface-variant">
+          <p class="pb-6 leading-relaxed">
+            El evento se lleva a cabo en el Predio Ferial de la <strong>Ciudad Cultural</strong>, ubicado en el barrio Alto Padilla de San Salvador de Jujuy. El lugar cuenta con accesos vehiculares directos sobre la Ruta Nacional 9 y la Avenida Bolivia, además de amplias áreas de estacionamiento y líneas de transporte urbano de pasajeros que llegan directamente al predio.
+          </p>
         </div>
+      </div>
 
-        <form class="space-y-4" id="acreditacion-form" (submit)="handleRegistrationSubmit($event)">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Nombre Completo</label>
-              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Ej. Camila Morales" required="" type="text">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Empresa u Organismo</label>
-              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Ej. Litio Andino SA" required="" type="text">
-            </div>
-          </div>
+      <!-- FAQ 3 -->
+      <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+        <button class="w-full p-5 sm:p-6 flex items-center justify-between text-left font-display text-base sm:text-lg font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+          <span>¿Cuáles son los sectores e industrias presentes en la feria?</span>
+          <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 sm:px-6 text-xs sm:text-sm text-on-surface-variant">
+          <p class="pb-6 leading-relaxed">
+            La ExpoJuy abarca stands de minería (litio, polimetálicos), energías renovables, agroindustria (caña de azúcar, tabaco, frutas finas), tecnología, logística, artesanías tradicionales, organismos del Estado provincial y nacional, así como delegaciones comerciales internacionales provenientes de países vecinos como Chile, Bolivia, Brasil y Paraguay.
+          </p>
+        </div>
+      </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Correo Corporativo</label>
-              <input class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="nombre@empresa.com" required="" type="email">
-            </div>
-            <div>
-              <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Perfil de Interés</label>
-              <select class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric text-on-surface">
-                <option value="visitante">Visitante Profesional / Comprador</option>
-                <option value="expositor">Quiero ser Expositor de Stand</option>
-                <option value="sponsor">Quiero ser Sponsor Oficial</option>
-                <option value="prensa">Prensa & Medios Acreditados</option>
-              </select>
-            </div>
-          </div>
+      <!-- FAQ 4 -->
+      <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+        <button class="w-full p-5 sm:p-6 flex items-center justify-between text-left font-display text-base sm:text-lg font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+          <span>¿Qué actividades se ofrecen además de la exhibición de stands?</span>
+          <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 sm:px-6 text-xs sm:text-sm text-on-surface-variant">
+          <p class="pb-6 leading-relaxed">
+            Además de los pabellones de expositores, el público y los profesionales pueden disfrutar de <strong>Rondas de Negocios B2B</strong> internacionales, conferencias académicas y técnicas, espectáculos artísticos y folklóricos en vivo todas las noches, un patio gastronómico con platos regionales y demostraciones artesanales en directo.
+          </p>
+        </div>
+      </div>
 
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1">Mensaje o Rubro Específico</label>
-            <textarea class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" placeholder="Indica el área de tu empresa o requerimiento de stand..." rows="3"></textarea>
-          </div>
-
-          <div class="flex items-center gap-2 pt-1">
-            <input class="w-4 h-4 rounded text-primary focus:ring-brand-cyan-electric" id="terms-check" required="" type="checkbox">
-            <label class="text-xs text-on-surface-variant" for="terms-check">Acepto los términos de acreditación digital y la política de privacidad oficial.</label>
-          </div>
-
-          <button class="w-full py-4 rounded-2xl bg-brand-slate-dark hover:bg-primary text-white font-display text-sm font-bold uppercase tracking-wider transition-colors shadow-lg flex items-center justify-center gap-2" type="submit">
-            <span>Confirmar Solicitud de Acreditación</span>
-            <span class="material-symbols-outlined text-base">verified</span>
-          </button>
-        </form>
-
-        <div class="hidden p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium" id="form-success">
-          <div class="flex items-center gap-2 font-bold mb-1">
-            <span class="material-symbols-outlined text-base text-emerald-600">check_circle</span>
-            <span>¡Acreditación Generada con Éxito!</span>
-          </div>
-          <p>Hemos enviado tu credencial nominada con código QR de acceso prioritario a tu correo electrónico.</p>
+      <!-- FAQ 5 -->
+      <div class="faq-item rounded-2xl bg-white border border-primary/10 overflow-hidden shadow-xs transition-all duration-300">
+        <button class="w-full p-5 sm:p-6 flex items-center justify-between text-left font-display text-base sm:text-lg font-bold text-brand-slate-dark cursor-pointer" (click)="toggleFaq($event)">
+          <span>¿Cómo se consiguen las entradas y cuáles son las modalidades de ingreso?</span>
+          <span class="material-symbols-outlined faq-icon text-outline transition-transform duration-300">expand_more</span>
+        </button>
+        <div class="faq-answer max-h-0 overflow-hidden transition-all duration-300 px-5 sm:px-6 text-xs sm:text-sm text-on-surface-variant">
+          <p class="pb-6 leading-relaxed">
+            Las entradas se adquieren tanto en las boleterías del predio en Ciudad Cultural como a través del portal de tickets digitales. Se ofrecen tarifas generales, pases corporativos/ejecutivos con acceso a salas VIP y rondas de negocios, e ingresos gratuitos o bonificados para delegaciones escolares, menores y jubilados durante días específicos del evento.
+          </p>
         </div>
       </div>
 
