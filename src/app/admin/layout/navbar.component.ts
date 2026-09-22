@@ -35,7 +35,25 @@ export class NavbarComponent {
     if (url.includes('/admin/posts')) {
       return {
         title: 'Publicaciones y Noticias',
-        subtitle: 'Administra los comunicados, lanzamientos y artículos'
+        subtitle: 'Administra comunicados con jerarquía visual y live preview'
+      };
+    }
+    if (url.includes('/admin/stands')) {
+      return {
+        title: 'Stands & Directorio de Expositores',
+        subtitle: 'Gestión de empresas, asignación de pabellones y visibilidad'
+      };
+    }
+    if (url.includes('/admin/agenda')) {
+      return {
+        title: 'Cronograma & Agenda Oficial',
+        subtitle: 'Planificación de paneles, foros y actividades por auditorio'
+      };
+    }
+    if (url.includes('/admin/pillars')) {
+      return {
+        title: 'Pilares Estratégicos & Ejes 2026',
+        subtitle: 'Gestión de los ejes temáticos institucionales de ExpoJuy'
       };
     }
     if (url.includes('/admin/media')) {

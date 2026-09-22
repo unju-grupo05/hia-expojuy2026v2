@@ -26,6 +26,18 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () => import('./pages/posts/posts-list.component').then(m => m.PostsListComponent)
       },
       {
+        path: 'stands',
+        loadComponent: () => import('./pages/stands/stands-list.component').then(m => m.StandsListComponent)
+      },
+      {
+        path: 'agenda',
+        loadComponent: () => import('./pages/agenda/agenda-list.component').then(m => m.AgendaListComponent)
+      },
+      {
+        path: 'pillars',
+        loadComponent: () => import('./pages/pillars/pillars.component').then(m => m.PillarsComponent)
+      },
+      {
         path: 'media',
         loadComponent: () => import('./pages/media/media-gallery.component').then(m => m.MediaGalleryComponent)
       }

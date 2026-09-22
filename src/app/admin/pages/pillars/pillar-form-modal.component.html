@@ -1,0 +1,159 @@
+@if (isOpen()) {
+  <div class="fixed inset-0 z-50 overflow-y-auto">
+    <!-- Backdrop oscuro -->
+    <div
+      class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+      (click)="close.emit()">
+    </div>
+
+    <!-- Modal Dialog -->
+    <div class="min-h-full flex items-center justify-center p-4 sm:p-6 text-center">
+      <div
+        class="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-3xl text-start shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="p-2 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric">
+              <span class="material-symbols-outlined text-[20px]">interests</span>
+            </span>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                {{ pillarToEdit() ? 'Editar Pilar Estratégico' : 'Nuevo Pilar Estratégico' }}
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                Define los ejes fundamentales que componen la visión de ExpoJuy 2026
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            (click)="close.emit()"
+            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <span class="material-symbols-outlined text-xl">close</span>
+          </button>
+        </div>
+
+        <!-- Form Body -->
+        <form [formGroup]="pillarForm" (ngSubmit)="onSubmit()" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+          
+          <!-- Título y Orden -->
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div class="sm:col-span-3">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Título del Eje Estratégico *
+              </label>
+              <input
+                type="text"
+                formControlName="title"
+                placeholder="Ej: Minería & Litio Sustentable"
+                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+              />
+              @if (pillarForm.get('title')?.invalid && pillarForm.get('title')?.touched) {
+                <p class="text-[11px] text-rose-500 mt-1">El título debe tener al menos 3 caracteres.</p>
+              }
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                N° de Orden *
+              </label>
+              <input
+                type="number"
+                formControlName="order"
+                min="1"
+                max="20"
+                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all font-mono"
+              />
+            </div>
+          </div>
+
+          <!-- Selector Visual de Iconos -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              Icono Representativo *
+            </label>
+            <div class="grid grid-cols-4 sm:grid-cols-4 gap-2">
+              @for (icon of availableIcons; track icon.name) {
+                <button
+                  type="button"
+                  (click)="selectIcon(icon.name)"
+                  class="flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all select-none group"
+                  [ngClass]="pillarForm.get('iconSvgName')?.value === icon.name
+                    ? 'border-primary dark:border-brand-cyan-electric bg-primary/10 dark:bg-purple-950/40 text-primary dark:text-brand-cyan-electric ring-1 ring-primary'
+                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'">
+                  <span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">
+                    {{ icon.name }}
+                  </span>
+                  <span class="text-[10px] font-semibold mt-1 truncate max-w-full">
+                    {{ icon.label }}
+                  </span>
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Descripción del Eje Estratégico *
+            </label>
+            <textarea
+              rows="3"
+              formControlName="description"
+              placeholder="Explica el alcance temático e impacto productivo..."
+              class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all resize-y">
+            </textarea>
+            @if (pillarForm.get('description')?.invalid && pillarForm.get('description')?.touched) {
+              <p class="text-[11px] text-rose-500 mt-1">La descripción debe tener al menos 10 caracteres.</p>
+            }
+          </div>
+
+          <!-- Live Card Preview -->
+          <div class="p-4 rounded-2xl bg-neutral-surface-light dark:bg-[#0b0813] border border-primary/20 flex flex-col items-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2">
+              Vista previa del Pilar en la landing:
+            </span>
+
+            <div class="w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-[#151026] border border-primary/10 dark:border-white/10 shadow-sm flex flex-col items-start">
+              <div class="w-12 h-12 rounded-2xl bg-brand-lavender-surface dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-2xl">
+                  {{ pillarForm.get('iconSvgName')?.value || 'lightbulb' }}
+                </span>
+              </div>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-brand-cyan-accessible dark:text-brand-cyan-electric">
+                Eje 0{{ pillarForm.get('order')?.value || '1' }}
+              </span>
+              <h3 class="font-display text-base font-bold text-slate-900 dark:text-white mt-0.5 mb-1.5">
+                {{ pillarForm.get('title')?.value || 'Título del Eje Estratégico' }}
+              </h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                {{ pillarForm.get('description')?.value || 'Descripción del impacto y desarrollo en la región.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Footer con Acciones -->
+          <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+            <button
+              type="button"
+              (click)="close.emit()"
+              class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/20 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">check</span>
+              <span>{{ pillarToEdit() ? 'Actualizar Pilar' : 'Guardar Pilar' }}</span>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+}
