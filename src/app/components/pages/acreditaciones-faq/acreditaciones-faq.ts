@@ -1,11 +1,10 @@
 import { Component, OnInit, AfterViewInit, Inject, PLATFORM_ID, ElementRef } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-acreditaciones-faq',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './acreditaciones-faq.html',
   styleUrl: './acreditaciones-faq.css'
 })
@@ -74,15 +73,5 @@ export class AcreditacionesFaq implements OnInit, AfterViewInit {
       body.style.maxHeight = body.scrollHeight + 'px';
       if (icon) icon.style.transform = 'rotate(180deg)';
     }
-  }
-
-  public handleRegistrationSubmit(e: Event): void {
-    e.preventDefault();
-    const nativeEl = this.el.nativeElement as HTMLElement;
-    const form = nativeEl.querySelector('#acreditacion-form');
-    const success = nativeEl.querySelector('#form-success');
-    
-    if (form) form.classList.add('hidden');
-    if (success) success.classList.remove('hidden');
   }
 }
