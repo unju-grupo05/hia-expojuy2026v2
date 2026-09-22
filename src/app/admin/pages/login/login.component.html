@@ -1,0 +1,158 @@
+<div class="min-h-screen w-full flex items-center justify-center p-4 bg-gradient-to-br from-slate-100 via-purple-50/40 to-slate-200 dark:from-slate-950 dark:via-[#160f25] dark:to-slate-900 selection:bg-brand-cyan-electric selection:text-brand-slate-dark">
+
+  <!-- Background decorative glows -->
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/15 dark:bg-primary/25 rounded-full blur-3xl pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-cyan-electric/15 dark:bg-brand-cyan-electric/15 rounded-full blur-3xl pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+
+  <!-- Login Card Container -->
+  <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl shadow-slate-300/40 dark:shadow-black/50 border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 overflow-hidden">
+    
+    <!-- Top Brand Header -->
+    <div class="flex flex-col items-center text-center mb-8">
+      <div class="p-3 bg-purple-50 dark:bg-purple-950/40 rounded-2xl border border-primary/10 dark:border-primary/20 mb-4 shadow-xs">
+        <img
+          src="./Img/expojuy26_isologotipo.png"
+          alt="ExpoJuy 2026 Logo"
+          class="h-14 w-auto drop-shadow-md"
+        />
+      </div>
+
+      <span class="text-[11px] font-bold tracking-widest uppercase text-primary dark:text-brand-cyan-electric mb-1">
+        Ciudad Cultural · San Salvador de Jujuy
+      </span>
+      <h1 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+        Panel de Control CMS
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+        Ingresa tus credenciales autorizadas para administrar el evento
+      </p>
+    </div>
+
+    <!-- Error Alert Banner -->
+    @if (errorMessage()) {
+      <div class="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs">
+        <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
+        <div class="flex-1">
+          <p class="font-semibold">{{ errorMessage() }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- Reactive Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      
+      <!-- Email Field -->
+      <div>
+        <label for="admin-email" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+          Correo Electrónico
+        </label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <span class="material-symbols-outlined text-[20px]">mail</span>
+          </span>
+          <input
+            id="admin-email"
+            type="email"
+            formControlName="email"
+            placeholder="admin@expojuy.com"
+            autocomplete="email"
+            class="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            [class.border-rose-500]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          />
+        </div>
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <p class="text-[11px] text-rose-500 mt-1 pl-1">
+            Ingresa un correo electrónico corporativo válido.
+          </p>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label for="admin-password" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+            Contraseña
+          </label>
+        </div>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <span class="material-symbols-outlined text-[20px]">lock</span>
+          </span>
+          <input
+            id="admin-password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            class="w-full pl-10 pr-10 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+            [class.border-rose-500]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <span class="material-symbols-outlined text-[20px]">
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
+          </button>
+        </div>
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <p class="text-[11px] text-rose-500 mt-1 pl-1">
+            La contraseña debe tener al menos 4 caracteres.
+          </p>
+        }
+      </div>
+
+      <!-- Remember device & Demo button -->
+      <div class="flex items-center justify-between pt-1">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            formControlName="rememberMe"
+            class="w-4 h-4 rounded text-primary focus:ring-primary border-slate-300 dark:border-slate-700"
+          />
+          <span class="text-xs text-slate-600 dark:text-slate-400">Recordar sesión</span>
+        </label>
+
+        <button
+          type="button"
+          (click)="fillDemoCredentials()"
+          class="text-xs text-primary dark:text-brand-cyan-electric hover:underline font-semibold">
+          Rellenar demo
+        </button>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-2">
+        <button
+          type="submit"
+          [disabled]="authService.isLoading()"
+          class="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:ring-primary/30 transition-all duration-200 shadow-md shadow-primary/25 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          
+          @if (authService.isLoading()) {
+            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span>Verificando acceso...</span>
+          } @else {
+            <span>Ingresar al Sistema</span>
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          }
+        </button>
+      </div>
+    </form>
+
+    <!-- Return to landing page -->
+    <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center">
+      <a
+        routerLink="/"
+        class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-brand-cyan-electric transition-colors">
+        <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+        <span>Volver a la landing pública de ExpoJuy</span>
+      </a>
+    </div>
+
+  </div>
+
+</div>
