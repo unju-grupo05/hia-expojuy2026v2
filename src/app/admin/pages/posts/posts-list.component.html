@@ -1,0 +1,208 @@
+<div class="space-y-6">
+
+  <!-- Toast de notificación -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
+      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header & Acciones Superiores -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+        Gestión de Publicaciones
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Crea, edita y administra los comunicados y artículos informativos de ExpoJuy 2026
+      </p>
+    </div>
+
+    <!-- Botón Crear -->
+    <button
+      type="button"
+      (click)="openCreateModal()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
+      <span class="material-symbols-outlined text-[18px]">add</span>
+      <span>Nueva Publicación</span>
+    </button>
+  </div>
+
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- Input de Búsqueda -->
+    <div class="relative w-full md:w-80">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <span class="material-symbols-outlined text-[18px]">search</span>
+      </span>
+      <input
+        type="text"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar por título, categoría o slug..."
+        class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+      />
+    </div>
+
+    <!-- Filtros de Estado -->
+    <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('all')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedStatusFilter() === 'all'
+          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Todos ({{ posts().length }})
+      </button>
+
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('published')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedStatusFilter() === 'published'
+          ? 'bg-emerald-600 text-white shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Publicados
+      </button>
+
+      <button
+        type="button"
+        (click)="selectedStatusFilter.set('draft')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedStatusFilter() === 'draft'
+          ? 'bg-amber-600 text-white shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Borradores
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Tabla de Publicaciones -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-start border-collapse">
+        
+        <!-- Cabecera de la tabla -->
+        <thead>
+          <tr class="border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-[11px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400">
+            <th class="py-3.5 px-4 sm:px-6 text-start">Título y Categoría</th>
+            <th class="py-3.5 px-4 text-start">Fecha</th>
+            <th class="py-3.5 px-4 text-start">Estado</th>
+            <th class="py-3.5 px-4 sm:px-6 text-end">Acciones</th>
+          </tr>
+        </thead>
+
+        <!-- Cuerpo de la tabla -->
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
+          @for (post of filteredPosts(); track post.id) {
+            <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+              
+              <!-- Título & Categoría -->
+              <td class="py-3.5 px-4 sm:px-6">
+                <div class="flex items-center gap-3">
+                  <img
+                    [src]="post.imageUrl"
+                    [alt]="post.title"
+                    class="w-12 h-10 rounded-lg object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200/60 dark:border-slate-700"
+                  />
+                  <div class="min-w-0 max-w-md">
+                    <p class="font-bold text-slate-900 dark:text-white truncate">
+                      {{ post.title }}
+                    </p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="text-[11px] font-medium text-primary dark:text-brand-cyan-electric">
+                        {{ post.category }}
+                      </span>
+                      <span class="text-slate-300 dark:text-slate-700">·</span>
+                      <span class="text-[11px] text-slate-400 font-mono truncate">
+                        /{{ post.slug }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Fecha -->
+              <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap text-xs">
+                {{ post.date }}
+              </td>
+
+              <!-- Estado -->
+              <td class="py-3.5 px-4 whitespace-nowrap">
+                @if (post.status === 'published') {
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span>Publicado</span>
+                  </span>
+                } @else {
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    <span>Borrador</span>
+                  </span>
+                }
+              </td>
+
+              <!-- Acciones -->
+              <td class="py-3.5 px-4 sm:px-6 text-end whitespace-nowrap">
+                <div class="inline-flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    (click)="openEditModal(post)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    title="Editar publicación">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    (click)="deletePost(post.id)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    title="Eliminar publicación">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4" class="py-12 px-4 text-center">
+                <div class="max-w-sm mx-auto flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">
+                    article
+                  </span>
+                  <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    No se encontraron publicaciones
+                  </p>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Prueba cambiando los términos de búsqueda o los filtros de estado.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- Paginación informativa del pie de tabla -->
+    <div class="px-4 sm:px-6 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      <span>Mostrando {{ filteredPosts().length }} de {{ posts().length }} publicaciones</span>
+      <span>Sistema CMS ExpoJuy</span>
+    </div>
+  </div>
+
+  <!-- Modal Flotante Reactivo -->
+  <app-post-form-modal
+    [isOpen]="isModalOpen()"
+    [postToEdit]="editingPost()"
+    (save)="savePost($event)"
+    (close)="closeModal()"
+  />
+
+</div>

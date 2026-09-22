@@ -1,0 +1,145 @@
+<div class="space-y-6">
+
+  <!-- Toast de notificación -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
+      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header con Botón de Subida e Input Hidden -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+        Biblioteca de Imágenes
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Gestiona y optimiza los recursos fotográficos e infografías del portal
+      </p>
+    </div>
+
+    <!-- Input Oculto de Archivo y Botón de Subida -->
+    <div>
+      <input
+        type="file"
+        #fileInput
+        (change)="onFileSelected($event)"
+        accept="image/*"
+        class="hidden"
+      />
+
+      <button
+        type="button"
+        (click)="fileInput.click()"
+        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 group">
+        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-y-0.5">
+          cloud_upload
+        </span>
+        <span>Subir Imagen</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de Búsqueda y Estadísticas Rápidas -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+    
+    <!-- Input de Búsqueda -->
+    <div class="relative w-full sm:w-80">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <span class="material-symbols-outlined text-[18px]">search</span>
+      </span>
+      <input
+        type="text"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar imagen por nombre..."
+        class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+      />
+    </div>
+
+    <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 w-full sm:w-auto justify-end">
+      <span class="material-symbols-outlined text-[18px] text-primary dark:text-brand-cyan-electric">photo_library</span>
+      <span>{{ filteredImages().length }} imágenes disponibles</span>
+    </div>
+
+  </div>
+
+  <!-- Grilla Responsiva de Imágenes (grid-cols-2 md:grid-cols-4 gap-4) -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    @for (image of filteredImages(); track image.id) {
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md hover:border-primary/40 dark:hover:border-primary/40 transition-all flex flex-col justify-between group">
+        
+        <!-- Previsualización -->
+        <div class="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+          <img
+            [src]="image.url"
+            [alt]="image.name"
+            class="object-cover h-36 w-full rounded-t group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+          <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-mono font-medium">
+            {{ image.size }}
+          </span>
+        </div>
+
+        <!-- Metadatos de la imagen -->
+        <div class="p-3.5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3
+              class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
+              [title]="image.name">
+              {{ image.name }}
+            </h3>
+            <div class="flex items-center justify-between mt-1 text-[10px] text-slate-400">
+              <span>{{ image.dimensions }}</span>
+              <span>{{ image.uploadedAt }}</span>
+            </div>
+          </div>
+
+          <!-- Botones de Acción ("Copiar URL" y "Eliminar") -->
+          <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5">
+            
+            <!-- Copiar URL -->
+            <button
+              type="button"
+              (click)="copyUrl(image)"
+              class="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all"
+              [ngClass]="copiedId() === image.id
+                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-700'">
+              <span class="material-symbols-outlined text-[15px]">
+                {{ copiedId() === image.id ? 'check' : 'content_copy' }}
+              </span>
+              <span>{{ copiedId() === image.id ? '¡Copiado!' : 'Copiar URL' }}</span>
+            </button>
+
+            <!-- Eliminar -->
+            <button
+              type="button"
+              (click)="deleteImage(image.id)"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+              title="Eliminar imagen">
+              <span class="material-symbols-outlined text-[17px]">delete</span>
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+    } @empty {
+      <div class="col-span-2 md:col-span-4 py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+        <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-2">
+          image_not_supported
+        </span>
+        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+          No se encontraron imágenes
+        </p>
+        <p class="text-xs text-slate-400 mt-1">
+          Sube un nuevo archivo fotográfico con el botón "Subir Imagen" o ajusta tu búsqueda.
+        </p>
+      </div>
+    }
+  </div>
+
+</div>
