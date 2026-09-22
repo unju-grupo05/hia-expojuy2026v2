@@ -1,0 +1,304 @@
+<div class="space-y-6">
+
+  <!-- Toast de notificación -->
+  @if (toastMessage()) {
+    <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
+      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+      <span>{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header & Botón Crear -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+        Directorio de Stands & Expositores
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+        Administra las empresas confirmadas, asignación de pabellones y visibilidad pública
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="openCreateModal()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
+      <span class="material-symbols-outlined text-[18px]">add_business</span>
+      <span>Nuevo Stand</span>
+    </button>
+  </div>
+
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- Input de Búsqueda -->
+    <div class="relative w-full md:w-80">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <span class="material-symbols-outlined text-[18px]">search</span>
+      </span>
+      <input
+        type="text"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        placeholder="Buscar por empresa, N° stand o rubro..."
+        class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+      />
+    </div>
+
+    <!-- Filtro por Rubro/Pabellón -->
+    <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+      <button
+        type="button"
+        (click)="selectedSectorFilter.set('all')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedSectorFilter() === 'all'
+          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Todos ({{ stands().length }})
+      </button>
+
+      <button
+        type="button"
+        (click)="selectedSectorFilter.set('Minería & Litio')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedSectorFilter() === 'Minería & Litio'
+          ? 'bg-primary text-white shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Minería & Litio
+      </button>
+
+      <button
+        type="button"
+        (click)="selectedSectorFilter.set('Energías Renovables')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedSectorFilter() === 'Energías Renovables'
+          ? 'bg-primary text-white shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Energías
+      </button>
+
+      <button
+        type="button"
+        (click)="selectedSectorFilter.set('Agroindustria')"
+        class="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap"
+        [ngClass]="selectedSectorFilter() === 'Agroindustria'
+          ? 'bg-primary text-white shadow-xs'
+          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'">
+        Agro
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Tabla de Stands -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-start border-collapse">
+        
+        <thead>
+          <tr class="border-b border-slate-200/80 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/40 text-[11px] uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400">
+            <th class="py-3.5 px-4 sm:px-6 text-start">Empresa y Logotipo</th>
+            <th class="py-3.5 px-4 text-start">Stand y Sector</th>
+            <th class="py-3.5 px-4 text-start">Origen</th>
+            <th class="py-3.5 px-4 text-center">Visibilidad Pública</th>
+            <th class="py-3.5 px-4 sm:px-6 text-end">Acciones</th>
+          </tr>
+        </thead>
+
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
+          @for (stand of filteredStands(); track stand.id) {
+            <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+              
+              <!-- Empresa & Logo -->
+              <td class="py-3.5 px-4 sm:px-6">
+                <div class="flex items-center gap-3">
+                  <img
+                    [src]="stand.logoUrl"
+                    [alt]="stand.name"
+                    class="w-10 h-10 rounded-full object-cover bg-white p-0.5 border border-slate-200 dark:border-slate-700 shrink-0"
+                  />
+                  <div class="min-w-0 max-w-sm">
+                    <p class="font-bold text-slate-900 dark:text-white truncate">
+                      {{ stand.name }}
+                    </p>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
+                      {{ stand.description }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Stand & Sector -->
+              <td class="py-3.5 px-4 whitespace-nowrap">
+                <div class="flex flex-col items-start gap-1">
+                  <span class="px-2.5 py-0.5 rounded-md font-mono text-xs font-bold bg-slate-100 dark:bg-slate-800 text-primary dark:text-brand-cyan-electric border border-primary/20 dark:border-slate-700">
+                    Stand {{ stand.standNumber }}
+                  </span>
+                  <span class="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                    {{ stand.sector }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Origen -->
+              <td class="py-3.5 px-4 text-slate-600 dark:text-slate-400 text-xs whitespace-nowrap">
+                {{ stand.origin || 'Argentina' }}
+              </td>
+
+              <!-- Visibilidad: TOGGLE SWITCH EN LÍNEA -->
+              <td class="py-3.5 px-4 text-center whitespace-nowrap">
+                <div class="inline-flex items-center gap-2">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      [checked]="stand.isVisible"
+                      (change)="toggleVisibility(stand)"
+                      class="sr-only peer"
+                    />
+                    <div class="w-10 h-5.5 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4.5 after:w-4.5 after:transition-all peer-checked:bg-emerald-500"></div>
+                  </label>
+                  <span class="text-[11px] font-bold" [ngClass]="stand.isVisible ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'">
+                    {{ stand.isVisible ? 'Visible' : 'Oculto' }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Acciones -->
+              <td class="py-3.5 px-4 sm:px-6 text-end whitespace-nowrap">
+                <div class="inline-flex items-center gap-1.5">
+                  
+                  <!-- Previsualizar -->
+                  <button
+                    type="button"
+                    (click)="openPreview(stand)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-brand-cyan-accessible dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    title="Previsualizar tarjeta en catálogo">
+                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                  </button>
+
+                  <!-- Editar -->
+                  <button
+                    type="button"
+                    (click)="openEditModal(stand)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                    title="Editar stand">
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+
+                  <!-- Eliminar -->
+                  <button
+                    type="button"
+                    (click)="deleteStand(stand.id)"
+                    class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    title="Eliminar stand">
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="py-12 px-4 text-center">
+                <div class="max-w-sm mx-auto flex flex-col items-center">
+                  <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">
+                    storefront
+                  </span>
+                  <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    No se encontraron stands registrados
+                  </p>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Crea un nuevo expositor con el botón superior.
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+
+      </table>
+    </div>
+
+    <div class="px-4 sm:px-6 py-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+      <span>Mostrando {{ filteredStands().length }} de {{ stands().length }} stands</span>
+      <span>Catálogo Oficial ExpoJuy 2026</span>
+    </div>
+  </div>
+
+  <!-- Modal Flotante de Edición/Creación -->
+  <app-stand-form-modal
+    [isOpen]="isModalOpen()"
+    [standToEdit]="editingStand()"
+    (save)="saveStand($event)"
+    (close)="closeModal()"
+  />
+
+  <!-- Modal Independiente de Previsualización de Stand -->
+  @if (previewingStand(); as stand) {
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs" (click)="closePreview()"></div>
+      <div class="min-h-full flex items-center justify-center p-4">
+        <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-800" (click)="$event.stopPropagation()">
+          
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-5">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-brand-cyan-electric">visibility</span>
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">
+                Previsualización en Directorio
+              </h3>
+            </div>
+            <button type="button" (click)="closePreview()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+              <span class="material-symbols-outlined text-lg">close</span>
+            </button>
+          </div>
+
+          <!-- Card idéntica a la landing -->
+          <div class="p-6 rounded-3xl bg-neutral-surface-light dark:bg-[#151026] border border-primary/15 shadow-md flex flex-col justify-between">
+            <div>
+              @if (stand.bannerUrl) {
+                <div class="h-28 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-3xl relative bg-slate-200 dark:bg-slate-800">
+                  <img [src]="stand.bannerUrl" [alt]="stand.name" class="w-full h-full object-cover" />
+                </div>
+              }
+              
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                  <img [src]="stand.logoUrl" [alt]="stand.name" class="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 bg-white" />
+                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
+                    Stand {{ stand.standNumber }} · {{ stand.sector }}
+                  </span>
+                </div>
+                <span class="material-symbols-outlined text-primary text-base">verified</span>
+              </div>
+
+              <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ stand.name }}</h3>
+              <p class="text-xs text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{{ stand.sector }}</p>
+              <p class="text-sm text-slate-600 dark:text-slate-300 mt-2.5 leading-relaxed">
+                {{ stand.description }}
+              </p>
+            </div>
+
+            <div class="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+              <span class="font-semibold text-primary dark:text-brand-cyan-electric">Origen: {{ stand.origin || 'Jujuy' }}</span>
+              <span class="font-bold text-brand-cyan-accessible dark:text-brand-cyan-electric flex items-center gap-1">
+                <span>Agendar B2B</span>
+                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-5 flex justify-end">
+            <button
+              type="button"
+              (click)="closePreview()"
+              class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+              Cerrar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
