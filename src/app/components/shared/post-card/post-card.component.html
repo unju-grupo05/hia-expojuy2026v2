@@ -1,0 +1,65 @@
+@if (size() === 'large') {
+  <!-- Tarjeta Grande / Panorámica (Estilo Cauchari) -->
+  <article class="relative overflow-hidden min-h-[320px] sm:min-h-[360px] bg-slate-900 rounded-3xl transition-all duration-300 hover:-translate-y-1 group w-full shadow-lg border border-white/10 select-none">
+    <img
+      class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+      [alt]="post().title"
+      loading="lazy"
+      [src]="post().imageUrl"
+    />
+    <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent"></div>
+    
+    <!-- Tag de categoría superior -->
+    <div class="absolute top-4 left-4 z-10">
+      <span class="px-3.5 py-1 rounded-full bg-black/70 text-brand-cyan-electric border border-brand-cyan-electric/40 backdrop-blur-md text-[11px] font-bold uppercase tracking-wider shadow-xs">
+        {{ post().category }}
+      </span>
+    </div>
+
+    <!-- Contenido inferior -->
+    <div class="absolute bottom-0 inset-x-0 p-6 sm:p-8 z-10 space-y-2">
+      <div class="text-xs text-slate-300 flex items-center gap-1.5 font-bold uppercase tracking-wider">
+        <span class="material-symbols-outlined text-sm text-brand-cyan-electric">calendar_today</span>
+        <span>{{ post().date }}</span>
+      </div>
+      <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight">
+        {{ post().title }}
+      </h3>
+      @if (post().body) {
+        <p class="text-xs text-slate-300 line-clamp-2 leading-relaxed opacity-90 font-sans">
+          {{ post().body }}
+        </p>
+      }
+    </div>
+  </article>
+} @else {
+  <!-- Tarjeta Pequeña / Estándar (Estilo Ventanilla / Cobertura) -->
+  <article class="bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-cyan-electric group w-full select-none">
+    <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
+      <img
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        [alt]="post().title"
+        loading="lazy"
+        [src]="post().imageUrl"
+      />
+      <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 text-brand-cyan-electric border border-brand-cyan-electric/30 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
+        {{ post().category }}
+      </span>
+    </div>
+
+    <div class="p-5 space-y-2">
+      <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1 font-semibold uppercase tracking-wider">
+        <span class="material-symbols-outlined text-sm text-brand-cyan-electric">calendar_today</span>
+        <span>{{ post().date }}</span>
+      </div>
+      <h3 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2 leading-snug font-display">
+        {{ post().title }}
+      </h3>
+      @if (post().body) {
+        <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed font-sans">
+          {{ post().body }}
+        </p>
+      }
+    </div>
+  </article>
+}

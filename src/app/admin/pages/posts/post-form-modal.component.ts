@@ -1,6 +1,7 @@
-import { Component, effect, inject, input, output } from '@angular/core';
+import { Component, effect, inject, input, output, signal, computed } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { PostCardComponent, PostCardData } from '../../../components/shared/post-card/post-card.component';
 
 export interface Post {
   id: string;
@@ -11,6 +12,7 @@ export interface Post {
   status: 'published' | 'draft';
   imageUrl: string;
   body: string;
+  displaySize: 'large' | 'small';
 }
 
 export type PostFormData = Omit<Post, 'id' | 'date'> & { id?: string };
@@ -18,7 +20,7 @@ export type PostFormData = Omit<Post, 'id' | 'date'> & { id?: string };
 @Component({
   selector: 'app-post-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, PostCardComponent],
   templateUrl: './post-form-modal.component.html'
 })
 export class PostFormModalComponent {
@@ -30,13 +32,29 @@ export class PostFormModalComponent {
   public save = output<PostFormData>();
   public close = output<void>();
 
+  public activeTab = signal<'form' | 'preview'>('form');
+
   public postForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(5)]],
     slug: ['', [Validators.required]],
     category: ['Minería y Litio', [Validators.required]],
     status: ['published' as 'published' | 'draft', [Validators.required]],
+    displaySize: ['small' as 'large' | 'small', [Validators.required]],
     imageUrl: ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80', [Validators.required]],
     body: ['', [Validators.required, Validators.minLength(20)]]
+  });
+
+  // Preview dinámico en tiempo real
+  public previewData = computed<PostCardData>(() => {
+    const val = this.postForm.value;
+    return {
+      title: val.title?.trim() || 'Título de ejemplo para la publicación',
+      category: val.category || 'Categoría',
+      date: this.postToEdit()?.date || 'Fecha actual',
+      imageUrl: val.imageUrl?.trim() || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+      body: val.body?.trim() || 'Resumen descriptivo del contenido oficial de la noticia.',
+      slug: val.slug || 'slug-ejemplo'
+    };
   });
 
   constructor() {
@@ -48,6 +66,7 @@ export class PostFormModalComponent {
           slug: post.slug,
           category: post.category,
           status: post.status,
+          displaySize: post.displaySize || 'small',
           imageUrl: post.imageUrl,
           body: post.body
         });
@@ -57,17 +76,18 @@ export class PostFormModalComponent {
           slug: '',
           category: 'Minería y Litio',
           status: 'published',
+          displaySize: 'small',
           imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
           body: ''
         });
       }
+      this.activeTab.set('form');
     });
   }
 
   public onTitleChange(): void {
     const currentSlug = this.postForm.get('slug')?.value;
     const title = this.postForm.get('title')?.value;
-    // Autogenerar slug si está vacío o si es una creación nueva
     if (!this.postToEdit() && (!currentSlug || currentSlug === this.slugify(title || ''))) {
       this.postForm.patchValue({ slug: this.slugify(title || '') });
     }
@@ -89,6 +109,7 @@ export class PostFormModalComponent {
   public onSubmit(): void {
     if (this.postForm.invalid) {
       this.postForm.markAllAsTouched();
+      this.activeTab.set('form');
       return;
     }
 
@@ -99,6 +120,7 @@ export class PostFormModalComponent {
       slug: formVal.slug || this.slugify(formVal.title || ''),
       category: formVal.category || 'General',
       status: (formVal.status as 'published' | 'draft') || 'draft',
+      displaySize: (formVal.displaySize as 'large' | 'small') || 'small',
       imageUrl: formVal.imageUrl || '',
       body: formVal.body || ''
     };

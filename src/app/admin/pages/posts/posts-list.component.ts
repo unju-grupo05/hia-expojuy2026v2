@@ -2,64 +2,70 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Post, PostFormData, PostFormModalComponent } from './post-form-modal.component';
+import { PostCardComponent } from '../../../components/shared/post-card/post-card.component';
 
 @Component({
   selector: 'app-posts-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, PostFormModalComponent],
+  imports: [CommonModule, FormsModule, PostFormModalComponent, PostCardComponent],
   templateUrl: './posts-list.component.html'
 })
 export class PostsListComponent {
   public posts = signal<Post[]>([
     {
       id: 'post-1',
-      title: 'Presentación Oficial del Corredor Bioceánico y Nuevos Acuerdos',
-      slug: 'presentacion-oficial-corredor-bioceanico',
-      category: 'Corredor Bioceánico',
-      date: '2026-09-18',
+      title: 'El Parque Solar Cauchari expondrá sus proyectos de expansión e hidrógeno verde en el Pabellón de Energías',
+      slug: 'parque-solar-cauchari-expansion-hidrogeno',
+      category: 'Energías Limpias',
+      date: '02 Agosto 2026',
       status: 'published',
-      imageUrl: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=600&auto=format&fit=crop&q=80',
-      body: 'Representantes gubernamentales y cámaras de comercio de la región consolidaron la hoja de ruta para la integración logística y portuaria de Jujuy con el Pacífico.'
+      displaySize: 'large',
+      imageUrl: './Img/Cauchari.jpg',
+      body: 'El Parque Solar Cauchari, el mayor de su tipo a gran altura del mundo, presentará en el Pabellón de Energías sus nuevas fases de expansión y la hoja de ruta para la producción de hidrógeno verde en la Puna.'
     },
     {
       id: 'post-2',
-      title: 'Lanzamiento de la Ronda de Negocios Mineros y Litio 2026',
-      slug: 'lanzamiento-ronda-negocios-mineros-litio',
-      category: 'Minería y Litio',
-      date: '2026-09-15',
+      title: 'Jujuy da inicio a su tradicional ExpoJuy en su edición 2026',
+      slug: 'jujuy-da-inicio-expojuy-2026',
+      category: 'Inauguración',
+      date: '09 Octubre 2026',
       status: 'published',
-      imageUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
-      body: 'Más de 80 empresas internacionales confirmaron su presencia en los paneles de industrialización de litio, cadenas de valor y minería con bajas emisiones.'
+      displaySize: 'small',
+      imageUrl: './Img/ExpoJuy-1.webp',
+      body: 'Se realizará en el predio de la Ciudad Cultural con la presencia de delegaciones internacionales y rondas de negocios estratégicas.'
     },
     {
       id: 'post-3',
-      title: 'Protocolos de Acreditación Internacional para Expositores',
-      slug: 'protocolos-acreditacion-internacional',
-      category: 'Institucional',
-      date: '2026-09-12',
-      status: 'draft',
-      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&auto=format&fit=crop&q=80',
-      body: 'Guía detallada con la documentación aduanera requerida para stands del exterior y el ingreso de maquinaria pesada al predio ferial.'
+      title: 'Cobertura técnica y streaming en directo durante la muestra internacional',
+      slug: 'cobertura-tecnica-streaming-directo',
+      category: 'En vivo 🎙️',
+      date: '10 Octubre 2026',
+      status: 'published',
+      displaySize: 'small',
+      imageUrl: './Img/Expojuy-8.webp',
+      body: 'Transmisión exclusiva minuto a minuto con entrevistas a líderes de industria, paneles y conferencias en vivo.'
     },
     {
       id: 'post-4',
-      title: 'Nuevas Tecnologías Verdes y Parques Solares aplicados al NOA',
-      slug: 'tecnologias-verdes-parques-solares-noa',
-      category: 'Energías Limpias',
-      date: '2026-09-08',
+      title: 'Avanzan los acuerdos estratégicos del Corredor Bioceánico',
+      slug: 'acuerdos-estrategicos-corredor-bioceanico',
+      category: 'Comercio Exterior',
+      date: '11 Octubre 2026',
       status: 'published',
-      imageUrl: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80',
-      body: 'Exposición interactiva sobre la ampliación del parque solar Cauchari y nuevos modelos de microrredes para comunidades y empresas en la puna jujeña.'
+      displaySize: 'small',
+      imageUrl: './Img/ExpoJuy-1.webp',
+      body: 'Integración logística y portuaria de Jujuy con el Pacífico para potenciar exportaciones mineras y agroindustriales.'
     },
     {
       id: 'post-5',
-      title: 'Agenda preliminar de Charlas Magistrales en Ciudad Cultural',
-      slug: 'agenda-preliminar-charlas-ciudad-cultural',
-      category: 'Innovación',
-      date: '2026-09-02',
+      title: 'Presentarán el nuevo ecosistema de startups e innovación industrial',
+      slug: 'ecosistema-startups-innovacion-industrial',
+      category: 'Tecnología',
+      date: '12 Octubre 2026',
       status: 'draft',
-      imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&auto=format&fit=crop&q=80',
-      body: 'Cronograma estimado con oradores invitados, paneles temáticos simultáneos y sesiones de networking empresarial en el pabellón principal.'
+      displaySize: 'small',
+      imageUrl: './Img/Cultural.png',
+      body: 'Espacio dedicado a incubadoras, soluciones de inteligencia artificial aplicada y robótica para el sector productivo.'
     }
   ]);
 
@@ -67,6 +73,7 @@ export class PostsListComponent {
   public selectedStatusFilter = signal<'all' | 'published' | 'draft'>('all');
   public isModalOpen = signal<boolean>(false);
   public editingPost = signal<Post | null>(null);
+  public previewingPost = signal<Post | null>(null);
   public toastMessage = signal<string | null>(null);
 
   public filteredPosts = computed(() => {
@@ -100,6 +107,14 @@ export class PostsListComponent {
     this.editingPost.set(null);
   }
 
+  public openPreview(post: Post): void {
+    this.previewingPost.set(post);
+  }
+
+  public closePreview(): void {
+    this.previewingPost.set(null);
+  }
+
   public savePost(formData: PostFormData): void {
     if (formData.id) {
       // Actualizar post existente
@@ -122,8 +137,9 @@ export class PostsListComponent {
         title: formData.title,
         slug: formData.slug,
         category: formData.category,
-        date: new Date().toISOString().split('T')[0],
+        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }),
         status: formData.status,
+        displaySize: formData.displaySize,
         imageUrl: formData.imageUrl,
         body: formData.body
       };
