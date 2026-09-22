@@ -316,8 +316,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     const sectionMap = [
       { navTarget: 'hero-section', elementId: 'hero-section' },
       { navTarget: 'sobre-expojuy', elementId: 'sobre-expojuy' },
-      { navTarget: 'mapa', elementId: 'mapa-ubicacion' },
-      { navTarget: 'ubicacion', elementId: 'mapa-ubicacion' },
+      { navTarget: 'mapa', elementId: 'mapa' },
       { navTarget: 'expositores', elementId: 'expositores' },
       { navTarget: 'agenda', elementId: 'agenda' },
       { navTarget: 'novedades', elementId: 'novedades' },
