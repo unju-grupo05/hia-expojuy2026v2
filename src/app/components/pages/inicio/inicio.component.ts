@@ -7,7 +7,6 @@ import { ExpositoresComponent } from '../expositores/expositores.component';
 import { AgendaComponent } from '../agenda/agenda.component';
 import { NovedadesComponent } from '../novedades/novedades.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
-import { Entradas } from '../entradas/entradas';
 import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
 import gsap from 'gsap';
@@ -26,7 +25,6 @@ import Lenis from 'lenis';
     AgendaComponent,
     NovedadesComponent,
     GaleriaComponent,
-    Entradas,
     AcreditacionesFaq,
     Sponsors
   ],
@@ -321,7 +319,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       { navTarget: 'agenda', elementId: 'agenda' },
       { navTarget: 'novedades', elementId: 'novedades' },
       { navTarget: 'galeria', elementId: 'galeria' },
-      { navTarget: 'entradas', elementId: 'entradas' },
       { navTarget: 'acreditaciones-section', elementId: 'acreditaciones-section' }
     ];
 
