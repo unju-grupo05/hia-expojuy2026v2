@@ -145,9 +145,12 @@
             </button>
             <button
               type="submit"
-              class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/20 flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[18px]">check</span>
-              <span>{{ pillarToEdit() ? 'Actualizar Pilar' : 'Guardar Pilar' }}</span>
+              [disabled]="isSaving()"
+              class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/20 flex items-center gap-1.5 disabled:opacity-60 disabled:cursor-not-allowed">
+              <span class="material-symbols-outlined text-[18px]">
+                {{ isSaving() ? 'progress_activity' : 'check' }}
+              </span>
+              <span>{{ isSaving() ? 'Guardando...' : (pillarToEdit() ? 'Actualizar Pilar' : 'Guardar Pilar') }}</span>
             </button>
           </div>
 

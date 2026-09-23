@@ -3,14 +3,14 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 export interface Pillar {
-  id: string;
+  id: number;
   title: string;
   description: string;
   iconSvgName: string;
   order: number;
 }
 
-export type PillarFormData = Omit<Pillar, 'id'> & { id?: string };
+export type PillarFormData = Omit<Pillar, 'id'> & { id?: number };
 
 @Component({
   selector: 'app-pillar-form-modal',
@@ -23,6 +23,7 @@ export class PillarFormModalComponent {
 
   public isOpen = input<boolean>(false);
   public pillarToEdit = input<Pillar | null>(null);
+  public isSaving = input<boolean>(false);
 
   public save = output<PillarFormData>();
   public close = output<void>();

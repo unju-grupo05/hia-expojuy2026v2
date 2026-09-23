@@ -1,8 +1,9 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable, of, throwError } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 export interface AdminUser {
   id: string;
@@ -30,8 +31,12 @@ const USER_KEY = 'expojuy_admin_user';
 })
 export class AuthService {
   private router = inject(Router);
+  private http = inject(HttpClient);
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+
+  private urlHost = 'http://localhost:3000';
+  private loginUrl = this.urlHost + '/api/usuarios/login';
 
   public readonly isAuthenticated = signal<boolean>(false);
   public readonly currentUser = signal<AdminUser | null>(null);
@@ -74,41 +79,56 @@ export class AuthService {
     const emailTrimmed = credentials.email?.trim().toLowerCase();
     const password = credentials.password?.trim();
 
-    // Mock validation
-    const isValid = (emailTrimmed === 'admin@expojuy.com' && password === 'admin123') ||
-      (Boolean(emailTrimmed) && Boolean(password) && password.length >= 4);
-
-    if (!isValid) {
-      this.isLoading.set(false);
-      return throwError(() => new Error('Credenciales inválidas. Usa admin@expojuy.com / admin123 para el acceso de prueba.'));
-    }
-
-    const mockResponse: AuthResponse = {
-      token: 'jwt-expojuy-admin-' + Math.random().toString(36).substring(2) + '-' + Date.now(),
-      user: {
-        id: 'admin-01',
-        email: emailTrimmed,
-        name: 'Administrador ExpoJuy',
-        role: 'Super Admin',
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-      }
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
     };
 
-    return of(mockResponse).pipe(
-      delay(600),
-      tap({
-        next: (res) => {
-          if (this.isBrowser) {
-            localStorage.setItem(TOKEN_KEY, res.token);
-            localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-          }
-          this.isAuthenticated.set(true);
-          this.currentUser.set(res.user);
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.isLoading.set(false);
+    // El Backend espera `identificador` (correo o legajo) y `password`
+    const body = {
+      identificador: emailTrimmed,
+      password
+    };
+
+    return this.http.post<{ msg: string; token: string; usuario: any }>(this.loginUrl, body, httpOptions).pipe(
+      map((res) => {
+        if (!res?.token) {
+          throw new Error('Respuesta inválida del servidor.');
         }
+
+        const usuario: AdminUser = {
+          id: res.usuario?.legajo || 'admin-01',
+          email: emailTrimmed || '',
+          name: [res.usuario?.nombre, res.usuario?.apellido].filter(Boolean).join(' ') || 'Administrador ExpoJuy',
+          role: res.usuario?.rol || 'admin',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+        };
+
+        if (this.isBrowser) {
+          localStorage.setItem(TOKEN_KEY, res.token);
+          localStorage.setItem(USER_KEY, JSON.stringify(usuario));
+        }
+
+        this.isAuthenticated.set(true);
+        this.currentUser.set(usuario);
+        this.isLoading.set(false);
+
+        return { token: res.token, user: usuario };
+      }),
+      catchError((httpError: HttpErrorResponse) => {
+        this.isLoading.set(false);
+
+        let message = 'No se pudo conectar con el servidor. Verifica que el Backend esté activo en el puerto 3000.';
+        if (httpError.status === 401) {
+          message = httpError.error?.msg || 'Contraseña incorrecta.';
+        } else if (httpError.status === 404) {
+          message = httpError.error?.msg || 'Usuario no encontrado.';
+        } else if (httpError.status === 400) {
+          message = httpError.error?.msg || 'Ingresa tu correo y contraseña.';
+        }
+
+        return throwError(() => new Error(message));
       })
     );
   }

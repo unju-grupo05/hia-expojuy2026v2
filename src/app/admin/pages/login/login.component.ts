@@ -20,8 +20,8 @@ export class LoginComponent {
   public showPassword = signal<boolean>(false);
 
   public loginForm = this.fb.group({
-    email: ['admin@expojuy.com', [Validators.required, Validators.email]],
-    password: ['admin123', [Validators.required, Validators.minLength(4)]],
+    email: ['lautaro@gmail.com', [Validators.required, Validators.email]],
+    password: ['admin', [Validators.required, Validators.minLength(4)]],
     rememberMe: [true]
   });
 
@@ -50,8 +50,8 @@ export class LoginComponent {
 
   public fillDemoCredentials(): void {
     this.loginForm.patchValue({
-      email: 'admin@expojuy.com',
-      password: 'admin123'
+      email: 'lautaro@gmail.com',
+      password: 'admin'
     });
     this.errorMessage.set(null);
   }

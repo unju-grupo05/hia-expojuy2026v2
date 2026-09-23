@@ -1,7 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-modal.component';
+import { ApiEjes } from '../../../../app/services/api-ejes.service';
 
 @Component({
   selector: 'app-pillars',
@@ -9,57 +10,19 @@ import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-
   imports: [CommonModule, FormsModule, PillarFormModalComponent],
   templateUrl: './pillars.component.html'
 })
-export class PillarsComponent {
-  public pillars = signal<Pillar[]>([
-    {
-      id: 'pillar-1',
-      title: 'Minería & Litio Sustentable',
-      description: 'Industrialización del litio, estándares ESG, electromovilidad y desarrollo de proveedores locales de alta competitividad.',
-      iconSvgName: 'science',
-      order: 1
-    },
-    {
-      id: 'pillar-2',
-      title: 'Energías Renovables & Hidrógeno',
-      description: 'El potencial solar de la Puna, Parque Cauchari, almacenamiento BESS y proyectos de descarbonización productiva.',
-      iconSvgName: 'solar_power',
-      order: 2
-    },
-    {
-      id: 'pillar-3',
-      title: 'Corredor Bioceánico & Logística',
-      description: 'Conexión vial y ferroviaria entre el Atlántico y los puertos de Chile y Brasil para potenciar la exportación regional.',
-      iconSvgName: 'rv_hookup',
-      order: 3
-    },
-    {
-      id: 'pillar-4',
-      title: 'Agrotecnología & Bioeconomía',
-      description: 'Sistemas de riego inteligente, bioplásticos, azúcar, bioetanol y productos andinos con denominación de origen.',
-      iconSvgName: 'agriculture',
-      order: 4
-    },
-    {
-      id: 'pillar-5',
-      title: 'Innovación, Startups & IA',
-      description: 'Transformación digital aplicada a cadenas productivas, telemetría y polos científicos de alta tecnología en Jujuy.',
-      iconSvgName: 'lightbulb',
-      order: 5
-    },
-    {
-      id: 'pillar-6',
-      title: 'Rondas de Negocios & Cooperación',
-      description: 'Vinculación directa entre inversores internacionales, cámaras empresariales y PyMEs exportadoras.',
-      iconSvgName: 'handshake',
-      order: 6
-    }
-  ]);
+export class PillarsComponent implements OnInit {
+  private apiEjes = inject(ApiEjes);
+
+  public pillars = signal<Pillar[]>([]);
+  public isLoading = signal<boolean>(true);
+  public isSaving = signal<boolean>(false);
 
   public viewMode = signal<'grid' | 'table'>('grid');
   public searchTerm = signal<string>('');
   public isModalOpen = signal<boolean>(false);
   public editingPillar = signal<Pillar | null>(null);
   public toastMessage = signal<string | null>(null);
+  public toastType = signal<'success' | 'error'>('success');
 
   public sortedPillars = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -71,6 +34,45 @@ export class PillarsComponent {
 
     return [...list].sort((a, b) => a.order - b.order);
   });
+
+  public ngOnInit(): void {
+    this.cargarEjes();
+  }
+
+  private mapearEjeDesdeApi(api: any): Pillar {
+    return {
+      id: Number(api.id),
+      title: api.nombre,
+      description: api.descripcion,
+      iconSvgName: api.icono || 'lightbulb',
+      order: Number(api.orden) || 0
+    };
+  }
+
+  private mapearEjeParaApi(data: PillarFormData): any {
+    return {
+      nombre: data.title,
+      descripcion: data.description,
+      icono: data.iconSvgName || 'lightbulb',
+      orden: Number(data.order) || 1
+    };
+  }
+
+  private cargarEjes(): void {
+    this.isLoading.set(true);
+    this.apiEjes.getEjes().subscribe({
+      next: (res) => {
+        const datos = res?.data || res;
+        this.pillars.set(Array.isArray(datos) ? datos.map(this.mapearEjeDesdeApi) : []);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.pillars.set([]);
+        this.isLoading.set(false);
+        this.showToast(err?.error?.message || 'Error al cargar los ejes estratégicos.', 'error');
+      }
+    });
+  }
 
   public openCreateModal(): void {
     this.editingPillar.set(null);
@@ -88,47 +90,56 @@ export class PillarsComponent {
   }
 
   public savePillar(formData: PillarFormData): void {
-    if (formData.id) {
-      this.pillars.update(list => list.map(p => {
-        if (p.id === formData.id) {
-          return {
-            ...p,
-            ...formData,
-            id: p.id
-          };
-        }
-        return p;
-      }));
-      this.showToast('Pilar estratégico actualizado con éxito.');
-    } else {
-      const newPillar: Pillar = {
-        id: 'pillar-' + Date.now(),
-        title: formData.title,
-        description: formData.description,
-        iconSvgName: formData.iconSvgName,
-        order: formData.order
-      };
-      this.pillars.update(list => [...list, newPillar]);
-      this.showToast('Nuevo pilar estratégico añadido al evento.');
-    }
+    if (this.isSaving()) return;
 
-    this.closeModal();
+    this.isSaving.set(true);
+    const payload = this.mapearEjeParaApi(formData);
+
+    const request = formData.id
+      ? this.apiEjes.putModificarEje(formData.id, payload)
+      : this.apiEjes.postEje(payload);
+
+    request.subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.closeModal();
+        this.showToast(
+          formData.id
+            ? 'Pilar estratégico actualizado con éxito.'
+            : 'Nuevo pilar estratégico añadido al evento.',
+          'success'
+        );
+        this.cargarEjes();
+      },
+      error: (err) => {
+        this.isSaving.set(false);
+        this.showToast(err?.error?.message || 'No se pudo guardar el pilar. Revisa tu sesión.', 'error');
+      }
+    });
   }
 
-  public deletePillar(id: string): void {
+  public deletePillar(id: number): void {
     const pillarToDelete = this.pillars().find(p => p.id === id);
     if (!pillarToDelete) return;
 
     if (confirm(`¿Eliminar el pilar "${pillarToDelete.title}"?`)) {
-      this.pillars.update(list => list.filter(p => p.id !== id));
-      this.showToast('Pilar eliminado correctamente.');
+      this.apiEjes.deleteEje(id).subscribe({
+        next: () => {
+          this.pillars.update(list => list.filter(p => p.id !== id));
+          this.showToast('Pilar eliminado correctamente.', 'success');
+        },
+        error: (err) => {
+          this.showToast(err?.error?.message || 'No se pudo eliminar el pilar. Revisa tu sesión.', 'error');
+        }
+      });
     }
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, tipo: 'success' | 'error' = 'success'): void {
     this.toastMessage.set(msg);
+    this.toastType.set(tipo);
     setTimeout(() => {
       this.toastMessage.set(null);
-    }, 3000);
+    }, 3500);
   }
 }

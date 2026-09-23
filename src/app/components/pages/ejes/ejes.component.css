@@ -31,3 +31,24 @@
     @media (prefers-reduced-motion: reduce) {
       .aurora-blob { animation: none; }
     }
+
+    /* Estado inicial invisible para el efecto de entrada */
+    #sobre-expojuy .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    /* Estado visible forzado */
+    #sobre-expojuy .reveal-on-scroll.is-visible {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    /* Ajuste opcional para Material Symbols */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      line-height: 1;
+    }
