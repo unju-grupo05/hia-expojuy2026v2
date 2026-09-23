@@ -17,100 +17,144 @@
       </p>
     </div>
 
-    <!-- Acordeón interactivo (Patrón Skiper 52 / HoverExpand_001) -->
-    <div class="gallery-ac" id="gallery-accordion" role="listbox" aria-label="Galería de imágenes de ExpoJuy 2026">
-      
-      <!-- Primera figura con clase is-active por defecto -->
-      <figure class="gallery-ac-item is-active reveal-on-scroll" role="option" aria-selected="true" tabindex="0">
-        <img alt="Ciudad Cultural Jujuy" loading="lazy" src="./Img/Cultural.png">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Ciudad Cultural</span>
-          <span class="gallery-ac-sub">Sede Central</span>
-        </figcaption>
-      </figure>
+    <!-- Estado: Cargando -->
+    @if (loading()) {
+      <div class="gallery-ac" aria-hidden="true">
+        @for (skeleton of [0, 1, 2, 3, 4, 5]; track $index) {
+          <figure class="gallery-ac skeleton-bar rounded-3xl bg-brand-cyan-electric/10 dark:bg-white/10 animate-pulse"></figure>
+        }
+      </div>
+    } @else if (error()) {
+      <!-- Estado: Error -->
+      <div class="flex flex-col items-center justify-center gap-4 py-16 text-center rounded-3xl bg-white/70 dark:bg-white/5 border border-rose-200/70 dark:border-rose-900/50">
+        <span class="material-symbols-outlined text-5xl text-rose-400">broken_image</span>
+        <div>
+          <p class="text-sm sm:text-base font-bold text-slate-700 dark:text-slate-200">No se pudo cargar la galería.</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Comprobá tu conexión e intentá nuevamente.</p>
+        </div>
+        <button
+          type="button"
+          (click)="cargarGaleria()"
+          class="px-6 py-2.5 rounded-full bg-brand-cyan-electric text-slate-900 text-xs font-black uppercase tracking-wider hover:brightness-110 transition-all">
+          Reintentar
+        </button>
+      </div>
+    } @else if (items().length === 0) {
+      <!-- Estado: Vacío -->
+      <div class="flex flex-col items-center justify-center gap-3 py-16 text-center rounded-3xl bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+        <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600">image_not_supported</span>
+        <p class="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">Aún no se subieron imágenes a la galería.</p>
+      </div>
+    } @else {
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Arte y Tradición" loading="lazy" src="./Img/ExpoJuy-9.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Arte y Tradición de Nuestra Tierra</span>
-          <span class="gallery-ac-sub">Identidad, colores y artesanías que representan el orgullo de La Quiaca y la Puna.</span>
-        </figcaption>
-      </figure>
+      <!-- Acordeón interactivo: primeras 10 imágenes (Patrón Skiper 52 / HoverExpand_001) -->
+      @if (accordionItems().length > 0) {
+        <div class="gallery-ac" id="gallery-accordion" role="listbox" aria-label="Galería de imágenes de ExpoJuy 2026">
+          @for (item of accordionItems(); track item.id; let idx = $index) {
+            <figure
+              class="gallery-ac-item reveal-on-scroll"
+              [class.is-active]="idx === activeIndex"
+              role="option"
+              [attr.aria-selected]="idx === activeIndex"
+              tabindex="0"
+              (mouseenter)="setActive(idx)"
+              (focus)="setActive(idx)"
+              (click)="setActive(idx)"
+              (keydown.enter)="setActive(idx)">
+              <img [alt]="item.titulo" loading="lazy" [src]="item.imagen">
+              <div class="gallery-ac-overlay"></div>
+              <figcaption class="gallery-ac-label">
+                <span class="gallery-ac-name">{{ item.titulo }}</span>
+                <span class="gallery-ac-sub">{{ item.descripcion }}</span>
+              </figcaption>
+            </figure>
+          }
+        </div>
+      }
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Innovación en Maquinaria" loading="lazy" src="./Img/ExpoJuy-10.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Innovación en Maquinaria y Tecnología</span>
-          <span class="gallery-ac-sub">Las últimas novedades en transporte, construcción y equipamiento agroindustrial.</span>
-        </figcaption>
-      </figure>
+      <!-- Carrusel: imágenes restantes (después de la décima) -->
+      @if (carouselPages().length > 0) {
+        <div class="mt-16">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+            <div class="space-y-1">
+              <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-brand-cyan-accessible">
+                <span class="material-symbols-outlined text-sm">auto_awesome_mosaic</span>
+                Galería completa
+              </span>
+              <h3 class="font-display text-xl sm:text-2xl font-extrabold text-brand-slate-dark dark:text-white">
+                Más momentos de la Expo
+              </h3>
+            </div>
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Innovación en Movilidad" loading="lazy" src="./Img/ExpoJuy-11.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Innovación en Movilidad</span>
-          <span class="gallery-ac-sub">Presencia institucional, flotas de vanguardia y servicios de larga distancia.</span>
-        </figcaption>
-      </figure>
+            @if (carouselPages().length > 1) {
+              <div class="flex items-center gap-3 shrink-0">
+                <button
+                  type="button"
+                  (click)="prevPage()"
+                  aria-label="Página anterior"
+                  class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-brand-cyan-electric hover:text-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center transition-all duration-300 shadow-xs active:scale-95">
+                  <span class="material-symbols-outlined text-lg">arrow_back</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="nextPage()"
+                  aria-label="Página siguiente"
+                  class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-brand-cyan-electric hover:text-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center transition-all duration-300 shadow-xs active:scale-95">
+                  <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </button>
+              </div>
+            }
+          </div>
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Robótica y Educación" loading="lazy" src="./Img/ExpoJuy-12.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Robótica y Educación</span>
-          <span class="gallery-ac-sub">Estudiantes explorando proyectos de tecnología y desarrollo del futuro.</span>
-        </figcaption>
-      </figure>
+          <div class="relative overflow-hidden">
+            <div
+              class="flex transition-transform duration-500 ease-out"
+              [style.transform]="'translateX(-' + (currentPage * 100) + '%)'">
+              @for (page of carouselPages(); track $index) {
+                <div class="w-full shrink-0 grid grid-cols-2 md:grid-cols-3 gap-4 pr-0.5">
+                  @for (item of page; track item.id) {
+                    <figure class="group cursor-pointer bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-brand-cyan-electric/60">
+                      <div class="relative h-36 sm:h-44 overflow-hidden bg-slate-200/70 dark:bg-slate-800/70">
+                        <img
+                          [src]="item.imagen"
+                          [alt]="item.titulo"
+                          loading="lazy"
+                          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                      </div>
+                      <figcaption class="p-3.5 sm:p-4">
+                        <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">{{ item.titulo }}</h4>
+                        @if (item.seccion || item.descripcion) {
+                          <p class="mt-1 text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 truncate">
+                            {{ item.seccion || item.descripcion }}
+                          </p>
+                        }
+                      </figcaption>
+                    </figure>
+                  }
+                </div>
+              }
+            </div>
+          </div>
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Cobertura Periodística" loading="lazy" src="./Img/ExpoJuy-15.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Cobertura Periodística y Medios</span>
-          <span class="gallery-ac-sub">Información al instante y transmisión en vivo de la mano de los principales medios.</span>
-        </figcaption>
-      </figure>
+          <!-- Indicadores de página -->
+          @if (carouselPages().length > 1) {
+            <div class="flex items-center justify-center gap-2 mt-6">
+              @for (page of carouselPages(); track $index) {
+                <button
+                  type="button"
+                  (click)="goToPage($index)"
+                  [class.bg-brand-cyan-electric]="currentPage === $index"
+                  [class.w-7]="currentPage === $index"
+                  [class.bg-slate-300]="currentPage !== $index"
+                  class="h-2 hidden sm:block rounded-full transition-all duration-300 w-2"
+                  [attr.aria-label]="'Ir a la página ' + ($index + 1)">
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
 
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Industria Minera" loading="lazy" src="./Img/ExpoJuy-2.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Industria Minera y Sustentabilidad</span>
-          <span class="gallery-ac-sub">Presencia de empresas clave impulsando el futuro industrial y la minería sustentable.</span>
-        </figcaption>
-      </figure>
-
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Espectáculos en vivo" loading="lazy" src="./Img/Expojuy-5.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Espectáculos y Ritmo en Vivo</span>
-          <span class="gallery-ac-sub">Comparsas, música y el color de los carnavales iluminando las noches de la Expo.</span>
-        </figcaption>
-      </figure>
-
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Festival de Música" loading="lazy" src="./Img/ExpoJuy-6.webp">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">Festival de Música y Tradición</span>
-          <span class="gallery-ac-sub">Viví la emoción y el folklore en las noches de la Expo.</span>
-        </figcaption>
-      </figure>
-
-      <figure class="gallery-ac-item reveal-on-scroll" role="option" aria-selected="false" tabindex="0">
-        <img alt="Isologotipo ExpoJuy 2026" class="bg-brand-slate-dark object-contain p-8" loading="lazy" src="./Img/expojuy26_isologotipo.png">
-        <div class="gallery-ac-overlay"></div>
-        <figcaption class="gallery-ac-label">
-          <span class="gallery-ac-name">ExpoJuy 2026</span>
-          <span class="gallery-ac-sub">Identidad Oficial</span>
-        </figcaption>
-      </figure>
-
-    </div>
+    }
   </div>
 </section>

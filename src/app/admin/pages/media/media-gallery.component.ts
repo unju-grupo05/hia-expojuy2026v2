@@ -1,6 +1,7 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { GaleriaApi } from '../../../services/apiGaleria.service';
 
 export interface MediaItem {
   id: string;
@@ -9,6 +10,10 @@ export interface MediaItem {
   size: string;
   dimensions: string;
   uploadedAt: string;
+  titulo: string;
+  descripcion: string;
+  seccion: string;
+  orden: number;
 }
 
 @Component({
@@ -17,89 +22,81 @@ export interface MediaItem {
   imports: [CommonModule, FormsModule],
   templateUrl: './media-gallery.component.html'
 })
-export class MediaGalleryComponent {
-  public images = signal<MediaItem[]>([
-    {
-      id: 'img-1',
-      name: 'predio-ferial-ciudad-cultural.jpg',
-      url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&auto=format&fit=crop&q=80',
-      size: '482 KB',
-      dimensions: '1920x1080',
-      uploadedAt: '2026-09-18'
-    },
-    {
-      id: 'img-2',
-      name: 'parque-solar-cauchari-litio.jpg',
-      url: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=80',
-      size: '620 KB',
-      dimensions: '1920x1280',
-      uploadedAt: '2026-09-17'
-    },
-    {
-      id: 'img-3',
-      name: 'ronda-negocios-internacional.jpg',
-      url: 'https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&auto=format&fit=crop&q=80',
-      size: '340 KB',
-      dimensions: '1600x900',
-      uploadedAt: '2026-09-15'
-    },
-    {
-      id: 'img-4',
-      name: 'conferencia-corredor-bioceanico.jpg',
-      url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&auto=format&fit=crop&q=80',
-      size: '512 KB',
-      dimensions: '1920x1080',
-      uploadedAt: '2026-09-14'
-    },
-    {
-      id: 'img-5',
-      name: 'stand-mineria-sustentable.jpg',
-      url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
-      size: '410 KB',
-      dimensions: '1280x853',
-      uploadedAt: '2026-09-10'
-    },
-    {
-      id: 'img-6',
-      name: 'tecnologia-litio-baterias.jpg',
-      url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
-      size: '298 KB',
-      dimensions: '1200x800',
-      uploadedAt: '2026-09-08'
-    },
-    {
-      id: 'img-7',
-      name: 'pabellon-gourmet-jujuy.jpg',
-      url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&auto=format&fit=crop&q=80',
-      size: '540 KB',
-      dimensions: '1920x1080',
-      uploadedAt: '2026-09-05'
-    },
-    {
-      id: 'img-8',
-      name: 'expojuy-banner-institucional.jpg',
-      url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
-      size: '390 KB',
-      dimensions: '1600x900',
-      uploadedAt: '2026-09-01'
-    }
-  ]);
+export class MediaGalleryComponent implements OnInit {
+  public images = signal<MediaItem[]>([]);
+
+  public loading = signal(true);
+  public loadError = signal(false);
 
   public searchTerm = signal<string>('');
   public copiedId = signal<string | null>(null);
   public toastMessage = signal<string | null>(null);
+  public toastError = signal<boolean>(false);
+  public uploading = signal(false);
+
+  public editing = signal<MediaItem | null>(null);
+  public saving = signal(false);
+
+  constructor(private galeriaApi: GaleriaApi) {}
+
+  ngOnInit(): void {
+    this.cargarGaleria();
+  }
 
   public filteredImages = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     if (!term) return this.images();
-    return this.images().filter(img => img.name.toLowerCase().includes(term));
+    return this.images().filter(img =>
+      img.name.toLowerCase().includes(term) ||
+      (img.descripcion && img.descripcion.toLowerCase().includes(term))
+    );
   });
+
+  public cargarGaleria(): void {
+    this.loading.set(true);
+    this.loadError.set(false);
+
+    this.galeriaApi.getGaleria().subscribe({
+      next: (res) => {
+        const items = Array.isArray(res?.data) ? res.data : [];
+        const mapped: MediaItem[] = items.map((g: any) => ({
+          id: String(g.id),
+          name: g.titulo || '',
+          url: g.imagen || '',
+          size: '',
+          dimensions: 'Original',
+          uploadedAt: g.createdAt ? String(g.createdAt).slice(0, 10) : '',
+          titulo: g.titulo || '',
+          descripcion: g.descripcion || '',
+          seccion: g.seccion || '',
+          orden: g.orden ?? 0
+        }));
+
+        this.images.set(mapped);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error al cargar la galería:', err);
+        this.loading.set(false);
+        this.loadError.set(true);
+      }
+    });
+  }
+
+  private readonly maxUploadMb = 20;
 
   public onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
+
+    if (file.size > this.maxUploadMb * 1024 * 1024) {
+      this.showToast(`La imagen supera el máximo de ${this.maxUploadMb} MB permitido.`, true);
+      input.value = '';
+      return;
+    }
+
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -108,18 +105,29 @@ export class MediaGalleryComponent {
         ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
         : Math.round(file.size / 1024) + ' KB';
 
-      const newImage: MediaItem = {
-        id: 'img-' + Date.now(),
-        name: file.name,
-        url: dataUrl,
-        size: sizeFormatted,
-        dimensions: 'Original',
-        uploadedAt: new Date().toISOString().split('T')[0]
-      };
+      const maxOrden = this.images().reduce((max, img) => Math.max(max, img.orden), 0);
 
-      this.images.update(current => [newImage, ...current]);
-      this.showToast(`Imagen "${file.name}" subida exitosamente.`);
-      input.value = '';
+      this.uploading.set(true);
+
+      this.galeriaApi.postGaleria({
+        titulo: file.name,
+        descripcion: '',
+        imagen: dataUrl,
+        seccion: '',
+        orden: maxOrden + 1
+      }).subscribe({
+        next: () => {
+          this.uploading.set(false);
+          this.showToast(`Imagen "${file.name}" subida exitosamente.`);
+          this.cargarGaleria();
+          input.value = '';
+        },
+        error: (err) => {
+          this.uploading.set(false);
+          this.showToast(err?.error?.message || 'No se pudo subir la imagen.', true);
+          input.value = '';
+        }
+      });
     };
 
     reader.readAsDataURL(file);
@@ -137,18 +145,65 @@ export class MediaGalleryComponent {
     }, 2000);
   }
 
+  public openEdit(image: MediaItem): void {
+    this.editing.set({ ...image });
+  }
+
+  public cancelEdit(): void {
+    this.editing.set(null);
+  }
+
+  public saveEdit(): void {
+    const edit = this.editing();
+    if (!edit) return;
+
+    if (!edit.titulo || !edit.titulo.trim()) {
+      this.showToast('El título de la imagen es obligatorio.', true);
+      return;
+    }
+
+    this.saving.set(true);
+
+    this.galeriaApi.putModificarGaleria(edit.id, {
+      titulo: edit.titulo,
+      descripcion: edit.descripcion,
+      imagen: edit.url,
+      seccion: edit.seccion,
+      orden: edit.orden ?? 0
+    }).subscribe({
+      next: () => {
+        this.saving.set(false);
+        this.editing.set(null);
+        this.showToast('Imagen actualizada correctamente.');
+        this.cargarGaleria();
+      },
+      error: (err) => {
+        this.saving.set(false);
+        this.showToast(err?.error?.message || 'No se pudo actualizar la imagen.', true);
+      }
+    });
+  }
+
   public deleteImage(id: string): void {
     const img = this.images().find(i => i.id === id);
     if (!img) return;
 
     if (confirm(`¿Deseas eliminar la imagen "${img.name}" de la biblioteca?`)) {
-      this.images.update(current => current.filter(i => i.id !== id));
-      this.showToast('Imagen eliminada de la biblioteca.');
+      this.galeriaApi.deleteGaleria(id).subscribe({
+        next: () => {
+          this.showToast('Imagen eliminada de la biblioteca.');
+          this.cargarGaleria();
+        },
+        error: (err) => {
+          this.showToast(err?.error?.message || 'No se pudo eliminar la imagen.', true);
+        }
+      });
     }
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, isError = false): void {
     this.toastMessage.set(msg);
+    this.toastError.set(isError);
     setTimeout(() => {
       this.toastMessage.set(null);
     }, 3500);
