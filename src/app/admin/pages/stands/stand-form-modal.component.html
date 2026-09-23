@@ -20,10 +20,10 @@
             </span>
             <div>
               <h2 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                {{ standToEdit() ? 'Editar Stand de Expositor' : 'Nuevo Stand de Expositor' }}
+                {{ standToEdit() ? 'Editar Expositor' : 'Nuevo Expositor' }}
               </h2>
               <p class="text-xs text-slate-500 dark:text-slate-400">
-                Configura los datos del stand para el catálogo oficial de empresas
+                Configura los datos del expositor para el catálogo oficial de empresas
               </p>
             </div>
           </div>
@@ -38,12 +38,12 @@
 
         <!-- Form Body -->
         <form [formGroup]="standForm" (ngSubmit)="onSubmit()" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-          
-          <!-- Nombre y Número de Stand -->
+
+          <!-- Nombre y Stand -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="sm:col-span-2">
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Empresa / Nombre del Stand *
+                Empresa / Nombre del Expositor *
               </label>
               <input
                 type="text"
@@ -58,33 +58,29 @@
 
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                N° de Stand *
+                Stand *
               </label>
               <input
                 type="text"
-                formControlName="standNumber"
-                placeholder="A-12"
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all font-mono uppercase"
+                formControlName="stand"
+                placeholder="Stand A-12 · Pab. Minería"
+                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
               />
             </div>
           </div>
 
-          <!-- Sector / Pabellón y Origen -->
+          <!-- Categoría y Origen -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Sector / Pabellón *
+                Rubro / Categoría *
               </label>
               <select
-                formControlName="sector"
+                formControlName="category"
                 class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all">
-                <option value="Minería & Litio">Minería & Litio</option>
-                <option value="Energías Renovables">Energías Renovables</option>
-                <option value="Agroindustria">Agroindustria</option>
-                <option value="Tecnología & IA">Tecnología & IA</option>
-                <option value="Logística & Puertos">Logística & Puertos</option>
-                <option value="Pabellón Comercial">Pabellón Comercial</option>
-                <option value="Institucional">Institucional</option>
+                @for (opt of categories; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
               </select>
             </div>
 
@@ -101,31 +97,17 @@
             </div>
           </div>
 
-          <!-- URLs de Logo y Banner -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                URL del Logotipo
-              </label>
-              <input
-                type="url"
-                formControlName="logoUrl"
-                placeholder="https://..."
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              />
-            </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                URL de Banner Fotográfico
-              </label>
-              <input
-                type="url"
-                formControlName="bannerUrl"
-                placeholder="https://..."
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              />
-            </div>
+          <!-- Subtítulo -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Subtítulo / Actividad Principal
+            </label>
+            <input
+              type="text"
+              formControlName="subtitle"
+              placeholder="Ej: Extracción y refinamiento de litio"
+              class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+            />
           </div>
 
           <!-- Descripción del Expositor -->
@@ -144,26 +126,6 @@
             }
           </div>
 
-          <!-- Visibilidad en la Landing -->
-          <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700">
-            <div>
-              <span class="text-xs font-bold text-slate-800 dark:text-slate-200 block">
-                Visibilidad en el Catálogo Público
-              </span>
-              <span class="text-[11px] text-slate-500 dark:text-slate-400">
-                Si está activo, el stand aparecerá en el buscador y mapa de la web oficial
-              </span>
-            </div>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                formControlName="isVisible"
-                class="sr-only peer"
-              />
-              <div class="w-11 h-6 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-            </label>
-          </div>
-
           <!-- BOTÓN DESTACADO PREVISUALIZAR STAND -->
           <div class="pt-2">
             <button
@@ -173,7 +135,7 @@
               <span class="material-symbols-outlined text-[18px]">
                 {{ isPreviewOpen() ? 'visibility_off' : 'visibility' }}
               </span>
-              <span>{{ isPreviewOpen() ? 'Ocultar Previsualización' : 'Previsualizar Stand en Modo Landing' }}</span>
+              <span>{{ isPreviewOpen() ? 'Ocultar Previsualización' : 'Previsualizar Tarjeta en Modo Landing' }}</span>
             </button>
           </div>
 
@@ -186,21 +148,10 @@
 
               <div class="w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-[#151026] border border-primary/10 dark:border-white/10 shadow-sm flex flex-col justify-between">
                 <div>
-                  @if (standForm.get('bannerUrl')?.value) {
-                    <div class="h-28 -mx-6 -mt-6 mb-4 overflow-hidden rounded-t-3xl relative bg-slate-100 dark:bg-slate-800">
-                      <img [src]="standForm.get('bannerUrl')?.value" [alt]="standForm.get('name')?.value" class="w-full h-full object-cover" />
-                    </div>
-                  }
-                  
                   <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-2">
-                      @if (standForm.get('logoUrl')?.value) {
-                        <img [src]="standForm.get('logoUrl')?.value" [alt]="standForm.get('name')?.value" class="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700 bg-white" />
-                      }
-                      <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
-                        Stand {{ standForm.get('standNumber')?.value || 'S/N' }}
-                      </span>
-                    </div>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
+                      {{ standForm.get('stand')?.value || 'Stand S/N' }}
+                    </span>
                     <span class="material-symbols-outlined text-primary text-base">verified</span>
                   </div>
 
@@ -208,7 +159,10 @@
                     {{ standForm.get('name')?.value || 'Nombre de la Empresa' }}
                   </h3>
                   <p class="text-[11px] text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">
-                    {{ standForm.get('sector')?.value }}
+                    {{ formatCategory(standForm.get('category')?.value || 'mineria') }}
+                  </p>
+                  <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed line-clamp-3">
+                    {{ standForm.get('subtitle')?.value }}
                   </p>
                   <p class="text-xs text-slate-600 dark:text-slate-300 mt-2 leading-relaxed line-clamp-3">
                     {{ standForm.get('description')?.value || 'Descripción del stand y soluciones tecnológicas.' }}
@@ -240,7 +194,7 @@
               type="submit"
               class="px-5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/20 flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[18px]">check</span>
-              <span>{{ standToEdit() ? 'Actualizar Stand' : 'Guardar Stand' }}</span>
+              <span>{{ standToEdit() ? 'Actualizar Expositor' : 'Guardar Expositor' }}</span>
             </button>
           </div>
 

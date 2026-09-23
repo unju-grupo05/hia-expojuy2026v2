@@ -5,16 +5,30 @@ import { CommonModule } from '@angular/common';
 export interface Stand {
   id: string;
   name: string;
-  sector: string;
+  stand: string;
+  category: string;
+  subtitle: string;
   description: string;
-  logoUrl: string;
-  bannerUrl: string;
-  standNumber: string;
-  isVisible: boolean;
-  origin?: string;
+  origin: string;
 }
 
 export type StandFormData = Omit<Stand, 'id'> & { id?: string };
+
+export const CATEGORY_LABELS: Record<string, string> = {
+  mineria: 'Minería & Litio',
+  energia: 'Energías Renovables',
+  agro: 'Agroindustria',
+  tecnologia: 'Tecnología & IA',
+  logistica: 'Logística & Puertos'
+};
+
+export const CATEGORY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'mineria', label: 'Minería & Litio' },
+  { value: 'energia', label: 'Energías Renovables' },
+  { value: 'agro', label: 'Agroindustria' },
+  { value: 'tecnologia', label: 'Tecnología & IA' },
+  { value: 'logistica', label: 'Logística & Puertos' }
+];
 
 @Component({
   selector: 'app-stand-form-modal',
@@ -33,15 +47,15 @@ export class StandFormModalComponent {
 
   public isPreviewOpen = signal<boolean>(false);
 
+  public categories = CATEGORY_OPTIONS;
+
   public standForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
-    sector: ['Minería & Litio', [Validators.required]],
-    standNumber: ['', [Validators.required]],
+    stand: ['', [Validators.required]],
+    category: ['mineria', [Validators.required]],
+    subtitle: [''],
     origin: ['Jujuy, Argentina', [Validators.required]],
-    description: ['', [Validators.required, Validators.minLength(10)]],
-    logoUrl: ['https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=150&auto=format&fit=crop&q=80'],
-    bannerUrl: ['https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80'],
-    isVisible: [true]
+    description: ['', [Validators.required, Validators.minLength(10)]]
   });
 
   constructor() {
@@ -50,24 +64,20 @@ export class StandFormModalComponent {
       if (stand) {
         this.standForm.patchValue({
           name: stand.name,
-          sector: stand.sector,
-          standNumber: stand.standNumber,
+          stand: stand.stand,
+          category: stand.category,
+          subtitle: stand.subtitle || '',
           origin: stand.origin || 'Argentina',
-          description: stand.description,
-          logoUrl: stand.logoUrl,
-          bannerUrl: stand.bannerUrl,
-          isVisible: stand.isVisible
+          description: stand.description
         });
       } else {
         this.standForm.reset({
           name: '',
-          sector: 'Minería & Litio',
-          standNumber: '',
+          stand: '',
+          category: 'mineria',
+          subtitle: '',
           origin: 'Jujuy, Argentina',
-          description: '',
-          logoUrl: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=150&auto=format&fit=crop&q=80',
-          bannerUrl: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
-          isVisible: true
+          description: ''
         });
       }
       this.isPreviewOpen.set(false);
@@ -84,13 +94,11 @@ export class StandFormModalComponent {
     const data: StandFormData = {
       id: this.standToEdit()?.id,
       name: val.name || '',
-      sector: val.sector || 'General',
-      standNumber: val.standNumber || 'S/N',
+      stand: val.stand || 'Stand S/N',
+      category: val.category || 'mineria',
+      subtitle: val.subtitle || '',
       origin: val.origin || 'Argentina',
-      description: val.description || '',
-      logoUrl: val.logoUrl || '',
-      bannerUrl: val.bannerUrl || '',
-      isVisible: val.isVisible !== false
+      description: val.description || ''
     };
 
     this.save.emit(data);
@@ -98,5 +106,9 @@ export class StandFormModalComponent {
 
   public togglePreview(): void {
     this.isPreviewOpen.update(v => !v);
+  }
+
+  public formatCategory(category: string): string {
+    return CATEGORY_LABELS[category] || category;
   }
 }

@@ -21,12 +21,24 @@
 
         <!-- Filter Category Tabs -->
         <div class="reveal-on-scroll flex flex-wrap items-center gap-2 mb-8" id="category-tabs">
-          <button class="filter-btn active-filter px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs transition-all" (click)="setCategoryFilter('all', $event)">Todos</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all" (click)="setCategoryFilter('mineria', $event)">Minería & Litio</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all" (click)="setCategoryFilter('agro', $event)">Agroindustria</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all" (click)="setCategoryFilter('energia', $event)">Energías Renovables</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all" (click)="setCategoryFilter('tecnologia', $event)">Tecnología & IA</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all" (click)="setCategoryFilter('logistica', $event)">Logística & Puertos</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs transition-all"
+                  [class.active-filter]="activeCategory() === 'all'"
+                  (click)="setCategoryFilter('all')">Todos</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+                  [class.active-filter]="activeCategory() === 'mineria'"
+                  (click)="setCategoryFilter('mineria')">Minería & Litio</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+                  [class.active-filter]="activeCategory() === 'agro'"
+                  (click)="setCategoryFilter('agro')">Agroindustria</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+                  [class.active-filter]="activeCategory() === 'energia'"
+                  (click)="setCategoryFilter('energia')">Energías Renovables</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+                  [class.active-filter]="activeCategory() === 'tecnologia'"
+                  (click)="setCategoryFilter('tecnologia')">Tecnología & IA</button>
+          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+                  [class.active-filter]="activeCategory() === 'logistica'"
+                  (click)="setCategoryFilter('logistica')">Logística & Puertos</button>
         </div>
 
         <!-- Exhibitor Grid -->
@@ -66,6 +78,25 @@
                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
               </div>
+            </div>
+          } @empty {
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 py-16 flex flex-col items-center justify-center text-center">
+              <span class="material-symbols-outlined text-5xl text-outline/50 mb-3">storefront</span>
+              <p class="text-sm sm:text-base font-semibold text-brand-slate-dark">
+                @if (loadingExhibitors()) {
+                  Cargando expositores...
+                } @else if (exhibitorsError()) {
+                  No se pudieron cargar los expositores.
+                } @else {
+                  No hay expositores que coincidan con tu búsqueda.
+                }
+              </p>
+              <button
+                type="button"
+                (click)="retryLoadExhibitors()"
+                class="mt-4 px-5 py-2.5 rounded-full text-xs font-bold text-white bg-primary hover:bg-primary-dark transition-all">
+                <span>Reintentar</span>
+              </button>
             </div>
           }
         </div>
