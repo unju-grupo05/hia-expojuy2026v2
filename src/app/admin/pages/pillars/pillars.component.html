@@ -3,7 +3,9 @@
   <!-- Toast de notificación -->
   @if (toastMessage()) {
     <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
-      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+      <span class="material-symbols-outlined text-lg" [ngClass]="toastType() === 'error' ? 'text-rose-400' : 'text-emerald-400'">
+        {{ toastType() === 'error' ? 'error' : 'check_circle' }}
+      </span>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -78,58 +80,72 @@
   <!-- VISTA 1: GRID DE TARJETAS (ESTILO LANDING) -->
   @if (viewMode() === 'grid') {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (pillar of sortedPillars(); track pillar.id) {
-        <div class="p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-brand-cyan-electric/50 transition-all duration-300 flex flex-col justify-between group">
-          
-          <div>
+      @if (isLoading()) {
+        @for (i of [1, 2, 3, 4, 5, 6]; track $index) {
+          <div class="p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs animate-pulse">
             <div class="flex items-center justify-between mb-5">
-              <div class="w-14 h-14 rounded-2xl bg-brand-lavender-surface dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-xs">
-                <span class="material-symbols-outlined text-3xl">{{ pillar.iconSvgName }}</span>
+              <div class="w-14 h-14 rounded-2xl bg-slate-200 dark:bg-slate-800"></div>
+              <div class="w-20 h-6 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+            </div>
+            <div class="w-3/4 h-5 bg-slate-200 dark:bg-slate-800 rounded-md mb-3"></div>
+            <div class="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full mb-1.5"></div>
+            <div class="w-5/6 h-3 bg-slate-200 dark:bg-slate-800 rounded-full"></div>
+          </div>
+        }
+      } @else {
+        @for (pillar of sortedPillars(); track pillar.id) {
+          <div class="p-7 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs hover:shadow-xl hover:border-brand-cyan-electric/50 transition-all duration-300 flex flex-col justify-between group">
+            
+            <div>
+              <div class="flex items-center justify-between mb-5">
+                <div class="w-14 h-14 rounded-2xl bg-brand-lavender-surface dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-xs">
+                  <span class="material-symbols-outlined text-3xl">{{ pillar.iconSvgName }}</span>
+                </div>
+
+                <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
+                  Eje 0{{ pillar.order }}
+                </span>
               </div>
 
-              <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
-                Eje 0{{ pillar.order }}
-              </span>
+              <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-brand-cyan-electric transition-colors">
+                {{ pillar.title }}
+              </h3>
+
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {{ pillar.description }}
+              </p>
             </div>
 
-            <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-primary dark:group-hover:text-brand-cyan-electric transition-colors">
-              {{ pillar.title }}
-            </h3>
+            <!-- Acciones de administración del pilar -->
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <span class="text-xs text-slate-400 font-mono">Orden: #{{ pillar.order }}</span>
 
-            <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-              {{ pillar.description }}
-            </p>
-          </div>
+              <div class="flex items-center gap-1">
+                <button
+                  type="button"
+                  (click)="openEditModal(pillar)"
+                  class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                  title="Editar pilar">
+                  <span class="material-symbols-outlined text-[18px]">edit</span>
+                </button>
 
-          <!-- Acciones de administración del pilar -->
-          <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-xs text-slate-400 font-mono">Orden: #{{ pillar.order }}</span>
-
-            <div class="flex items-center gap-1">
-              <button
-                type="button"
-                (click)="openEditModal(pillar)"
-                class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                title="Editar pilar">
-                <span class="material-symbols-outlined text-[18px]">edit</span>
-              </button>
-
-              <button
-                type="button"
-                (click)="deletePillar(pillar.id)"
-                class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-                title="Eliminar pilar">
-                <span class="material-symbols-outlined text-[18px]">delete</span>
-              </button>
+                <button
+                  type="button"
+                  (click)="deletePillar(pillar.id)"
+                  class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                  title="Eliminar pilar">
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-        </div>
-      } @empty {
-        <div class="col-span-1 md:col-span-3 py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800">
-          <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">interests</span>
-          <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se encontraron pilares estratégicos</p>
-        </div>
+          </div>
+        } @empty {
+          <div class="col-span-1 md:col-span-3 py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800">
+            <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">interests</span>
+            <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se encontraron pilares estratégicos</p>
+          </div>
+        }
       }
     </div>
   }
@@ -148,39 +164,56 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs sm:text-sm">
-            @for (pillar of sortedPillars(); track pillar.id) {
-              <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
-                <td class="py-3.5 px-4 sm:px-6 whitespace-nowrap font-mono font-bold text-primary dark:text-brand-cyan-electric">
-                  Eje 0{{ pillar.order }}
-                </td>
-                <td class="py-3.5 px-4 whitespace-nowrap">
-                  <div class="flex items-center gap-2.5">
-                    <span class="p-1.5 rounded-lg bg-brand-lavender-surface dark:bg-purple-950/60 text-primary dark:text-brand-cyan-electric">
-                      <span class="material-symbols-outlined text-[20px]">{{ pillar.iconSvgName }}</span>
-                    </span>
-                    <span class="font-bold text-slate-900 dark:text-white">{{ pillar.title }}</span>
-                  </div>
-                </td>
-                <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-md">
-                  <p class="line-clamp-2">{{ pillar.description }}</p>
-                </td>
-                <td class="py-3.5 px-4 sm:px-6 text-end whitespace-nowrap">
-                  <div class="inline-flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      (click)="openEditModal(pillar)"
-                      class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
-                    </button>
-                    <button
-                      type="button"
-                      (click)="deletePillar(pillar.id)"
-                      class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
-                      <span class="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
+            @if (isLoading()) {
+              <tr>
+                <td colspan="4" class="py-10 text-center text-slate-400">
+                  <div class="flex items-center justify-center gap-2 animate-pulse">
+                    <span class="material-symbols-outlined animate-spin">progress_activity</span>
+                    <span class="font-semibold">Cargando ejes...</span>
                   </div>
                 </td>
               </tr>
+            } @else {
+              @for (pillar of sortedPillars(); track pillar.id) {
+                <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors">
+                  <td class="py-3.5 px-4 sm:px-6 whitespace-nowrap font-mono font-bold text-primary dark:text-brand-cyan-electric">
+                    Eje 0{{ pillar.order }}
+                  </td>
+                  <td class="py-3.5 px-4 whitespace-nowrap">
+                    <div class="flex items-center gap-2.5">
+                      <span class="p-1.5 rounded-lg bg-brand-lavender-surface dark:bg-purple-950/60 text-primary dark:text-brand-cyan-electric">
+                        <span class="material-symbols-outlined text-[20px]">{{ pillar.iconSvgName }}</span>
+                      </span>
+                      <span class="font-bold text-slate-900 dark:text-white">{{ pillar.title }}</span>
+                    </div>
+                  </td>
+                  <td class="py-3.5 px-4 text-xs text-slate-600 dark:text-slate-300 max-w-md">
+                    <p class="line-clamp-2">{{ pillar.description }}</p>
+                  </td>
+                  <td class="py-3.5 px-4 sm:px-6 text-end whitespace-nowrap">
+                    <div class="inline-flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        (click)="openEditModal(pillar)"
+                        class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="deletePillar(pillar.id)"
+                        class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="py-10 text-center text-slate-400 text-sm font-semibold">
+                    No se encontraron pilares estratégicos
+                  </td>
+                </tr>
+              }
             }
           </tbody>
         </table>
@@ -192,6 +225,7 @@
   <app-pillar-form-modal
     [isOpen]="isModalOpen()"
     [pillarToEdit]="editingPillar()"
+    [isSaving]="isSaving()"
     (save)="savePillar($event)"
     (close)="closeModal()"
   />

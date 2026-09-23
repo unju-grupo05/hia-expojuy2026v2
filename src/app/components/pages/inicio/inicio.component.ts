@@ -378,26 +378,32 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // SCROLL REVEAL (INTERSECTION OBSERVER)
   // =========================================================================
   private initScrollReveal(): void {
-    const reveals = document.querySelectorAll('.reveal-on-scroll');
-    if (!reveals.length) return;
+    // Ejecutamos un timeout breve para permitir que componentes como Ejes carguen sus datos
+    setTimeout(() => {
+      const reveals = document.querySelectorAll('.reveal-on-scroll');
+      if (!reveals.length) return;
 
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.05, // Umbral más bajo para que active apenas asome en pantalla
+          rootMargin: '50px 0px 0px 0px'
         });
-      }, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -40px 0px'
-      });
 
-      reveals.forEach(el => observer.observe(el));
-    } else {
-      reveals.forEach(el => el.classList.add('is-visible'));
-    }
+        reveals.forEach(el => observer.observe(el));
+      } else {
+        reveals.forEach(el => el.classList.add('is-visible'));
+      }
+      
+      // Notifica a GSAP que refresque las posiciones del scroll
+      ScrollTrigger.refresh();
+    }, 300);
   }
 
   // =========================================================================
