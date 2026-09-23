@@ -2,8 +2,12 @@
 
   <!-- Toast de notificación -->
   @if (toastMessage()) {
-    <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
-      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+    <div
+      class="fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce"
+      [ngClass]="toastError() ? 'bg-rose-600 text-white dark:bg-rose-600' : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'">
+      <span class="material-symbols-outlined text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'">
+        {{ toastError() ? 'error' : 'check_circle' }}
+      </span>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -32,18 +36,19 @@
       <button
         type="button"
         (click)="fileInput.click()"
-        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 group">
+        [disabled]="uploading()"
+        class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 group disabled:opacity-60 disabled:cursor-not-allowed">
         <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-y-0.5">
-          cloud_upload
+          {{ uploading() ? 'hourglass_top' : 'cloud_upload' }}
         </span>
-        <span>Subir Imagen</span>
+        <span>{{ uploading() ? 'Subiendo...' : 'Subir Imagen' }}</span>
       </button>
     </div>
   </div>
 
   <!-- Barra de Búsqueda y Estadísticas Rápidas -->
   <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-    
+
     <!-- Input de Búsqueda -->
     <div class="relative w-full sm:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
@@ -65,81 +70,208 @@
 
   </div>
 
-  <!-- Grilla Responsiva de Imágenes (grid-cols-2 md:grid-cols-4 gap-4) -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    @for (image of filteredImages(); track image.id) {
-      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md hover:border-primary/40 dark:hover:border-primary/40 transition-all flex flex-col justify-between group">
-        
-        <!-- Previsualización -->
-        <div class="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
-          <img
-            [src]="image.url"
-            [alt]="image.name"
-            class="object-cover h-36 w-full rounded-t group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-          />
-          <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-mono font-medium">
-            {{ image.size }}
-          </span>
+  <!-- Estado: Cargando -->
+  @if (loading()) {
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      @for (skeleton of [0, 1, 2, 3, 4, 5, 6, 7]; track $index) {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden animate-pulse">
+          <div class="h-36 bg-slate-100 dark:bg-slate-800"></div>
+          <div class="p-3.5 space-y-2">
+            <div class="h-3 w-3/4 rounded bg-slate-100 dark:bg-slate-800"></div>
+            <div class="h-2.5 w-1/2 rounded bg-slate-100 dark:bg-slate-800"></div>
+          </div>
         </div>
+      }
+    </div>
+  } @else if (loadError()) {
+    <!-- Estado: Error -->
+    <div class="col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-rose-200/80 dark:border-rose-900/50 flex flex-col items-center gap-3">
+      <span class="material-symbols-outlined text-5xl text-rose-400">cloud_off</span>
+      <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+        No se pudieron cargar las imágenes.
+      </p>
+      <button
+        type="button"
+        (click)="cargarGaleria()"
+        class="px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-dark transition-all">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+    <!-- Grilla Responsiva de Imágenes -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      @for (image of filteredImages(); track image.id) {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-md hover:border-primary/40 dark:hover:border-primary/40 transition-all flex flex-col justify-between group">
 
-        <!-- Metadatos de la imagen -->
-        <div class="p-3.5 flex-1 flex flex-col justify-between">
-          <div>
-            <h3
-              class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
-              [title]="image.name">
-              {{ image.name }}
-            </h3>
-            <div class="flex items-center justify-between mt-1 text-[10px] text-slate-400">
-              <span>{{ image.dimensions }}</span>
-              <span>{{ image.uploadedAt }}</span>
+          <!-- Previsualización -->
+          <div class="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
+            <img
+              [src]="image.url"
+              [alt]="image.name"
+              class="object-cover h-36 w-full rounded-t group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+            <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-slate-900/75 backdrop-blur-xs text-white text-[10px] font-mono font-medium">
+              {{ image.size || 'Original' }}
+            </span>
+          </div>
+
+          <!-- Metadatos de la imagen -->
+          <div class="p-3.5 flex-1 flex flex-col justify-between">
+            <div>
+              <h3
+                class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate"
+                [title]="image.name">
+                {{ image.name }}
+              </h3>
+              <div class="flex items-center justify-between mt-1 text-[10px] text-slate-400">
+                <span>{{ image.dimensions }}</span>
+                <span>{{ image.uploadedAt }}</span>
+              </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5">
+
+              <!-- Copiar URL -->
+              <button
+                type="button"
+                (click)="copyUrl(image)"
+                class="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all"
+                [ngClass]="copiedId() === image.id
+                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-700'">
+                <span class="material-symbols-outlined text-[15px]">
+                  {{ copiedId() === image.id ? 'check' : 'content_copy' }}
+                </span>
+                <span>{{ copiedId() === image.id ? '¡Copiado!' : 'Copiar URL' }}</span>
+              </button>
+
+              <!-- Editar -->
+              <button
+                type="button"
+                (click)="openEdit(image)"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors"
+                title="Editar imagen">
+                <span class="material-symbols-outlined text-[17px]">edit</span>
+              </button>
+
+              <!-- Eliminar -->
+              <button
+                type="button"
+                (click)="deleteImage(image.id)"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                title="Eliminar imagen">
+                <span class="material-symbols-outlined text-[17px]">delete</span>
+              </button>
+
             </div>
           </div>
 
-          <!-- Botones de Acción ("Copiar URL" y "Eliminar") -->
-          <div class="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5">
-            
-            <!-- Copiar URL -->
-            <button
-              type="button"
-              (click)="copyUrl(image)"
-              class="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all"
-              [ngClass]="copiedId() === image.id
-                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-700'">
-              <span class="material-symbols-outlined text-[15px]">
-                {{ copiedId() === image.id ? 'check' : 'content_copy' }}
-              </span>
-              <span>{{ copiedId() === image.id ? '¡Copiado!' : 'Copiar URL' }}</span>
-            </button>
+        </div>
+      } @empty {
+        <div class="col-span-2 md:col-span-4 py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+          <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-2">
+            image_not_supported
+          </span>
+          <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            No se encontraron imágenes
+          </p>
+          <p class="text-xs text-slate-400 mt-1">
+            Sube un nuevo archivo fotográfico con el botón "Subir Imagen" o ajusta tu búsqueda.
+          </p>
+        </div>
+      }
+    </div>
+  }
 
-            <!-- Eliminar -->
-            <button
-              type="button"
-              (click)="deleteImage(image.id)"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
-              title="Eliminar imagen">
-              <span class="material-symbols-outlined text-[17px]">delete</span>
-            </button>
+  <!-- Modal de Edición -->
+  @if (editing()) {
+    <div class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/70 dark:bg-black/70 backdrop-blur-sm">
+      <div class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden">
 
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+          <h3 class="text-sm sm:text-base font-black text-slate-900 dark:text-white">
+            Editar imagen
+          </h3>
+          <button
+            type="button"
+            (click)="cancelEdit()"
+            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <span class="material-symbols-outlined text-lg">close</span>
+          </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+              Título *
+            </label>
+            <input
+              type="text"
+              [(ngModel)]="editing()!.titulo"
+              placeholder="Nombre de la imagen"
+              class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+              Descripción
+            </label>
+            <textarea
+              [(ngModel)]="editing()!.descripcion"
+              rows="2"
+              placeholder="Descripción breve de la imagen"
+              class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all resize-none"
+            ></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Sección
+              </label>
+              <input
+                type="text"
+                [(ngModel)]="editing()!.seccion"
+                placeholder="Ej: Stands, Cultura..."
+                class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+              />
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+                Orden
+              </label>
+              <input
+                type="number"
+                [(ngModel)]="editing()!.orden"
+                min="0"
+                class="w-full px-3.5 py-2.5 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+              />
+            </div>
           </div>
         </div>
 
+        <div class="flex items-center justify-end gap-3 px-5 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40">
+          <button
+            type="button"
+            (click)="cancelEdit()"
+            class="px-4 py-2 rounded-lg text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="saveEdit()"
+            [disabled]="saving()"
+            class="px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2">
+            <span class="material-symbols-outlined text-[16px]">{{ saving() ? 'hourglass_top' : 'save' }}</span>
+            <span>{{ saving() ? 'Guardando...' : 'Guardar cambios' }}</span>
+          </button>
+        </div>
+
       </div>
-    } @empty {
-      <div class="col-span-2 md:col-span-4 py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
-        <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-2">
-          image_not_supported
-        </span>
-        <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
-          No se encontraron imágenes
-        </p>
-        <p class="text-xs text-slate-400 mt-1">
-          Sube un nuevo archivo fotográfico con el botón "Subir Imagen" o ajusta tu búsqueda.
-        </p>
-      </div>
-    }
-  </div>
+    </div>
+  }
 
 </div>
