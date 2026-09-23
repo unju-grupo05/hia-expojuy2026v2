@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Post, PostFormData, PostFormModalComponent } from './post-form-modal.component';
 import { PostCardComponent } from '../../../components/shared/post-card/post-card.component';
+import { ApiNoticiasService } from '../../../services/apiNoticias.service';
 
 @Component({
   selector: 'app-posts-list',
@@ -11,63 +12,9 @@ import { PostCardComponent } from '../../../components/shared/post-card/post-car
   templateUrl: './posts-list.component.html'
 })
 export class PostsListComponent {
-  public posts = signal<Post[]>([
-    {
-      id: 'post-1',
-      title: 'El Parque Solar Cauchari expondrá sus proyectos de expansión e hidrógeno verde en el Pabellón de Energías',
-      slug: 'parque-solar-cauchari-expansion-hidrogeno',
-      category: 'Energías Limpias',
-      date: '02 Agosto 2026',
-      status: 'published',
-      displaySize: 'large',
-      imageUrl: './Img/Cauchari.jpg',
-      body: 'El Parque Solar Cauchari, el mayor de su tipo a gran altura del mundo, presentará en el Pabellón de Energías sus nuevas fases de expansión y la hoja de ruta para la producción de hidrógeno verde en la Puna.'
-    },
-    {
-      id: 'post-2',
-      title: 'Jujuy da inicio a su tradicional ExpoJuy en su edición 2026',
-      slug: 'jujuy-da-inicio-expojuy-2026',
-      category: 'Inauguración',
-      date: '09 Octubre 2026',
-      status: 'published',
-      displaySize: 'small',
-      imageUrl: './Img/ExpoJuy-1.webp',
-      body: 'Se realizará en el predio de la Ciudad Cultural con la presencia de delegaciones internacionales y rondas de negocios estratégicas.'
-    },
-    {
-      id: 'post-3',
-      title: 'Cobertura técnica y streaming en directo durante la muestra internacional',
-      slug: 'cobertura-tecnica-streaming-directo',
-      category: 'En vivo 🎙️',
-      date: '10 Octubre 2026',
-      status: 'published',
-      displaySize: 'small',
-      imageUrl: './Img/Expojuy-8.webp',
-      body: 'Transmisión exclusiva minuto a minuto con entrevistas a líderes de industria, paneles y conferencias en vivo.'
-    },
-    {
-      id: 'post-4',
-      title: 'Avanzan los acuerdos estratégicos del Corredor Bioceánico',
-      slug: 'acuerdos-estrategicos-corredor-bioceanico',
-      category: 'Comercio Exterior',
-      date: '11 Octubre 2026',
-      status: 'published',
-      displaySize: 'small',
-      imageUrl: './Img/ExpoJuy-1.webp',
-      body: 'Integración logística y portuaria de Jujuy con el Pacífico para potenciar exportaciones mineras y agroindustriales.'
-    },
-    {
-      id: 'post-5',
-      title: 'Presentarán el nuevo ecosistema de startups e innovación industrial',
-      slug: 'ecosistema-startups-innovacion-industrial',
-      category: 'Tecnología',
-      date: '12 Octubre 2026',
-      status: 'draft',
-      displaySize: 'small',
-      imageUrl: './Img/Cultural.png',
-      body: 'Espacio dedicado a incubadoras, soluciones de inteligencia artificial aplicada y robótica para el sector productivo.'
-    }
-  ]);
+  public posts = signal<Post[]>([]);
+  public loading = signal<boolean>(false);
+  public loadError = signal<boolean>(false);
 
   public searchTerm = signal<string>('');
   public selectedStatusFilter = signal<'all' | 'published' | 'draft'>('all');
@@ -75,6 +22,44 @@ export class PostsListComponent {
   public editingPost = signal<Post | null>(null);
   public previewingPost = signal<Post | null>(null);
   public toastMessage = signal<string | null>(null);
+  public toastError = signal<boolean>(false);
+  public saving = signal<boolean>(false);
+
+  constructor(private apiNoticias: ApiNoticiasService) {}
+
+  ngOnInit(): void {
+    this.cargarNoticias();
+  }
+
+  cargarNoticias(): void {
+    this.loading.set(true);
+    this.loadError.set(false);
+
+    this.apiNoticias.getNoticias(true).subscribe({
+      next: (res) => {
+        const items = Array.isArray(res?.data) ? res.data : [];
+        const mapped: Post[] = items.map((n: any) => ({
+          id: String(n.id),
+          title: n.titulo || '',
+          slug: n.slug || '',
+          category: n.categoria || 'General',
+          date: n.fecha || '',
+          status: n.vigente === false ? 'draft' : 'published',
+          displaySize: 'small',
+          imageUrl: n.imagen || '',
+          body: n.descripcion || ''
+        }));
+        this.posts.set(mapped);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.loadError.set(true);
+        this.showToast('No se pudieron cargar las publicaciones desde el servidor.', true);
+        console.error('Error al cargar noticias:', err);
+      }
+    });
+  }
 
   public filteredPosts = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
@@ -91,6 +76,13 @@ export class PostsListComponent {
       return matchesTerm && matchesStatus;
     });
   });
+
+  public formatFecha(fecha: string): string {
+    if (!fecha) return 'Sin fecha';
+    const date = new Date(`${fecha}T00:00:00`);
+    if (isNaN(date.getTime())) return fecha;
+    return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
 
   public openCreateModal(): void {
     this.editingPost.set(null);
@@ -116,38 +108,48 @@ export class PostsListComponent {
   }
 
   public savePost(formData: PostFormData): void {
-    if (formData.id) {
-      // Actualizar post existente
-      this.posts.update(list => list.map(p => {
-        if (p.id === formData.id) {
-          return {
-            ...p,
-            ...formData,
-            id: p.id,
-            date: p.date
-          };
-        }
-        return p;
-      }));
-      this.showToast('Publicación actualizada correctamente.');
-    } else {
-      // Crear nuevo post
-      const newPost: Post = {
-        id: 'post-' + Date.now(),
-        title: formData.title,
-        slug: formData.slug,
-        category: formData.category,
-        date: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' }),
-        status: formData.status,
-        displaySize: formData.displaySize,
-        imageUrl: formData.imageUrl,
-        body: formData.body
-      };
-      this.posts.update(list => [newPost, ...list]);
-      this.showToast('Nueva publicación creada y guardada con éxito.');
-    }
+    if (this.saving()) return;
+    this.saving.set(true);
 
-    this.closeModal();
+    const payload = {
+      titulo: formData.title,
+      slug: formData.slug,
+      categoria: formData.category,
+      descripcion: formData.body,
+      imagen: formData.imageUrl || null,
+      fecha: formData.date,
+      vigente: formData.status === 'published'
+    };
+
+    if (formData.id) {
+      this.apiNoticias.putModificarNoticias(formData.id, payload).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.closeModal();
+          this.showToast('Publicación actualizada correctamente.');
+          this.cargarNoticias();
+        },
+        error: (err) => {
+          this.saving.set(false);
+          console.error('Error al actualizar noticia:', err);
+          this.showToast(err?.error?.message || 'No se pudo actualizar la publicación.', true);
+        }
+      });
+    } else {
+      this.apiNoticias.postNoticias(payload).subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.closeModal();
+          this.showToast('Nueva publicación creada y guardada con éxito.');
+          this.cargarNoticias();
+        },
+        error: (err) => {
+          this.saving.set(false);
+          console.error('Error al crear noticia:', err);
+          this.showToast(err?.error?.message || 'No se pudo crear la publicación.', true);
+        }
+      });
+    }
   }
 
   public deletePost(id: string): void {
@@ -155,13 +157,22 @@ export class PostsListComponent {
     if (!postToDelete) return;
 
     if (confirm(`¿Estás seguro de eliminar la publicación "${postToDelete.title}"?`)) {
-      this.posts.update(list => list.filter(p => p.id !== id));
-      this.showToast('Publicación eliminada correctamente.');
+      this.apiNoticias.deleteNoticias(id).subscribe({
+        next: () => {
+          this.showToast('Publicación eliminada correctamente.');
+          this.cargarNoticias();
+        },
+        error: (err) => {
+          console.error('Error al eliminar noticia:', err);
+          this.showToast('No se pudo eliminar la publicación.', true);
+        }
+      });
     }
   }
 
-  private showToast(msg: string): void {
+  private showToast(msg: string, isError = false): void {
     this.toastMessage.set(msg);
+    this.toastError.set(isError);
     setTimeout(() => {
       this.toastMessage.set(null);
     }, 3500);

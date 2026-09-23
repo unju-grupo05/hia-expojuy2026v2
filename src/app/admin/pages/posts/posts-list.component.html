@@ -2,8 +2,13 @@
 
   <!-- Toast de notificación -->
   @if (toastMessage()) {
-    <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
-      <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+    <div class="fixed bottom-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce"
+         [ngClass]="toastError()
+           ? 'bg-rose-600 text-white'
+           : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'">
+      <span class="material-symbols-outlined text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'">
+        {{ toastError() ? 'error' : 'check_circle' }}
+      </span>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -81,6 +86,25 @@
 
   </div>
 
+  <!-- Estado de Carga -->
+  @if (loading()) {
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs p-16 flex flex-col items-center justify-center gap-3">
+      <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400">Cargando publicaciones desde el servidor...</p>
+    </div>
+  } @else if (loadError()) {
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900 shadow-xs p-16 flex flex-col items-center justify-center gap-3">
+      <span class="material-symbols-outlined text-4xl text-rose-400">cloud_off</span>
+      <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se pudieron cargar las publicaciones.</p>
+      <button
+        type="button"
+        (click)="cargarNoticias()"
+        class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-primary hover:bg-primary-dark transition-all">
+        Reintentar
+      </button>
+    </div>
+  } @else {
+
   <!-- Tabla de Publicaciones -->
   <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs overflow-hidden">
     <div class="overflow-x-auto">
@@ -144,7 +168,7 @@
 
               <!-- Fecha -->
               <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 whitespace-nowrap text-xs">
-                {{ post.date }}
+                {{ formatFecha(post.date) }}
               </td>
 
               <!-- Estado -->
@@ -224,6 +248,7 @@
       <span>Sistema CMS ExpoJuy</span>
     </div>
   </div>
+  }
 
   <!-- Modal Flotante de Creación / Edición con Live Preview -->
   <app-post-form-modal

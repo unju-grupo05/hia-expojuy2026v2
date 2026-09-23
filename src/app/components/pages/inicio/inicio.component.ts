@@ -5,7 +5,7 @@ import { EjesComponent } from '../ejes/ejes.component';
 import { UbicacionPredioHubComponent } from '../ubicacion-predio-hub/ubicacion-predio-hub';
 import { ExpositoresComponent } from '../expositores/expositores.component';
 import { AgendaComponent } from '../agenda/agenda.component';
-import { NovedadesComponent } from '../novedades/novedades.component';
+import { NovedadesComponent } from '../publicaciones/publicaciones.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
 import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
