@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID, ChangeDetectorRef, signal } from '@angular/core';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { ExhibitorService } from '../../../services/exhibitor.service';
 import { Exhibitor } from '../../models/exhibitor.model';
+import { ExpositorApi } from '../../../services/apiExpositores.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-expositores',
@@ -15,13 +16,18 @@ export class ExpositoresComponent implements OnInit {
   readonly loadingExhibitors = signal<boolean>(false);
   readonly hasMoreExhibitors = signal<boolean>(true);
   readonly exhibitorsError = signal<boolean>(false);
+  readonly activeCategory = signal<string>('all');
 
   private currentExhibitorPage = 1;
   private readonly pageSize = 6;
   private currentCategory = 'all';
   private currentSearchQuery = '';
 
-  constructor(private readonly exhibitorService: ExhibitorService) {}
+  constructor(
+    private apiExpositores: ExpositorApi,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
   ngOnInit(): void {
     this.bindWindowGlobals();
@@ -29,9 +35,9 @@ export class ExpositoresComponent implements OnInit {
   }
 
   private bindWindowGlobals(): void {
-    const w = window as any;
-    w.setCategoryFilter = this.setCategoryFilter.bind(this);
-    w.filterExhibitors = this.filterExhibitors.bind(this);
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    (window as any).filtrarExpositores = () => this.filterExhibitors();
   }
 
   loadExhibitors(reset = false): void {
@@ -48,70 +54,80 @@ export class ExpositoresComponent implements OnInit {
     this.loadingExhibitors.set(true);
     this.exhibitorsError.set(false);
 
-    this.exhibitorService.getExhibitors({
+    this.apiExpositores.getExpositores({
       page: this.currentExhibitorPage,
       pageSize: this.pageSize,
       category: this.currentCategory,
       search: this.currentSearchQuery
     }).subscribe({
       next: (res) => {
+        const datos = res?.data && Array.isArray(res.data.items) ? res.data : res;
+        const items: Exhibitor[] = Array.isArray(datos.items) ? datos.items : [];
+
         if (reset) {
-          this.exhibitors.set(res.items);
+          this.exhibitors.set(items);
         } else {
-          this.exhibitors.update(current => [...current, ...res.items]);
+          this.exhibitors.update(current => [...current, ...items]);
         }
-        this.hasMoreExhibitors.set(res.hasMore);
-        this.loadingExhibitors.set(false);
+
+        this.hasMoreExhibitors.set(datos.hasMore !== false);
         this.currentExhibitorPage++;
+        this.loadingExhibitors.set(false);
+        this.cdr.detectChanges();
+
+        if (isPlatformBrowser(this.platformId)) {
+          this.activarScrollRevealLocal();
+        }
       },
-      error: () => {
+      error: (err) => {
         this.loadingExhibitors.set(false);
         this.exhibitorsError.set(true);
+        this.hasMoreExhibitors.set(false);
+        this.cdr.detectChanges();
+        console.error('Error al obtener expositores:', err);
       }
     });
   }
 
   onScrollExhibitors(): void {
-    if (this.hasMoreExhibitors() && !this.loadingExhibitors()) {
+    if (this.hasMoreExhibitors()) {
       this.loadExhibitors(false);
     }
   }
 
   retryLoadExhibitors(): void {
-    this.loadExhibitors(false);
-  }
-
-  setCategoryFilter(category: string, event?: Event): void {
-    this.currentCategory = category;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active-filter'));
-
-    if (event && event.target) {
-      const target = (event.target as HTMLElement).closest('.filter-btn');
-      if (target) target.classList.add('active-filter');
-    }
-
     this.loadExhibitors(true);
   }
 
-  onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.currentSearchQuery = target.value.trim();
+  setCategoryFilter(category: string): void {
+    this.currentCategory = category;
+    this.activeCategory.set(category);
     this.loadExhibitors(true);
   }
 
   filterExhibitors(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const input = document.getElementById('exhibitor-search') as HTMLInputElement | null;
-    this.currentSearchQuery = input ? input.value.trim() : '';
+    this.currentSearchQuery = input?.value ?? '';
     this.loadExhibitors(true);
   }
 
-  smoothScrollTo(target: string | HTMLElement): void {
-    const w = window as any;
-    if (typeof w.smoothScrollTo === 'function') {
-      w.smoothScrollTo(target);
-      return;
+  smoothScrollTo(target: string): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const id = target.replace(/^#/, '');
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-    const el = typeof target === 'string' ? document.querySelector(target) as HTMLElement : target;
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private activarScrollRevealLocal(): void {
+    const reveals = document.querySelectorAll('#expositores .reveal-on-scroll');
+    reveals.forEach((el) => {
+      if (el instanceof Element) {
+        el.classList.add('visible');
+      }
+    });
   }
 }
