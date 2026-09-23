@@ -2,7 +2,7 @@ import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-modal.component';
-import { ApiEjes } from '../../../../app/services/api-ejes.service';
+import { ApiEjes } from '../../../services/apiEjes.service';
 
 @Component({
   selector: 'app-pillars',

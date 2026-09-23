@@ -3,19 +3,20 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 export interface AgendaEvent {
-  id: string;
-  title: string;
-  speaker: string;
-  date: string;
-  timeStart: string;
-  timeEnd: string;
-  stage: string;
-  isVisible: boolean;
-  description?: string;
-  badge?: string;
+  id: number;
+  dia: number;
+  diaSemana: string;
+  horaInicio: string;
+  horaFin: string;
+  titulo: string;
+  descripcion?: string;
+  lugar: string;
+  disertante?: string;
+  etiqueta?: string;
+  orden: number;
 }
 
-export type AgendaEventFormData = Omit<AgendaEvent, 'id'> & { id?: string };
+export type AgendaEventFormData = Omit<AgendaEvent, 'id'> & { id?: number };
 
 @Component({
   selector: 'app-agenda-form-modal',
@@ -34,16 +35,40 @@ export class AgendaFormModalComponent {
 
   public isPreviewOpen = signal<boolean>(false);
 
+  public DIAS = [
+    { numero: 1, fecha: '09 Oct 2026', label: 'Día 1 · 09 Oct 2026' },
+    { numero: 2, fecha: '10 Oct 2026', label: 'Día 2 · 10 Oct 2026' },
+    { numero: 3, fecha: '11 Oct 2026', label: 'Día 3 · 11 Oct 2026' },
+    { numero: 4, fecha: '12 Oct 2026', label: 'Día 4 · 12 Oct 2026' }
+  ];
+
+  public LUGARES = [
+    'Auditorio Plenario A',
+    'Sala de Conferencias B',
+    'Espacio Networking Central',
+    'Pabellón de Energías',
+    'Escenario Abierto Cultural'
+  ];
+
+  public ETIQUETAS = [
+    'Confirmado',
+    'Cupos Limitados',
+    'Pase VIP',
+    'Apertura Oficial',
+    'Transmisión en Vivo',
+    'Inscripción Previa'
+  ];
+
   public agendaForm = this.fb.group({
-    title: ['', [Validators.required, Validators.minLength(5)]],
-    speaker: ['', [Validators.required]],
-    date: ['09 Octubre 2026', [Validators.required]],
-    timeStart: ['10:00', [Validators.required]],
-    timeEnd: ['11:30', [Validators.required]],
-    stage: ['Auditorio Plenario A', [Validators.required]],
-    badge: ['Confirmado', [Validators.required]],
-    description: ['', [Validators.required, Validators.minLength(10)]],
-    isVisible: [true]
+    titulo: ['', [Validators.required, Validators.minLength(5)]],
+    disertante: [''],
+    dia: [1, [Validators.required]],
+    horaInicio: ['10:00', [Validators.required]],
+    horaFin: ['11:30', [Validators.required]],
+    lugar: ['Auditorio Plenario A', [Validators.required]],
+    etiqueta: ['Confirmado'],
+    descripcion: ['', [Validators.required, Validators.minLength(10)]],
+    orden: [1, [Validators.required, Validators.min(1)]]
   });
 
   constructor() {
@@ -51,31 +76,36 @@ export class AgendaFormModalComponent {
       const ev = this.eventToEdit();
       if (ev) {
         this.agendaForm.patchValue({
-          title: ev.title,
-          speaker: ev.speaker,
-          date: ev.date,
-          timeStart: ev.timeStart,
-          timeEnd: ev.timeEnd,
-          stage: ev.stage,
-          badge: ev.badge || 'Confirmado',
-          description: ev.description || '',
-          isVisible: ev.isVisible
+          titulo: ev.titulo,
+          disertante: ev.disertante || '',
+          dia: ev.dia,
+          horaInicio: ev.horaInicio,
+          horaFin: ev.horaFin,
+          lugar: ev.lugar,
+          etiqueta: ev.etiqueta || 'Confirmado',
+          descripcion: ev.descripcion || '',
+          orden: ev.orden
         });
       } else {
         this.agendaForm.reset({
-          title: '',
-          speaker: '',
-          date: '09 Octubre 2026',
-          timeStart: '10:00',
-          timeEnd: '11:30',
-          stage: 'Auditorio Plenario A',
-          badge: 'Confirmado',
-          description: '',
-          isVisible: true
+          titulo: '',
+          disertante: '',
+          dia: 1,
+          horaInicio: '10:00',
+          horaFin: '11:30',
+          lugar: 'Auditorio Plenario A',
+          etiqueta: 'Confirmado',
+          descripcion: '',
+          orden: 1
         });
       }
       this.isPreviewOpen.set(false);
     });
+  }
+
+  private obtenerFechaDia(dia: number): string {
+    const d = this.DIAS.find(diaItem => diaItem.numero === dia);
+    return d ? d.fecha : '';
   }
 
   public onSubmit(): void {
@@ -85,17 +115,19 @@ export class AgendaFormModalComponent {
     }
 
     const val = this.agendaForm.value;
+    const dia = Number(val.dia) || 1;
     const data: AgendaEventFormData = {
       id: this.eventToEdit()?.id,
-      title: val.title || '',
-      speaker: val.speaker || '',
-      date: val.date || '09 Octubre 2026',
-      timeStart: val.timeStart || '10:00',
-      timeEnd: val.timeEnd || '11:00',
-      stage: val.stage || 'Auditorio',
-      badge: val.badge || 'Confirmado',
-      description: val.description || '',
-      isVisible: val.isVisible !== false
+      dia,
+      diaSemana: this.obtenerFechaDia(dia),
+      horaInicio: val.horaInicio || '10:00',
+      horaFin: val.horaFin || '11:00',
+      titulo: val.titulo || '',
+      descripcion: val.descripcion || '',
+      lugar: val.lugar || 'Auditorio Plenario A',
+      disertante: val.disertante || '',
+      etiqueta: val.etiqueta || 'Confirmado',
+      orden: Number(val.orden) || 1
     };
 
     this.save.emit(data);

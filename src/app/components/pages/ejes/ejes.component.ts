@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { ApiEjes } from '../../../services/api-ejes.service';
+import { ApiEjes } from '../../../services/apiEjes.service';
 
 @Component({
   selector: 'app-ejes',
