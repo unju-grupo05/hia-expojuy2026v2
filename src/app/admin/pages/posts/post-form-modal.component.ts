@@ -15,7 +15,7 @@ export interface Post {
   displaySize: 'large' | 'small';
 }
 
-export type PostFormData = Omit<Post, 'id' | 'date'> & { id?: string };
+export type PostFormData = Omit<Post, 'id'> & { id?: string };
 
 @Component({
   selector: 'app-post-form-modal',
@@ -38,11 +38,18 @@ export class PostFormModalComponent {
     title: ['', [Validators.required, Validators.minLength(5)]],
     slug: ['', [Validators.required]],
     category: ['Minería y Litio', [Validators.required]],
+    fecha: [this.hoyIso(), [Validators.required]],
     status: ['published' as 'published' | 'draft', [Validators.required]],
     displaySize: ['small' as 'large' | 'small', [Validators.required]],
     imageUrl: ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80', [Validators.required]],
     body: ['', [Validators.required, Validators.minLength(20)]]
   });
+
+  private hoyIso(): string {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    return new Date(now.getTime() - offset * 60000).toISOString().slice(0, 10);
+  }
 
   // Preview dinámico en tiempo real
   public previewData = computed<PostCardData>(() => {
@@ -65,6 +72,7 @@ export class PostFormModalComponent {
           title: post.title,
           slug: post.slug,
           category: post.category,
+          fecha: (post.date || '').slice(0, 10),
           status: post.status,
           displaySize: post.displaySize || 'small',
           imageUrl: post.imageUrl,
@@ -75,6 +83,7 @@ export class PostFormModalComponent {
           title: '',
           slug: '',
           category: 'Minería y Litio',
+          fecha: this.hoyIso(),
           status: 'published',
           displaySize: 'small',
           imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
@@ -119,6 +128,7 @@ export class PostFormModalComponent {
       title: formVal.title || '',
       slug: formVal.slug || this.slugify(formVal.title || ''),
       category: formVal.category || 'General',
+      date: formVal.fecha || this.hoyIso(),
       status: (formVal.status as 'published' | 'draft') || 'draft',
       displaySize: (formVal.displaySize as 'large' | 'small') || 'small',
       imageUrl: formVal.imageUrl || '',
