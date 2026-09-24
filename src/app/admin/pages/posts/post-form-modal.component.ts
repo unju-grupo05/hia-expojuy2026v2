@@ -2,6 +2,7 @@ import { Component, effect, inject, input, output, signal, computed } from '@ang
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostCardComponent, PostCardData } from '../../../components/shared/post-card/post-card.component';
+import { ApiMediaService } from '../../../services/apiMedia.service';
 
 export interface Post {
   id: string;
@@ -25,6 +26,7 @@ export type PostFormData = Omit<Post, 'id'> & { id?: string };
 })
 export class PostFormModalComponent {
   private fb = inject(FormBuilder);
+  private apiMedia = inject(ApiMediaService);
 
   public isOpen = input<boolean>(false);
   public postToEdit = input<Post | null>(null);
@@ -33,6 +35,8 @@ export class PostFormModalComponent {
   public close = output<void>();
 
   public activeTab = signal<'form' | 'preview'>('form');
+  public isUploadingImage = signal<boolean>(false);
+  public uploadImageError = signal<string | null>(null);
 
   public postForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(5)]],
@@ -113,6 +117,35 @@ export class PostFormModalComponent {
       .replace(/\-\-+/g, '-')
       .replace(/^-+/, '')
       .replace(/-+$/, '');
+  }
+
+  public onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      this.uploadImageError.set('La imagen supera el límite de 5MB permitido.');
+      input.value = '';
+      return;
+    }
+
+    this.isUploadingImage.set(true);
+    this.uploadImageError.set(null);
+
+    this.apiMedia.uploadImage(file).subscribe({
+      next: (res) => {
+        const webpUrl = `${this.apiMedia.urlHost}${res.url}`;
+        this.postForm.patchValue({ imageUrl: webpUrl });
+        this.isUploadingImage.set(false);
+        input.value = '';
+      },
+      error: (err) => {
+        this.isUploadingImage.set(false);
+        this.uploadImageError.set(err?.error?.message || 'Error al procesar y convertir la imagen a WebP.');
+        input.value = '';
+      }
+    });
   }
 
   public onSubmit(): void {

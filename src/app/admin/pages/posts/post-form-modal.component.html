@@ -215,15 +215,43 @@
               </div>
 
               <div>
-                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  URL de Imagen de Portada *
-                </label>
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    URL de Imagen de Portada *
+                  </label>
+
+                  <!-- Botón para subir y convertir a WebP directo -->
+                  <div>
+                    <input
+                      type="file"
+                      #postImageInput
+                      (change)="onImageFileSelected($event)"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      class="hidden"
+                    />
+                    <button
+                      type="button"
+                      (click)="postImageInput.click()"
+                      [disabled]="isUploadingImage()"
+                      class="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:text-primary-dark dark:text-brand-cyan-electric transition-colors disabled:opacity-50 cursor-pointer">
+                      <span class="material-symbols-outlined text-[15px]">
+                        {{ isUploadingImage() ? 'hourglass_top' : 'cloud_upload' }}
+                      </span>
+                      <span>{{ isUploadingImage() ? 'Convirtiendo...' : 'Subir foto a WebP' }}</span>
+                    </button>
+                  </div>
+                </div>
+
                 <input
                   type="url"
                   formControlName="imageUrl"
-                  placeholder="https://images.unsplash.com/..."
-                  class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+                  placeholder="https://images.unsplash.com/... o http://localhost:3000/uploads/..."
+                  class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all font-mono text-xs"
                 />
+
+                @if (uploadImageError()) {
+                  <p class="text-[11px] text-rose-500 mt-1">{{ uploadImageError() }}</p>
+                }
               </div>
 
               <div></div>

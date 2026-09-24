@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Post, PostFormData, PostFormModalComponent } from './post-form-modal.component';
 import { PostCardComponent } from '../../../components/shared/post-card/post-card.component';
 import { ApiNoticiasService } from '../../../services/apiNoticias.service';
+import { ApiMediaService } from '../../../services/apiMedia.service';
 
 @Component({
   selector: 'app-posts-list',
@@ -25,7 +26,10 @@ export class PostsListComponent {
   public toastError = signal<boolean>(false);
   public saving = signal<boolean>(false);
 
-  constructor(private apiNoticias: ApiNoticiasService) {}
+  constructor(
+    private apiNoticias: ApiNoticiasService,
+    private apiMedia: ApiMediaService
+  ) {}
 
   ngOnInit(): void {
     this.cargarNoticias();
@@ -46,7 +50,7 @@ export class PostsListComponent {
           date: n.fecha || '',
           status: n.vigente === false ? 'draft' : 'published',
           displaySize: 'small',
-          imageUrl: n.imagen || '',
+          imageUrl: this.apiMedia.normalizeImageUrl(n.imagen || ''),
           body: n.descripcion || ''
         }));
         this.posts.set(mapped);
