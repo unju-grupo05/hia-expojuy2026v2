@@ -58,4 +58,17 @@ export class AgendaApi {
   deleteActividad(id: number): Observable<any> {
     return this.http.delete(this.urlBase + id, this.httpOptionsConAuth())
   }
+
+  suscribirse(email: string, actividadId: number): Observable<any> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+      })
+    };
+    return this.http.post(`${this.urlHost}/api/correos`, {
+      email,
+      actividadId,
+      tipo: 'recordatorio'
+    }, httpOptions);
+  }
 }
