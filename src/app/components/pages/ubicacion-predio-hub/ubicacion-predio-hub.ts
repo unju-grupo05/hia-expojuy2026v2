@@ -28,12 +28,11 @@ export class UbicacionPredioHubComponent {
   public setTab(tab: '3d' | 'location'): void {
     this.activeTab.set(tab);
     if (tab === 'location') {
-      // Detener bucle 3D para liberar 0% CPU/GPU
-      this.threeService.pauseLoop?.();
+      this.threeService.pauseLoop();
     } else {
-      // Reanudar loop
-      this.threeService.resumeLoop?.();
-      setTimeout(() => this.threeService.handleResize(), 50);
+      this.threeService.resumeLoop();
+      // Forzar ajuste de dimensiones tras volver a estar visible
+      requestAnimationFrame(() => this.threeService.handleResize());
     }
   }
 

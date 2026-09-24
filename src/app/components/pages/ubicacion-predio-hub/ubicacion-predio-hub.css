@@ -207,6 +207,14 @@
 }
 
 /* =====================================================
+   ESTADOS DE VISIBILIDAD DE PESTAÑAS ([hidden])
+   ===================================================== */
+.tab-content-3d[hidden],
+.tab-content-location[hidden] {
+  display: none !important;
+}
+
+/* =====================================================
    PESTAÑA 2: MAPA VECTORIAL SVG ULTRA RÁPIDO (0% GPU LEAK)
    ===================================================== */
 .tab-content-location {

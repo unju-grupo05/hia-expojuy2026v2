@@ -11,6 +11,7 @@ export class Masterplan3dService {
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
+  private sunLight!: THREE.DirectionalLight;
   private animationFrameId: number = 0;
   private clock = new THREE.Clock();
 
@@ -130,11 +131,12 @@ export class Masterplan3dService {
     const ambientLight = new THREE.AmbientLight(0xdbeafe, 1.0);
     this.scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
-    sunLight.position.set(120, 180, 90);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.set(1024, 1024);
-    this.scene.add(sunLight);
+    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    this.sunLight.position.set(120, 180, 90);
+    this.sunLight.castShadow = true;
+    const shadowResolution = (typeof window !== 'undefined' && window.innerWidth < 768) ? 512 : 1024;
+    this.sunLight.shadow.mapSize.set(shadowResolution, shadowResolution);
+    this.scene.add(this.sunLight);
 
     const neonCyan = new THREE.DirectionalLight(0x00f0ff, 0.55);
     neonCyan.position.set(-100, 50, -60);
@@ -1087,25 +1089,23 @@ export class Masterplan3dService {
     this.pinElement.classList.add('visible');
   }
 
-  private isPaused = false;
+  private isLoopPaused = false;
 
   public pauseLoop(): void {
-    this.isPaused = true;
+    this.isLoopPaused = true;
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
     }
   }
 
   public resumeLoop(): void {
-    if (!this.isPaused) return;
-    this.isPaused = false;
-    this.ngZone.runOutsideAngular(() => {
-      this.renderLoop();
-    });
+    if (!this.isLoopPaused) return;
+    this.isLoopPaused = false;
+    this.ngZone.runOutsideAngular(() => this.renderLoop());
   }
 
   private renderLoop(): void {
-    if (this.isPaused) return;
+    if (this.isLoopPaused) return;
     this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
 
     this.controls.update();

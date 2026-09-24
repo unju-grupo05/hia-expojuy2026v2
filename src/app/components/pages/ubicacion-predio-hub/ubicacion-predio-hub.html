@@ -33,7 +33,7 @@
     </header>
 
     <!-- PESTAÑA 1: 3D MASTERPLAN -->
-    <div *ngIf="activeTab() === '3d'" class="flex flex-col gap-6 w-full">
+    <div [hidden]="activeTab() !== '3d'" class="tab-content-3d flex flex-col gap-6 w-full">
       <!-- Fila de búsqueda y filtros en el flujo superior -->
       <div class="w-full">
         <app-controls></app-controls>
@@ -43,7 +43,13 @@
       <div class="cards-duo-container">
         <!-- Tarjeta del Mapa 3D -->
         <div class="card-map-wrapper rounded-3xl shadow-xs overflow-hidden relative">
-          <app-canvas></app-canvas>
+          @defer (on viewport) {
+            <app-canvas></app-canvas>
+          } @placeholder {
+            <div class="flex items-center justify-center w-full h-full text-sm text-slate-400 bg-slate-900/60">
+              <span>Cargando visualizador 3D...</span>
+            </div>
+          }
         </div>
 
         <!-- Tarjeta de Información Técnica (Sidebar) -->
@@ -54,7 +60,7 @@
     </div>
 
     <!-- PESTAÑA 2: UBICACIÓN URBANA (MAPA VECTORIAL EXACTO MORFOLOGÍA CIUDAD CULTURAL) -->
-    <section *ngIf="activeTab() === 'location'" class="tab-content-location">
+    <section [hidden]="activeTab() !== 'location'" class="tab-content-location">
       <div class="cards-duo-container">
 
         <!-- TARJETA IZQUIERDA: MAPA VECTORIAL SVG ULTRA RÁPIDO -->
