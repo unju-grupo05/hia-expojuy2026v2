@@ -1,0 +1,59 @@
+<aside class="sidebar-inner flex flex-col justify-between h-full gap-5">
+
+  <div class="space-y-4">
+
+    <div class="flex items-center justify-between">
+      <div
+        class="badge-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/25">
+        <span>Sector Seleccionado</span>
+      </div>
+      <span class="material-symbols-outlined text-sm">sensors</span>
+    </div>
+
+
+    <div *ngIf="stand() as item; else defaultInfo" class="space-y-1">
+      <h3 class="sidebar-title font-display text-xl font-bold leading-tight">
+        {{ item.id }} — {{ item.company || 'Punto Oficial' }}
+      </h3>
+      <p class="sidebar-sub text-xs font-semibold uppercase tracking-wider">
+        {{ item.rubro }} · {{ item.sectorName }}
+      </p>
+      <p class="sidebar-desc text-sm leading-relaxed pt-1">
+        {{ item.desc || 'Stand oficial de ' + item.area + ' ubicado en ' + item.sectorName + '. Equipado con suministro
+        eléctrico 220V/380V, iluminación LED y conexión Wi-Fi 6.' }}
+      </p>
+    </div>
+
+    <ng-template #defaultInfo>
+      <div class="space-y-1">
+        <h3 class="sidebar-title font-display text-xl font-bold leading-tight">
+          Predio Ciudad Cultural
+        </h3>
+        <p class="sidebar-sub text-xs font-semibold uppercase tracking-wider">
+          Explorador Masterplan 3D
+        </p>
+        <p class="sidebar-desc text-sm leading-relaxed pt-1">
+          Haz clic o toca cualquier stand del predio ferial para inspeccionar sus especificaciones técnicas, dimensiones
+          y empresas participantes.
+        </p>
+      </div>
+    </ng-template>
+
+    <div class="pt-3 border-t border-slate-100 dark:border-[#2c2541]">
+      <h4 class="section-title text-xs font-bold uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">storefront</span>
+        <span>Expositores Destacados</span>
+      </h4>
+      <div class="flex flex-wrap gap-1.5 expositores-list">
+        <span *ngFor="let exp of featuredCompanies(); let i = index"
+          class="px-2.5 py-1 rounded-full text-xs font-semibold border transition-all"
+          [class.bg-brand-cyan-electric/15]="i === 0" [class.text-brand-cyan-accessible]="i === 0"
+          [class.border-brand-cyan-electric/30]="i === 0" [class.bg-surface-container-high]="i !== 0"
+          [class.text-on-surface-variant]="i !== 0" [class.border-slate-200/60]="i !== 0">
+          {{ exp }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+</aside>

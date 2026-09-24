@@ -1,0 +1,66 @@
+<div class="map-3d-wrapper" #map3dWrapper [class.is-fullscreen]="isFullscreen()">
+  <canvas #masterplanCanvas id="masterplanCanvas"></canvas>
+
+  <!-- Pin Flotante Screen-Space -->
+  <div #floatingPin id="floating-pin">
+    <div class="pin-tag" #pinTagText>STAND EXPOJUY</div>
+    <div class="pin-stem"></div>
+    <div class="pin-base-dot"></div>
+  </div>
+
+  <!-- Barra Superior de Cámaras -->
+  <div class="map-3d-topbar">
+    <button 
+      class="map-3d-btn" 
+      [class.active]="activeCameraMode === 'iso'" 
+      (click)="setCamera('iso')" 
+      type="button">
+      📐 3D Isométrico
+    </button>
+    <button 
+      class="map-3d-btn" 
+      [class.active]="activeCameraMode === 'top'" 
+      (click)="setCamera('top')" 
+      type="button">
+      🗺️ 2D Cenital
+    </button>
+    <button 
+      class="map-3d-btn" 
+      [class.active]="activeCameraMode === 'entrance'" 
+      (click)="setCamera('entrance')" 
+      type="button">
+      🚪 Entrada
+    </button>
+    <button 
+      class="map-3d-btn roof-btn" 
+      [class.active]="threeService.roofVisible" 
+      (click)="toggleRoof()" 
+      type="button">
+      {{ threeService.roofVisible ? '⛺ Techo: ON' : '⛺ Techo: OFF' }}
+    </button>
+  </div>
+
+  <!-- Controles de Zoom y Pantalla Completa -->
+  <div class="map-zoom-controls">
+    <button class="map-zoom-control" (click)="zoomIn()" aria-label="Acercar" type="button">
+      <span class="material-symbols-outlined">add</span>
+    </button>
+    <button class="map-zoom-control" (click)="zoomOut()" aria-label="Alejar" type="button">
+      <span class="material-symbols-outlined">remove</span>
+    </button>
+    <button 
+      class="map-zoom-control btn-fs" 
+      (click)="toggleFullscreen()" 
+      [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'" 
+      type="button">
+      <span class="material-symbols-outlined">
+        {{ isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}
+      </span>
+    </button>
+  </div>
+
+  <div class="map-3d-tip">
+    <span class="material-symbols-outlined tip-icon">touch_app</span>
+    <span>Toca un stand para inspeccionar · Arrastra para girar</span>
+  </div>
+</div>

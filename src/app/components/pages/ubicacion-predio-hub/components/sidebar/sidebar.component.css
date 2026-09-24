@@ -1,0 +1,189 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar-inner {
+  width: 100%;
+}
+
+/* =====================================================
+   TÍTULOS Y DESCRIPCIÓN DEL STAND
+   ===================================================== */
+.sidebar-title {
+  color: #0f172a;
+  transition: color 0.2s ease;
+}
+
+:host-context(.dark) .sidebar-title,
+:host-context(html.dark) .sidebar-title,
+.dark .sidebar-title {
+  color: #ffffff;
+}
+
+.sidebar-sub {
+  color: #64748b;
+  transition: color 0.2s ease;
+}
+
+:host-context(.dark) .sidebar-sub,
+:host-context(html.dark) .sidebar-sub,
+.dark .sidebar-sub {
+  color: #94a3b8;
+}
+
+.sidebar-desc {
+  color: #475569;
+  transition: color 0.2s ease;
+}
+
+:host-context(.dark) .sidebar-desc,
+:host-context(html.dark) .sidebar-desc,
+.dark .sidebar-desc {
+  color: #cbd5e1;
+}
+
+/* =====================================================
+   META-BOX: SUPERFICIE Y ESTADO COMERCIAL
+   ===================================================== */
+.meta-box {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+:host-context(.dark) .meta-box,
+:host-context(html.dark) .meta-box,
+.dark .meta-box {
+  background: rgba(22, 19, 32, 0.6);
+  border-color: #2c2541;
+}
+
+.meta-row span {
+  color: #64748b;
+}
+
+:host-context(.dark) .meta-row span,
+:host-context(html.dark) .meta-row span,
+.dark .meta-row span {
+  color: #94a3b8;
+}
+
+.meta-row strong {
+  color: #0f172a;
+}
+
+:host-context(.dark) .meta-row strong,
+:host-context(html.dark) .meta-row strong,
+.dark .meta-row strong {
+  color: #ffffff;
+}
+
+/* =====================================================
+   ENCABEZADOS DE SECCIÓN
+   ===================================================== */
+.section-title {
+  color: #0f172a;
+}
+
+.section-title .material-symbols-outlined {
+  color: var(--ej-primary, #5E3A8C);
+}
+
+:host-context(.dark) .section-title,
+:host-context(html.dark) .section-title,
+.dark .section-title {
+  color: #ffffff;
+}
+
+:host-context(.dark) .section-title .material-symbols-outlined,
+:host-context(html.dark) .section-title .material-symbols-outlined,
+.dark .section-title .material-symbols-outlined {
+  color: #bda3e2;
+}
+
+/* =====================================================
+   CHIPS DE EXPOSITORES DESTACADOS
+   ===================================================== */
+.expositores-list span:not(.text-brand-cyan-accessible) {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #475569;
+}
+
+:host-context(.dark) .expositores-list span:not(.text-brand-cyan-accessible),
+:host-context(html.dark) .expositores-list span:not(.text-brand-cyan-accessible),
+.dark .expositores-list span:not(.text-brand-cyan-accessible) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+/* =====================================================
+   TARJETAS DE ACTIVIDADES EN EL ESPACIO
+   ===================================================== */
+.activity-item {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.activity-item strong {
+  color: #0f172a;
+}
+
+.activity-item span {
+  color: #64748b;
+}
+
+:host-context(.dark) .activity-item,
+:host-context(html.dark) .activity-item,
+.dark .activity-item {
+  background: rgba(22, 19, 32, 0.6);
+  border-color: #2c2541;
+}
+
+:host-context(.dark) .activity-item strong,
+:host-context(html.dark) .activity-item strong,
+.dark .activity-item strong {
+  color: #ffffff;
+}
+
+:host-context(.dark) .activity-item span,
+:host-context(html.dark) .activity-item span,
+.dark .activity-item span {
+  color: #94a3b8;
+}
+
+/* =====================================================
+   ENLACE "AGENDAR B2B" (ESTILO EXPOSITORES)
+   ===================================================== */
+.b2b-link {
+  text-decoration: none;
+}
+.b2b-link > span:first-child {
+  position: relative;
+  padding-bottom: 2px;
+}
+.b2b-link > span:first-child::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.b2b-link:hover > span:first-child::after {
+  transform: scaleX(1);
+}
+.b2b-link .material-symbols-outlined {
+  transition: transform 0.25s ease;
+}
+.b2b-link:hover .material-symbols-outlined {
+  transform: translateX(4px);
+}

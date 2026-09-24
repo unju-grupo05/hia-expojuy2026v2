@@ -1,0 +1,27 @@
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
+  <!-- Search Bar: Idéntico al buscador del directorio de Expositores -->
+  <div class="w-full md:w-80">
+    <div class="relative">
+      <input 
+        class="map-search-input" 
+        id="masterplan-search" 
+        [value]="dataService.searchQuery()" 
+        (input)="onSearchChange($event)" 
+        placeholder="Buscar stand, empresa o rubro..." 
+        type="text">
+      <span class="material-symbols-outlined search-icon">search</span>
+    </div>
+  </div>
+
+  <!-- Píldoras de Filtro de Categorías: Idéntico a los tabs de Expositores -->
+  <div class="flex flex-wrap items-center gap-2" id="masterplan-category-tabs">
+    <button 
+      *ngFor="let f of filters" 
+      class="filter-btn"
+      [class.active-filter]="dataService.activeFilter() === f.key" 
+      (click)="setFilter(f.key)"
+      type="button">
+      {{ f.label }}
+    </button>
+  </div>
+</div>
