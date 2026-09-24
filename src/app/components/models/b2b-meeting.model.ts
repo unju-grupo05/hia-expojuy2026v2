@@ -1,15 +1,15 @@
 export interface B2BMeetingRequest {
-  clientName: string;
-  clientCompany: string;
-  clientEmail: string;
-  clientPhone: string;
-  exhibitorId: string;
-  exhibitorName: string;
-  meetingDate: string;
-  startTime: string;
-  endTime: string;
-  attendees: number;
-  description: string;
-  modality: 'presencial' | 'virtual';
-  notes: string;
+  nombreCliente: string;
+  empresaCliente: string;
+  emailCliente: string;
+  telefonoCliente: string;
+  expositorId: string;
+  empresaExpositora: string;
+  fechaSolicitada: string;
+  horaInicioSolicitada: string;
+  horaFinSolicitada: string;
+  cantidadAsistentes: number;
+  motivo: string;
+  modalidad: 'presencial' | 'virtual';
+  observaciones: string;
 }
