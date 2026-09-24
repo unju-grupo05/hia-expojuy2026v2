@@ -127,7 +127,7 @@
     @if (b2bModalState() !== 'closed') {
       <div class="b2b-modal-backdrop" role="presentation" (click)="closeB2BModalOnBackdrop($event)">
         <section class="b2b-modal-panel" role="dialog" aria-modal="true" aria-labelledby="b2b-modal-title">
-          <div class="b2b-modal-header flex items-start justify-between gap-4 border-b border-slate-100 px-5 py-4 sm:px-7">
+          <div class="b2b-modal-header flex items-start gap-4 border-b border-slate-100 px-5 py-4 pr-16 sm:px-7 sm:pr-20">
             <div>
               <p class="text-xs font-bold uppercase tracking-widest text-primary">Reuniones B2B</p>
               <h2 id="b2b-modal-title" class="mt-1 font-display text-xl font-extrabold text-brand-slate-dark sm:text-2xl">Agendar reunión</h2>
@@ -144,14 +144,14 @@
             <div class="flex flex-col items-center px-6 py-12 text-center" role="status">
               <span class="material-symbols-outlined mb-4 text-5xl text-emerald-600">check_circle</span>
               <h3 class="font-display text-xl font-bold text-brand-slate-dark">Solicitud registrada</h3>
-              <p class="mt-2 max-w-md text-sm text-on-surface-variant">Recibimos tu solicitud de reunión con {{ selectedExhibitor()?.name }}. Te contactaremos para confirmar el horario.</p>
+              <p class="mt-2 max-w-md text-sm text-on-surface-variant">{{ b2bSuccessMessage() }}</p>
               <button type="button" class="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-dark" (click)="closeB2BModal()">Cerrar</button>
             </div>
           } @else if (b2bModalState() === 'server-error') {
             <div class="flex flex-col items-center px-6 py-12 text-center" role="alert">
               <span class="material-symbols-outlined mb-4 text-5xl text-red-600">error</span>
               <h3 class="font-display text-xl font-bold text-brand-slate-dark">No pudimos registrar la solicitud</h3>
-              <p class="mt-2 max-w-md text-sm text-on-surface-variant">Ocurrió un problema del servidor. Revisa tu conexión e inténtalo nuevamente.</p>
+              <p class="mt-2 max-w-md text-sm text-on-surface-variant">{{ b2bErrorMessage() }}</p>
               <button type="button" class="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-dark" (click)="b2bModalState.set('open')">Volver al formulario</button>
             </div>
           } @else {
@@ -160,32 +160,36 @@
                 <div class="b2b-form-alert" role="alert"><span class="material-symbols-outlined text-base">warning</span>Revisa los campos marcados antes de enviar.</div>
               }
               <div class="b2b-form-grid">
-                <label>Nombre completo *<input type="text" formControlName="clientName" autocomplete="name" placeholder="Tu nombre" [class.b2b-invalid]="isFieldInvalid('clientName')"></label>
-                <label>Empresa del cliente *<input type="text" formControlName="clientCompany" autocomplete="organization" placeholder="Nombre de tu empresa" [class.b2b-invalid]="isFieldInvalid('clientCompany')"></label>
-                <label>Correo electrónico *<input type="email" formControlName="clientEmail" autocomplete="email" placeholder="nombre@empresa.com" [class.b2b-invalid]="isFieldInvalid('clientEmail')">@if (isFieldInvalid('clientEmail')) { <span class="b2b-field-error">Ingresa un correo válido.</span> }</label>
-                <label>Teléfono *<input type="tel" formControlName="clientPhone" autocomplete="tel" placeholder="+54 388 ..." [class.b2b-invalid]="isFieldInvalid('clientPhone')"></label>
-                <input type="hidden" formControlName="exhibitorName">
+                <label>Nombre completo *<input type="text" formControlName="nombreCliente" autocomplete="name" placeholder="Tu nombre" [class.b2b-invalid]="isFieldInvalid('nombreCliente')"></label>
+                <label>Empresa del cliente *<input type="text" formControlName="empresaCliente" autocomplete="organization" placeholder="Nombre de tu empresa" [class.b2b-invalid]="isFieldInvalid('empresaCliente')"></label>
+                <label>Correo electrónico *<input type="email" formControlName="emailCliente" autocomplete="email" placeholder="nombre@empresa.com" [class.b2b-invalid]="isFieldInvalid('emailCliente')">@if (isFieldInvalid('emailCliente')) { <span class="b2b-field-error">Ingresa un correo válido.</span> }</label>
+                <label>Teléfono *<input type="tel" formControlName="telefonoCliente" autocomplete="tel" placeholder="+54 388 ..." [class.b2b-invalid]="isFieldInvalid('telefonoCliente')"></label>
+                <input type="hidden" formControlName="empresaExpositora">
                 <input type="hidden" formControlName="exhibitorId">
-                <label>Fecha de la reunión *<input type="date" formControlName="meetingDate" [min]="today" [class.b2b-invalid]="isFieldInvalid('meetingDate')"></label>
-                <label>Cantidad de asistentes *<input type="number" formControlName="attendees" min="1" max="999" [class.b2b-invalid]="isFieldInvalid('attendees')"></label>
-                <label>Hora de inicio *<input type="time" formControlName="startTime" [class.b2b-invalid]="isFieldInvalid('startTime')"></label>
-                <label>Hora de finalización *<input type="time" formControlName="endTime" [class.b2b-invalid]="isFieldInvalid('endTime')"></label>
+                <div class="sm:col-span-2 rounded-xl border border-cyan-200 bg-cyan-50 p-4 dark:border-cyan-900 dark:bg-cyan-950/30">
+                  <h3 class="text-sm font-bold text-cyan-900 dark:text-cyan-200">Horario preferido para la reunión</h3>
+                  <p class="mt-1 text-xs font-normal text-cyan-800 dark:text-cyan-300">El horario ingresado es una preferencia. El expositor se comunicará contigo para confirmar la reunión o coordinar otro horario si fuera necesario.</p>
+                </div>
+                <label>Fecha preferida *<input type="date" formControlName="fechaSolicitada" [min]="today" [class.b2b-invalid]="isFieldInvalid('fechaSolicitada')"></label>
+                <label>Cantidad de asistentes *<input type="number" formControlName="cantidadAsistentes" min="1" max="999" [class.b2b-invalid]="isFieldInvalid('cantidadAsistentes')"></label>
+                <label>Hora de inicio preferida *<input type="time" formControlName="horaInicioSolicitada" [class.b2b-invalid]="isFieldInvalid('horaInicioSolicitada')"></label>
+                <label>Hora de finalización preferida *<input type="time" formControlName="horaFinSolicitada" [class.b2b-invalid]="isFieldInvalid('horaFinSolicitada')"></label>
               </div>
-              @if (b2bForm.hasError('invalidTimeRange') && (b2bForm.get('startTime')?.touched || b2bForm.get('endTime')?.touched)) {
-                <p class="b2b-field-error" role="alert">La hora de finalización debe ser posterior a la hora de inicio.</p>
+              @if (b2bForm.hasError('invalidTimeRange') && (b2bForm.get('horaInicioSolicitada')?.touched || b2bForm.get('horaFinSolicitada')?.touched)) {
+                <p class="b2b-field-error" role="alert">La hora de finalización preferida debe ser posterior a la hora de inicio.</p>
               }
-              @if (isFieldInvalid('meetingDate') && b2bForm.get('meetingDate')?.hasError('pastDate')) {
+              @if (isFieldInvalid('fechaSolicitada') && b2bForm.get('fechaSolicitada')?.hasError('pastDate')) {
                 <p class="b2b-field-error" role="alert">Selecciona hoy o una fecha posterior.</p>
               }
-              <label>Motivo o descripción de la reunión *<textarea formControlName="description" rows="3" placeholder="¿Qué te gustaría conversar?" [class.b2b-invalid]="isFieldInvalid('description')"></textarea></label>
+              <label>Motivo o descripción de la reunión *<textarea formControlName="motivo" rows="3" placeholder="¿Qué te gustaría conversar?" [class.b2b-invalid]="isFieldInvalid('motivo')"></textarea></label>
               <fieldset>
                 <legend>Modalidad *</legend>
                 <div class="flex flex-wrap gap-5">
-                  <label class="b2b-radio"><input type="radio" formControlName="modality" value="presencial"> Presencial</label>
-                  <label class="b2b-radio"><input type="radio" formControlName="modality" value="virtual"> Virtual</label>
+                  <label class="b2b-radio"><input type="radio" formControlName="modalidad" value="presencial"> Presencial</label>
+                  <label class="b2b-radio"><input type="radio" formControlName="modalidad" value="virtual"> Virtual</label>
                 </div>
               </fieldset>
-              <label>Observaciones adicionales<textarea formControlName="notes" rows="2" placeholder="Información que debamos conocer"></textarea></label>
+              <label>Observaciones adicionales<textarea formControlName="observaciones" rows="2" placeholder="Información que debamos conocer"></textarea></label>
               <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 pt-4 sm:flex-row">
                 <button type="button" class="b2b-secondary-button" (click)="closeB2BModal()" [disabled]="b2bModalState() === 'submitting'">Cancelar</button>
                 <button type="submit" class="b2b-primary-button" [disabled]="b2bModalState() === 'submitting'">

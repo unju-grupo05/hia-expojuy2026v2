@@ -22,25 +22,27 @@ export class ExpositoresComponent implements OnInit {
   readonly activeCategory = signal<string>('all');
   readonly selectedExhibitor = signal<Exhibitor | null>(null);
   readonly b2bModalState = signal<'closed' | 'open' | 'submitting' | 'success' | 'validation-error' | 'server-error'>('closed');
+  readonly b2bErrorMessage = signal('');
+  readonly b2bSuccessMessage = signal('');
   readonly today = this.getToday();
 
   readonly b2bForm: ReturnType<FormBuilder['group']>;
 
   private createB2BForm(): ReturnType<FormBuilder['group']> {
     return this.formBuilder.group({
-    clientName: ['', [Validators.required, Validators.minLength(2)]],
-    clientCompany: ['', Validators.required],
-    clientEmail: ['', [Validators.required, Validators.email]],
-    clientPhone: ['', Validators.required],
+    nombreCliente: ['', [Validators.required, Validators.minLength(2)]],
+    empresaCliente: ['', Validators.required],
+    emailCliente: ['', [Validators.required, Validators.email]],
+    telefonoCliente: ['', Validators.required],
     exhibitorId: ['', Validators.required],
-    exhibitorName: ['', Validators.required],
-    meetingDate: ['', [Validators.required, this.notPastDateValidator]],
-    startTime: ['', Validators.required],
-    endTime: ['', Validators.required],
-    attendees: [1, [Validators.required, Validators.min(1), Validators.max(999)]],
-    description: ['', [Validators.required, Validators.minLength(5)]],
-    modality: ['presencial' as 'presencial' | 'virtual', Validators.required],
-    notes: ['']
+    empresaExpositora: ['', Validators.required],
+    fechaSolicitada: ['', [Validators.required, this.notPastDateValidator]],
+    horaInicioSolicitada: ['', Validators.required],
+    horaFinSolicitada: ['', Validators.required],
+    cantidadAsistentes: [1, [Validators.required, Validators.min(1), Validators.max(999)]],
+    motivo: ['', [Validators.required, Validators.minLength(5)]],
+    modalidad: ['presencial' as 'presencial' | 'virtual', Validators.required],
+    observaciones: ['']
     }, { validators: this.timeRangeValidator });
   }
 
@@ -132,10 +134,10 @@ export class ExpositoresComponent implements OnInit {
   openB2BModal(exhibitor: Exhibitor): void {
     this.selectedExhibitor.set(exhibitor);
     this.b2bForm.reset({
-      clientName: '', clientCompany: '', clientEmail: '', clientPhone: '',
-      exhibitorId: exhibitor.id, exhibitorName: exhibitor.name, meetingDate: '',
-      startTime: '', endTime: '', attendees: 1, description: '',
-      modality: 'presencial', notes: ''
+      nombreCliente: '', empresaCliente: '', emailCliente: '', telefonoCliente: '',
+      exhibitorId: exhibitor.id, empresaExpositora: exhibitor.name, fechaSolicitada: '',
+      horaInicioSolicitada: '', horaFinSolicitada: '', cantidadAsistentes: 1, motivo: '',
+      modalidad: 'presencial', observaciones: ''
     });
     this.b2bModalState.set('open');
     if (isPlatformBrowser(this.platformId)) document.body.style.overflow = 'hidden';
@@ -163,19 +165,29 @@ export class ExpositoresComponent implements OnInit {
   submitB2BMeeting(): void {
     if (this.b2bForm.invalid) {
       this.b2bForm.markAllAsTouched();
+      this.b2bErrorMessage.set('Revisa los campos marcados antes de enviar.');
       this.b2bModalState.set('validation-error');
       return;
     }
 
     const request = this.b2bForm.getRawValue() as B2BMeetingRequest;
+    console.info('Solicitud B2B enviada desde el formulario:', {
+      expositorId: request.expositorId,
+      empresaExpositora: request.empresaExpositora
+    });
     this.b2bModalState.set('submitting');
     this.b2bMeetingService.createB2BMeeting(request).subscribe({
-      next: () => {
+      next: (response) => {
         this.b2bForm.reset();
+        this.b2bErrorMessage.set('');
+        this.b2bSuccessMessage.set(response?.emailEnviado
+          ? 'La solicitud fue registrada y el correo fue enviado al expositor. Se comunicará contigo para confirmar o coordinar otro horario.'
+          : (response?.message || 'La solicitud fue guardada, pero no se pudo enviar el correo al expositor.'));
         this.b2bModalState.set('success');
       },
       error: (error) => {
         console.error('Error al registrar la reunión B2B:', error);
+        this.b2bErrorMessage.set(error?.error?.message || 'No se pudo registrar la solicitud.');
         this.b2bModalState.set('server-error');
       }
     });
@@ -200,8 +212,8 @@ export class ExpositoresComponent implements OnInit {
   }
 
   private timeRangeValidator(control: AbstractControl): ValidationErrors | null {
-    const startTime = control.get('startTime')?.value;
-    const endTime = control.get('endTime')?.value;
+    const startTime = control.get('horaInicioSolicitada')?.value;
+    const endTime = control.get('horaFinSolicitada')?.value;
     return startTime && endTime && endTime <= startTime ? { invalidTimeRange: true } : null;
   }
 
