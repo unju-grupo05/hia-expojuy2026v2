@@ -42,9 +42,9 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     { sender: 'bot', text: '¡Hola! Soy PachAI, tu asistente virtual de ExpoJuy 2026. ¿En qué puedo ayudarte hoy?' }
   ];
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   ngAfterViewInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
@@ -128,24 +128,24 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       duration: 0.6,
       ease: 'back.out(1.7)'
     })
-    .to(badge, {
-      opacity: 0,
-      y: 10,
-      duration: 0.3,
-      delay: 0.3
-    })
-    .to(logo, {
-      scale: 14,
-      opacity: 0,
-      filter: 'blur(20px)',
-      duration: 0.7,
-      ease: 'expo.in'
-    }, 'zoom')
-    .to(splash, {
-      opacity: 0,
-      duration: 0.5,
-      ease: 'power2.out'
-    }, 'zoom+=0.1');
+      .to(badge, {
+        opacity: 0,
+        y: 10,
+        duration: 0.3,
+        delay: 0.3
+      })
+      .to(logo, {
+        scale: 14,
+        opacity: 0,
+        filter: 'blur(20px)',
+        duration: 0.7,
+        ease: 'expo.in'
+      }, 'zoom')
+      .to(splash, {
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 'zoom+=0.1');
   }
 
   private iniciarVideoFondo(): void {
@@ -195,7 +195,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (typeof target === 'string') {
       if (target === '#mapa' || target === '#ubicacion') {
-        el = document.getElementById('mapa-ubicacion');
+        el = document.getElementById('mapa') || document.getElementById('mapa-ubicacion');
         if (this.predioComponent) {
           const tabToSet = target === '#ubicacion' ? 'ubicacion' : 'predio';
           this.predioComponent.switchTab(tabToSet);
@@ -400,7 +400,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         reveals.forEach(el => el.classList.add('is-visible'));
       }
-      
+
       // Notifica a GSAP que refresque las posiciones del scroll
       ScrollTrigger.refresh();
     }, 300);
