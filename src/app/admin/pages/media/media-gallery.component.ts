@@ -2,6 +2,7 @@ import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { ApiMediaService } from '../../../services/apiMedia.service';
 
 export interface MediaItem {
   id: string;
@@ -37,7 +38,10 @@ export class MediaGalleryComponent implements OnInit {
   public editing = signal<MediaItem | null>(null);
   public saving = signal(false);
 
-  constructor(private galeriaApi: GaleriaApi) {}
+  constructor(
+    private galeriaApi: GaleriaApi,
+    private apiMedia: ApiMediaService
+  ) {}
 
   ngOnInit(): void {
     this.cargarGaleria();
@@ -62,9 +66,9 @@ export class MediaGalleryComponent implements OnInit {
         const mapped: MediaItem[] = items.map((g: any) => ({
           id: String(g.id),
           name: g.titulo || '',
-          url: g.imagen || '',
-          size: '',
-          dimensions: 'Original',
+          url: this.apiMedia.normalizeImageUrl(g.imagen || ''),
+          size: g.imagen?.endsWith('.webp') ? 'WebP' : 'Original',
+          dimensions: 'WebP (1920 max)',
           uploadedAt: g.createdAt ? String(g.createdAt).slice(0, 10) : '',
           titulo: g.titulo || '',
           descripcion: g.descripcion || '',
@@ -83,7 +87,7 @@ export class MediaGalleryComponent implements OnInit {
     });
   }
 
-  private readonly maxUploadMb = 20;
+  private readonly maxUploadMb = 5;
 
   public onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -97,40 +101,42 @@ export class MediaGalleryComponent implements OnInit {
       return;
     }
 
-    const reader = new FileReader();
+    this.uploading.set(true);
+    this.showToast('Subiendo y optimizando imagen a WebP...');
 
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const sizeFormatted = file.size > 1024 * 1024
-        ? (file.size / (1024 * 1024)).toFixed(2) + ' MB'
-        : Math.round(file.size / 1024) + ' KB';
+    this.apiMedia.uploadImage(file).subscribe({
+      next: (res) => {
+        const webpUrl = `${this.apiMedia.urlHost}${res.url}`;
+        const maxOrden = this.images().reduce((max, img) => Math.max(max, img.orden), 0);
 
-      const maxOrden = this.images().reduce((max, img) => Math.max(max, img.orden), 0);
-
-      this.uploading.set(true);
-
-      this.galeriaApi.postGaleria({
-        titulo: file.name,
-        descripcion: '',
-        imagen: dataUrl,
-        seccion: '',
-        orden: maxOrden + 1
-      }).subscribe({
-        next: () => {
-          this.uploading.set(false);
-          this.showToast(`Imagen "${file.name}" subida exitosamente.`);
-          this.cargarGaleria();
-          input.value = '';
-        },
-        error: (err) => {
-          this.uploading.set(false);
-          this.showToast(err?.error?.message || 'No se pudo subir la imagen.', true);
-          input.value = '';
-        }
-      });
-    };
-
-    reader.readAsDataURL(file);
+        this.galeriaApi.postGaleria({
+          titulo: file.name.replace(/\.[^/.]+$/, ''),
+          descripcion: '',
+          imagen: webpUrl,
+          seccion: 'General',
+          orden: maxOrden + 1
+        }).subscribe({
+          next: () => {
+            this.uploading.set(false);
+            const sizeKb = Math.round(res.size / 1024);
+            this.showToast(`Imagen convertida a WebP (${sizeKb} KB) y guardada con éxito.`);
+            this.cargarGaleria();
+            input.value = '';
+          },
+          error: (err) => {
+            this.uploading.set(false);
+            this.showToast(err?.error?.message || 'Error al registrar en la galería.', true);
+            input.value = '';
+          }
+        });
+      },
+      error: (err) => {
+        this.uploading.set(false);
+        const msg = err?.error?.message || 'No se pudo procesar la imagen en el servidor.';
+        this.showToast(msg, true);
+        input.value = '';
+      }
+    });
   }
 
   public copyUrl(image: MediaItem): void {

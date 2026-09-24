@@ -1,6 +1,7 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { ApiMediaService } from '../../../services/apiMedia.service';
 
 export interface GaleriaItem {
   id: number;
@@ -42,7 +43,10 @@ export class GaleriaComponent implements OnInit {
   public activeIndex = 0;
   public currentPage = 0;
 
-  constructor(private galeriaApi: GaleriaApi) {}
+  constructor(
+    private galeriaApi: GaleriaApi,
+    private apiMedia: ApiMediaService
+  ) {}
 
   ngOnInit(): void {
     this.cargarGaleria();
@@ -59,7 +63,7 @@ export class GaleriaComponent implements OnInit {
           id: g.id,
           titulo: g.titulo || '',
           descripcion: g.descripcion || '',
-          imagen: g.imagen || '',
+          imagen: this.apiMedia.normalizeImageUrl(g.imagen || ''),
           seccion: g.seccion || '',
           orden: g.orden ?? 0
         }));

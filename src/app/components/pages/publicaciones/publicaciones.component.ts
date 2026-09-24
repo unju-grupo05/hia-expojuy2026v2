@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiNoticiasService } from '../../../services/apiNoticias.service';
+import { ApiMediaService } from '../../../services/apiMedia.service';
 
 interface NewsItem {
   id: string;
@@ -43,7 +44,10 @@ export class NovedadesComponent implements OnInit {
     body: []
   };
 
-  constructor(private apiNoticias: ApiNoticiasService) {}
+  constructor(
+    private apiNoticias: ApiNoticiasService,
+    private apiMedia: ApiMediaService
+  ) {}
 
   ngOnInit(): void {
     this.cargarNoticias();
@@ -58,7 +62,7 @@ export class NovedadesComponent implements OnInit {
         const items = Array.isArray(res?.data) ? res.data : [];
         const parsed: NewsItem[] = items.map((n: any) => ({
           id: String(n.id),
-          img: n.imagen || '',
+          img: this.apiMedia.normalizeImageUrl(n.imagen || ''),
           badge: n.categoria || 'Noticia',
           date: this.formatFecha(n.fecha),
           title: n.titulo || '',

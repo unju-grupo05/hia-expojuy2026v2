@@ -52,7 +52,7 @@
         <div class="gallery-ac" id="gallery-accordion" role="listbox" aria-label="Galería de imágenes de ExpoJuy 2026">
           @for (item of accordionItems(); track item.id; let idx = $index) {
             <figure
-              class="gallery-ac-item reveal-on-scroll"
+              class="gallery-ac-item reveal-on-scroll is-visible"
               [class.is-active]="idx === activeIndex"
               role="option"
               [attr.aria-selected]="idx === activeIndex"
