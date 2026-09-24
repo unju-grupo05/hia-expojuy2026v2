@@ -40,6 +40,10 @@ export class AgendaComponent implements OnInit {
   cargando: boolean = true;
   activeDay: number = 1;
 
+  selectedActivityId: number | null = null;
+  selectedActivityTitle: string = '';
+  selectedActivityTime: string = '';
+
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
     private apiAgenda: AgendaApi,
@@ -78,17 +82,25 @@ export class AgendaComponent implements OnInit {
     }
   }
 
-  openReminderModal(title: string, time: string): void {
+  openReminderModal(actId: number, title: string, time: string): void {
+    this.selectedActivityId = actId;
+    this.selectedActivityTitle = title;
+    this.selectedActivityTime = time;
+
     const modal = document.getElementById('reminder-modal');
     const actName = document.getElementById('reminder-activity-name');
     const actDate = document.getElementById('reminder-activity-date');
     const success = document.getElementById('reminder-success');
     const form = document.getElementById('reminder-form');
+    const errorBox = document.getElementById('reminder-error');
+    const emailInput = document.getElementById('reminder-email') as HTMLInputElement;
 
     if (!modal) return;
     if (actName) actName.textContent = title;
     if (actDate) actDate.textContent = time;
+    if (emailInput) emailInput.value = '';
     if (success) success.classList.add('hidden');
+    if (errorBox) errorBox.classList.add('hidden');
     if (form) form.classList.remove('hidden');
 
     modal.classList.add('modal-open');
@@ -105,16 +117,44 @@ export class AgendaComponent implements OnInit {
 
   submitReminder(event: Event): void {
     event.preventDefault();
+
+    const emailInput = document.getElementById('reminder-email') as HTMLInputElement;
     const form = document.getElementById('reminder-form');
     const success = document.getElementById('reminder-success');
-    if (form) form.classList.add('hidden');
-    if (success) success.classList.remove('hidden');
-    setTimeout(() => {
-      this.closeReminderModal();
-    }, 2400);
+    const successMsg = document.getElementById('reminder-success-msg');
+    const errorBox = document.getElementById('reminder-error');
+    const submitBtn = document.getElementById('reminder-submit-btn') as HTMLButtonElement;
+
+    if (!emailInput || !emailInput.value || !this.selectedActivityId) return;
+
+    const email = emailInput.value.trim();
+
+    if (submitBtn) submitBtn.disabled = true;
+    if (errorBox) errorBox.classList.add('hidden');
+
+    this.apiAgenda.suscribirse(email, this.selectedActivityId).subscribe({
+      next: (res) => {
+        if (submitBtn) submitBtn.disabled = false;
+        if (form) form.classList.add('hidden');
+        if (successMsg && res?.message) successMsg.textContent = res.message;
+        if (success) success.classList.remove('hidden');
+
+        setTimeout(() => {
+          this.closeReminderModal();
+        }, 2500);
+      },
+      error: (err) => {
+        if (submitBtn) submitBtn.disabled = false;
+        if (errorBox) {
+          errorBox.textContent = err?.error?.message || 'Error al guardar el recordatorio. Inténtalo de nuevo.';
+          errorBox.classList.remove('hidden');
+        }
+        console.error('Error al suscribir recordatorio:', err);
+      }
+    });
   }
 
-    //***********************SERVICIOS*************************
+  //***********************SERVICIOS*************************
 
   obtenerAgenda(): void {
     this.cargando = true;
