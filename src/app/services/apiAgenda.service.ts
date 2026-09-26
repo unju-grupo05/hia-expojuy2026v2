@@ -1,55 +1,65 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/api-url';
+import { ApiResponse } from '../models/api-response.model';
+import {
+  AgendaEvento,
+  AgendaPayload,
+  RecordatorioPayload,
+  RecordatorioSuscripcion
+} from '../models/agenda.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AgendaApi {
 
-  urlBase: string = `${environment.apiUrl}/agendas/`;
+  urlBase: string = `${API_URL}/agendas/`;
   constructor(private http: HttpClient) { }
 
   //***********************OBTENER*************************
-  getAgenda(): Observable<any> {
-    let httpOptions = {
+  getAgenda(): Observable<ApiResponse<AgendaEvento[]>> {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       })
     };
-    return this.http.get(this.urlBase, httpOptions)
+    return this.http.get<ApiResponse<AgendaEvento[]>>(this.urlBase, httpOptions);
   }
 
-  getAgendaById(id: number): Observable<any> {
-    return this.http.get(this.urlBase + id)
+  getAgendaById(id: number): Observable<ApiResponse<AgendaEvento>> {
+    return this.http.get<ApiResponse<AgendaEvento>>(this.urlBase + id);
   }
 
   //***********************CREAR*************************
-  postAgenda(actividad: any): Observable<any> {
-    return this.http.post(this.urlBase, actividad)
+  postAgenda(actividad: AgendaPayload): Observable<ApiResponse<AgendaEvento>> {
+    return this.http.post<ApiResponse<AgendaEvento>>(this.urlBase, actividad);
   }
 
   //***********************MODIFICAR*************************
-  putModificarAgenda(id: number, actividad: any): Observable<any> {
-    return this.http.put(this.urlBase + id, actividad)
+  putModificarAgenda(id: number, actividad: AgendaPayload): Observable<ApiResponse<AgendaEvento>> {
+    return this.http.put<ApiResponse<AgendaEvento>>(this.urlBase + id, actividad);
   }
 
   //***********************ELIMINACION FISICA*************************
-  deleteActividad(id: number): Observable<any> {
-    return this.http.delete(this.urlBase + id)
+  deleteActividad(id: number): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(this.urlBase + id);
   }
 
-  suscribirse(email: string, actividadId: number): Observable<any> {
+  suscribirse(email: string, actividadId: number): Observable<ApiResponse<RecordatorioSuscripcion>> {
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
       })
     };
-    return this.http.post(`${environment.apiUrl}/correos`, {
+
+    const payload: RecordatorioPayload = {
       email,
       actividadId,
       tipo: 'recordatorio'
-    }, httpOptions);
+    };
+
+    return this.http.post<ApiResponse<RecordatorioSuscripcion>>(`${API_URL}/correos`, payload, httpOptions);
   }
 }

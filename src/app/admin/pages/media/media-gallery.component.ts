@@ -2,6 +2,7 @@ import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { GaleriaItem } from '../../../models/galeria.model';
 import { ApiMediaService } from '../../../services/apiMedia.service';
 
 export interface MediaItem {
@@ -62,8 +63,8 @@ export class MediaGalleryComponent implements OnInit {
 
     this.galeriaApi.getGaleria().subscribe({
       next: (res) => {
-        const items = Array.isArray(res?.data) ? res.data : [];
-        const mapped: MediaItem[] = items.map((g: any) => ({
+        const items: GaleriaItem[] = res.data ?? [];
+        const mapped: MediaItem[] = items.map((g) => ({
           id: String(g.id),
           name: g.titulo || '',
           url: this.apiMedia.normalizeImageUrl(g.imagen || ''),

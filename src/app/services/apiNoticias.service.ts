@@ -1,19 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/api-url';
+import { ApiResponse } from '../models/api-response.model';
+import { NoticiaDTO, NoticiaPayload } from '../models/noticia.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiNoticiasService {
 
-  urlBase: string = `${environment.apiUrl}/noticias/`;
+  urlBase: string = `${API_URL}/noticias/`;
   constructor(private http: HttpClient) { }
 
   //***********************OBTENER*************************
-  getNoticias(incluirBorradores?: boolean): Observable<any> {
-    let httpOptions = {
+  getNoticias(incluirBorradores?: boolean): Observable<ApiResponse<NoticiaDTO[]>> {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       })
@@ -24,25 +26,25 @@ export class ApiNoticiasService {
       httpParams = httpParams.set('incluirBorradores', 'true');
     }
 
-    return this.http.get(this.urlBase, { ...httpOptions, params: httpParams })
+    return this.http.get<ApiResponse<NoticiaDTO[]>>(this.urlBase, { ...httpOptions, params: httpParams });
   }
 
-  getNoticiasById(id: number | string): Observable<any> {
-    return this.http.get(this.urlBase + id)
+  getNoticiasById(id: number | string): Observable<ApiResponse<NoticiaDTO>> {
+    return this.http.get<ApiResponse<NoticiaDTO>>(this.urlBase + id);
   }
 
   //***********************CREAR*************************
-  postNoticias(actividad: any): Observable<any> {
-    return this.http.post(this.urlBase, actividad)
+  postNoticias(noticia: NoticiaPayload): Observable<ApiResponse<NoticiaDTO>> {
+    return this.http.post<ApiResponse<NoticiaDTO>>(this.urlBase, noticia);
   }
 
   //***********************MODIFICAR*************************
-  putModificarNoticias(id: number | string, actividad: any): Observable<any> {
-    return this.http.put(this.urlBase + id, actividad)
+  putModificarNoticias(id: number | string, noticia: NoticiaPayload): Observable<ApiResponse<NoticiaDTO>> {
+    return this.http.put<ApiResponse<NoticiaDTO>>(this.urlBase + id, noticia);
   }
 
   //***********************ELIMINACION FISICA*************************
-  deleteNoticias(id: number | string): Observable<any> {
-    return this.http.delete(this.urlBase + id)
+  deleteNoticias(id: number | string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(this.urlBase + id);
   }
 }

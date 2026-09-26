@@ -1,42 +1,46 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/api-url';
+import { ApiResponse } from '../models/api-response.model';
+import { GaleriaItem, GaleriaPayload } from '../models/galeria.model';
+
+export type { GaleriaItem, GaleriaPayload } from '../models/galeria.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GaleriaApi {
 
-  urlBase: string = `${environment.apiUrl}/galerias/`;
+  urlBase: string = `${API_URL}/galerias/`;
   constructor(private http: HttpClient) { }
 
   //***********************OBTENER*************************
-  getGaleria(): Observable<any> {
-    let httpOptions = {
+  getGaleria(): Observable<ApiResponse<GaleriaItem[]>> {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       })
     };
-    return this.http.get(this.urlBase, httpOptions)
+    return this.http.get<ApiResponse<GaleriaItem[]>>(this.urlBase, httpOptions);
   }
 
-  getGaleriaById(id: number | string): Observable<any> {
-    return this.http.get(this.urlBase + id)
+  getGaleriaById(id: number | string): Observable<ApiResponse<GaleriaItem>> {
+    return this.http.get<ApiResponse<GaleriaItem>>(this.urlBase + id);
   }
 
   //***********************CREAR*************************
-  postGaleria(actividad: any): Observable<any> {
-    return this.http.post(this.urlBase, actividad)
+  postGaleria(item: GaleriaPayload): Observable<ApiResponse<GaleriaItem>> {
+    return this.http.post<ApiResponse<GaleriaItem>>(this.urlBase, item);
   }
 
   //***********************MODIFICAR*************************
-  putModificarGaleria(id: number | string, actividad: any): Observable<any> {
-    return this.http.put(this.urlBase + id, actividad)
+  putModificarGaleria(id: number | string, item: GaleriaPayload): Observable<ApiResponse<GaleriaItem>> {
+    return this.http.put<ApiResponse<GaleriaItem>>(this.urlBase + id, item);
   }
 
   //***********************ELIMINACION FISICA*************************
-  deleteGaleria(id: number | string): Observable<any> {
-    return this.http.delete(this.urlBase + id)
+  deleteGaleria(id: number | string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(this.urlBase + id);
   }
 }

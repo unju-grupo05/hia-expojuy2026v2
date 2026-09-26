@@ -5,6 +5,7 @@ import { Post, PostFormData, PostFormModalComponent } from './post-form-modal.co
 import { PostCardComponent } from '../../../components/shared/post-card/post-card.component';
 import { ApiNoticiasService } from '../../../services/apiNoticias.service';
 import { ApiMediaService } from '../../../services/apiMedia.service';
+import { NoticiaDTO, NoticiaPayload } from '../../../models/noticia.model';
 
 @Component({
   selector: 'app-posts-list',
@@ -41,8 +42,10 @@ export class PostsListComponent {
 
     this.apiNoticias.getNoticias(true).subscribe({
       next: (res) => {
-        const items = Array.isArray(res?.data) ? res.data : [];
-        const mapped: Post[] = items.map((n: any) => ({
+        // `NoticiaDTO` es el contrato de la API (campos en espanol). `Post` es el
+        // view model del panel: traduce los nombres y decide el `status`.
+        const items: NoticiaDTO[] = res.data ?? [];
+        const mapped: Post[] = items.map((n) => ({
           id: String(n.id),
           title: n.titulo || '',
           slug: n.slug || '',
@@ -115,7 +118,7 @@ export class PostsListComponent {
     if (this.saving()) return;
     this.saving.set(true);
 
-    const payload = {
+    const payload: NoticiaPayload = {
       titulo: formData.title,
       slug: formData.slug,
       categoria: formData.category,

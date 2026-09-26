@@ -2,7 +2,13 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiNoticiasService } from '../../../services/apiNoticias.service';
 import { ApiMediaService } from '../../../services/apiMedia.service';
+import { NoticiaDTO } from '../../../models/noticia.model';
 
+/**
+ * View model de la grilla publica. Se deriva de `NoticiaDTO` (contrato de la
+ * API): la imagen pasa por `ApiMediaService`, la fecha se formatea y el cuerpo
+ * se parte en parrafos para el modal.
+ */
 interface NewsItem {
   id: string;
   img: string;
@@ -59,14 +65,14 @@ export class NovedadesComponent implements OnInit {
 
     this.apiNoticias.getNoticias().subscribe({
       next: (res) => {
-        const items = Array.isArray(res?.data) ? res.data : [];
-        const parsed: NewsItem[] = items.map((n: any) => ({
+        const items: NoticiaDTO[] = res.data ?? [];
+        const parsed: NewsItem[] = items.map((n) => ({
           id: String(n.id),
           img: this.apiMedia.normalizeImageUrl(n.imagen || ''),
           badge: n.categoria || 'Noticia',
           date: this.formatFecha(n.fecha),
           title: n.titulo || '',
-          body: (n.descripcion || '').split(/\n+/).map((p: string) => p.trim()).filter((p: string) => p.length > 0)
+          body: (n.descripcion || '').split(/\n+/).map((p) => p.trim()).filter((p) => p.length > 0)
         }));
 
         this.news.set(parsed);

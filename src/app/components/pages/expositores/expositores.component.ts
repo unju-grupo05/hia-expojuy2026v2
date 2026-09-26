@@ -13,8 +13,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
-import { Exhibitor } from '../../models/exhibitor.model';
-import { B2BMeetingRequest } from '../../models/b2b-meeting.model';
+import { Expositor } from '../../../models/expositor.model';
+import { B2BMeetingRequest } from '../../../models/b2b-meeting.model';
 import { ExpositorApi } from '../../../services/apiExpositores.service';
 import { B2BMeetingService } from '../../../services/apiB2B-meeting.service';
 
@@ -26,12 +26,12 @@ import { B2BMeetingService } from '../../../services/apiB2B-meeting.service';
   styleUrl: './expositores.component.css'
 })
 export class ExpositoresComponent implements OnInit, OnDestroy {
-  readonly exhibitors = signal<Exhibitor[]>([]);
+  readonly exhibitors = signal<Expositor[]>([]);
   readonly loadingExhibitors = signal<boolean>(false);
   readonly hasMoreExhibitors = signal<boolean>(true);
   readonly exhibitorsError = signal<boolean>(false);
   readonly activeCategory = signal<string>('all');
-  readonly selectedExhibitor = signal<Exhibitor | null>(null);
+  readonly selectedExhibitor = signal<Expositor | null>(null);
   readonly b2bModalState = signal<'closed' | 'open' | 'submitting' | 'success' | 'validation-error' | 'server-error'>('closed');
   readonly b2bErrorMessage = signal('');
   readonly b2bSuccessMessage = signal('');
@@ -101,8 +101,9 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          const datos = res?.data && Array.isArray(res.data.items) ? res.data : res;
-          const items: Exhibitor[] = Array.isArray(datos.items) ? datos.items : [];
+          // Contrato de `/expositores`: la pagina viene en `data` y trae `hasMore`.
+          const pagina = res.data;
+          const items: Expositor[] = pagina?.items ?? [];
 
           if (reset) {
             this.exhibitors.set(items);
@@ -110,7 +111,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
             this.exhibitors.update(current => [...current, ...items]);
           }
 
-          this.hasMoreExhibitors.set(datos.hasMore !== false);
+          this.hasMoreExhibitors.set(pagina?.hasMore === true);
           this.currentExhibitorPage++;
           this.loadingExhibitors.set(false);
 
@@ -137,7 +138,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.loadExhibitors(true);
   }
 
-  openB2BModal(exhibitor: Exhibitor): void {
+  openB2BModal(exhibitor: Expositor): void {
     this.selectedExhibitor.set(exhibitor);
     this.b2bForm.reset({
       nombreCliente: '', empresaCliente: '', emailCliente: '', telefonoCliente: '',

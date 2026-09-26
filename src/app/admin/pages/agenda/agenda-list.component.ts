@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AgendaEvent, AgendaEventFormData, AgendaFormModalComponent } from './agenda-form-modal.component';
 import { AgendaApi } from '../../../services/apiAgenda.service';
+import { AgendaEvento, AgendaPayload } from '../../../models/agenda.model';
 
 @Component({
   selector: 'app-agenda-list',
@@ -51,7 +52,7 @@ export class AgendaListComponent implements OnInit {
     this.cargarAgenda();
   }
 
-  private mapearEventoDesdeApi(api: any): AgendaEvent {
+  private mapearEventoDesdeApi(api: AgendaEvento): AgendaEvent {
     return {
       id: Number(api.id),
       dia: Number(api.dia) || 1,
@@ -67,7 +68,7 @@ export class AgendaListComponent implements OnInit {
     };
   }
 
-  private mapearEventoParaApi(data: AgendaEventFormData): any {
+  private mapearEventoParaApi(data: AgendaEventFormData): AgendaPayload {
     return {
       dia: Number(data.dia) || 1,
       diaSemana: data.diaSemana || '',
@@ -86,8 +87,7 @@ export class AgendaListComponent implements OnInit {
     this.isLoading.set(true);
     this.apiAgenda.getAgenda().subscribe({
       next: (res) => {
-        const datos = res?.data || res;
-        this.events.set(Array.isArray(datos) ? datos.map(this.mapearEventoDesdeApi) : []);
+        this.events.set((res.data ?? []).map((evento) => this.mapearEventoDesdeApi(evento)));
         this.isLoading.set(false);
       },
       error: (err) => {
