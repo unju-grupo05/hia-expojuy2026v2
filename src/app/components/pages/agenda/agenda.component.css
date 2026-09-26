@@ -1,19 +1,20 @@
-    /* Modal backdrop */
+    /* Modal backdrop.
+       El modal se inserta con `@if (modalOpen())`, por lo que cuando existe ya
+       es visible: la animacion de entrada se resuelve con `animation` en lugar
+       de depender de la clase `.modal-open` aplicada por JS. */
     .modal-backdrop {
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    .modal-backdrop.modal-open {
-      opacity: 1;
-      visibility: visible;
+      animation: modalFadeIn 0.25s ease both;
     }
     .modal-panel {
-      transform: scale(0.95) translateY(20px);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: modalPanelIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
-    .modal-backdrop.modal-open .modal-panel {
-      transform: scale(1) translateY(0);
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes modalPanelIn {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
     /* Reminder bell button */
     .reminder-btn {

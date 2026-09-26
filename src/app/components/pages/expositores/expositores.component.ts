@@ -1,4 +1,15 @@
-import { Component, HostListener, Inject, OnInit, PLATFORM_ID, ChangeDetectorRef, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  inject,
+  signal
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
@@ -14,7 +25,7 @@ import { B2BMeetingService } from '../../../services/apiB2B-meeting.service';
   templateUrl: './expositores.component.html',
   styleUrl: './expositores.component.css'
 })
-export class ExpositoresComponent implements OnInit {
+export class ExpositoresComponent implements OnInit, OnDestroy {
   readonly exhibitors = signal<Exhibitor[]>([]);
   readonly loadingExhibitors = signal<boolean>(false);
   readonly hasMoreExhibitors = signal<boolean>(true);
@@ -27,6 +38,8 @@ export class ExpositoresComponent implements OnInit {
   readonly today = this.getToday();
 
   readonly b2bForm: ReturnType<FormBuilder['group']>;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   private createB2BForm(): ReturnType<FormBuilder['group']> {
     return this.formBuilder.group({
@@ -55,21 +68,13 @@ export class ExpositoresComponent implements OnInit {
     private apiExpositores: ExpositorApi,
     private b2bMeetingService: B2BMeetingService,
     private formBuilder: FormBuilder,
-    private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.b2bForm = this.createB2BForm();
   }
 
   ngOnInit(): void {
-    this.bindWindowGlobals();
     this.loadExhibitors(true);
-  }
-
-  private bindWindowGlobals(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    (window as any).filtrarExpositores = () => this.filterExhibitors();
   }
 
   loadExhibitors(reset = false): void {
@@ -86,39 +91,40 @@ export class ExpositoresComponent implements OnInit {
     this.loadingExhibitors.set(true);
     this.exhibitorsError.set(false);
 
-    this.apiExpositores.getExpositores({
-      page: this.currentExhibitorPage,
-      pageSize: this.pageSize,
-      category: this.currentCategory,
-      search: this.currentSearchQuery
-    }).subscribe({
-      next: (res) => {
-        const datos = res?.data && Array.isArray(res.data.items) ? res.data : res;
-        const items: Exhibitor[] = Array.isArray(datos.items) ? datos.items : [];
+    this.apiExpositores
+      .getExpositores({
+        page: this.currentExhibitorPage,
+        pageSize: this.pageSize,
+        category: this.currentCategory,
+        search: this.currentSearchQuery
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          const datos = res?.data && Array.isArray(res.data.items) ? res.data : res;
+          const items: Exhibitor[] = Array.isArray(datos.items) ? datos.items : [];
 
-        if (reset) {
-          this.exhibitors.set(items);
-        } else {
-          this.exhibitors.update(current => [...current, ...items]);
+          if (reset) {
+            this.exhibitors.set(items);
+          } else {
+            this.exhibitors.update(current => [...current, ...items]);
+          }
+
+          this.hasMoreExhibitors.set(datos.hasMore !== false);
+          this.currentExhibitorPage++;
+          this.loadingExhibitors.set(false);
+
+          if (isPlatformBrowser(this.platformId)) {
+            this.activarScrollRevealLocal();
+          }
+        },
+        error: (err) => {
+          this.loadingExhibitors.set(false);
+          this.exhibitorsError.set(true);
+          this.hasMoreExhibitors.set(false);
+          console.error('Error al obtener expositores:', err);
         }
-
-        this.hasMoreExhibitors.set(datos.hasMore !== false);
-        this.currentExhibitorPage++;
-        this.loadingExhibitors.set(false);
-        this.cdr.detectChanges();
-
-        if (isPlatformBrowser(this.platformId)) {
-          this.activarScrollRevealLocal();
-        }
-      },
-      error: (err) => {
-        this.loadingExhibitors.set(false);
-        this.exhibitorsError.set(true);
-        this.hasMoreExhibitors.set(false);
-        this.cdr.detectChanges();
-        console.error('Error al obtener expositores:', err);
-      }
-    });
+      });
   }
 
   onScrollExhibitors(): void {
@@ -176,7 +182,10 @@ export class ExpositoresComponent implements OnInit {
       empresaExpositora: request.empresaExpositora
     });
     this.b2bModalState.set('submitting');
-    this.b2bMeetingService.createB2BMeeting(request).subscribe({
+    this.b2bMeetingService
+      .createB2BMeeting(request)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: (response) => {
         this.b2bForm.reset();
         this.b2bErrorMessage.set('');
@@ -223,29 +232,34 @@ export class ExpositoresComponent implements OnInit {
     this.loadExhibitors(true);
   }
 
-  filterExhibitors(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const input = document.getElementById('exhibitor-search') as HTMLInputElement | null;
-    this.currentSearchQuery = input?.value ?? '';
+  /**
+   * La consulta llega desde el binding `(input)="filterExhibitors($any($event.target).value)"`.
+   * Antes se leia con `document.getElementById('exhibitor-search')` y ademas se
+   * publicaba un global `window.filtrarExpositores` que nunca se eliminaba.
+   */
+  filterExhibitors(query: string): void {
+    this.currentSearchQuery = (query ?? '').trim();
     this.loadExhibitors(true);
   }
 
-  smoothScrollTo(target: string): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-    const id = target.replace(/^#/, '');
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
   private activarScrollRevealLocal(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
     const reveals = document.querySelectorAll('#expositores .reveal-on-scroll');
     reveals.forEach((el) => {
       if (el instanceof Element) {
         el.classList.add('visible');
       }
     });
+  }
+
+  /**
+   * Si el modal B2B seguía abierto al salir de la ruta, el `body` quedaba con
+   * `overflow: hidden` y la pagina quedaba sin scroll de forma permanente.
+   */
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId) && this.b2bModalState() !== 'closed') {
+      document.body.style.overflow = '';
+    }
   }
 }

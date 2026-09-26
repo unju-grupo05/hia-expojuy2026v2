@@ -13,7 +13,7 @@
           <!-- Search Bar -->
           <div class="w-full md:w-80">
             <div class="relative">
-              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="exhibitor-search" (input)="filterExhibitors()" placeholder="Buscar por empresa o rubro..." type="text">
+              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="exhibitor-search" (input)="filterExhibitors($any($event.target).value)" placeholder="Buscar por empresa o rubro..." type="text">
               <span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-lg">search</span>
             </div>
           </div>

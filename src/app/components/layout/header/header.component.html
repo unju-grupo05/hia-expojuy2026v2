@@ -13,13 +13,20 @@
 
     <!-- Desktop Navigation Links -->
    <nav class="hidden lg:flex items-center gap-5 xl:gap-7">
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#hero-section">Inicio</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#sobre-expojuy">Ejes 2026</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#mapa">Ubicación</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#expositores">Expositores</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#agenda">Agenda</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors"     href="#novedades">Novedades</a>
-      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors"     href="#galeria">Galería</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#hero-section"
+        [class.text-brand-cyan-electric]="isActiveSection('#hero-section')" [class.text-slate-700]="!isActiveSection('#hero-section')" [class.dark:text-purple-300]="!isActiveSection('#hero-section')">Inicio</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#sobre-expojuy"
+        [class.text-brand-cyan-electric]="isActiveSection('#sobre-expojuy')" [class.text-slate-700]="!isActiveSection('#sobre-expojuy')" [class.dark:text-purple-300]="!isActiveSection('#sobre-expojuy')">Ejes 2026</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#mapa"
+        [class.text-brand-cyan-electric]="isActiveSection('#mapa')" [class.text-slate-700]="!isActiveSection('#mapa')" [class.dark:text-purple-300]="!isActiveSection('#mapa')">Ubicación</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#expositores"
+        [class.text-brand-cyan-electric]="isActiveSection('#expositores')" [class.text-slate-700]="!isActiveSection('#expositores')" [class.dark:text-purple-300]="!isActiveSection('#expositores')">Expositores</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors" href="#agenda"
+        [class.text-brand-cyan-electric]="isActiveSection('#agenda')" [class.text-slate-700]="!isActiveSection('#agenda')" [class.dark:text-purple-300]="!isActiveSection('#agenda')">Agenda</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors"     href="#novedades"
+        [class.text-brand-cyan-electric]="isActiveSection('#novedades')" [class.text-slate-700]="!isActiveSection('#novedades')" [class.dark:text-purple-300]="!isActiveSection('#novedades')">Novedades</a>
+      <a class="nav-item py-2 text-sm font-bold text-slate-700 dark:text-purple-300 hover:text-brand-cyan-electric dark:hover:text-brand-cyan-electric transition-colors"     href="#galeria"
+        [class.text-brand-cyan-electric]="isActiveSection('#galeria')" [class.text-slate-700]="!isActiveSection('#galeria')" [class.dark:text-purple-300]="!isActiveSection('#galeria')">Galería</a>
     </nav>
 
     <!-- Header Actions -->
@@ -30,92 +37,55 @@
       </a>
 
       <!-- Dark Mode Toggle -->
-      <button id="theme-toggle" aria-label="Cambiar tema" type="button" class="w-10 h-10 inline-flex items-center justify-center rounded-full text-primary dark:text-brand-cyan-electric bg-transparent hover:bg-primary/10 dark:hover:bg-white/10 transition-colors">
-        <span data-theme-icon="moon" class="material-symbols-outlined text-[22px]">dark_mode</span>
-        <span data-theme-icon="sun" class="material-symbols-outlined text-[22px] hidden">light_mode</span>
+      <button aria-label="Cambiar tema" type="button" (click)="toggleTheme()"
+        class="w-10 h-10 inline-flex items-center justify-center rounded-full text-primary dark:text-brand-cyan-electric bg-transparent hover:bg-primary/10 dark:hover:bg-white/10 transition-colors">
+        @if (chrome.darkMode()) {
+          <span class="material-symbols-outlined text-[22px]">light_mode</span>
+        } @else {
+          <span class="material-symbols-outlined text-[22px]">dark_mode</span>
+        }
       </button>
 
       <!-- Mobile Hamburger Button (Garantizado para pantalla táctil) -->
-      <button id="mobile-menu-btn" aria-label="Abrir menú" aria-controls="mobile-menu" aria-expanded="false" type="button" class="lg:hidden w-10 h-10 flex items-center justify-center rounded-2xl text-slate-800 dark:text-white bg-slate-100 dark:bg-white/10 hover:bg-primary/10 transition-all shrink-0">
-        <span id="menu-icon" class="material-symbols-outlined text-[24px]">menu</span>
+      <button aria-label="Abrir menú" aria-controls="mobile-menu" [attr.aria-expanded]="chrome.mobileMenuOpen()" type="button" (click)="toggleMobileMenu()"
+        class="lg:hidden w-10 h-10 flex items-center justify-center rounded-2xl text-slate-800 dark:text-white bg-slate-100 dark:bg-white/10 hover:bg-primary/10 transition-all shrink-0">
+        @if (chrome.mobileMenuOpen()) {
+          <span class="material-symbols-outlined text-[24px]">close</span>
+        } @else {
+          <span class="material-symbols-outlined text-[24px]">menu</span>
+        }
       </button>
     </div>
 
   </div>
 
   <!-- Mobile Dropdown Menu (Cápsula Flotante con Z-Index 100) -->
-  <div class="lg:hidden fixed top-16 left-0 w-full z-[100] px-4 invisible opacity-0 -translate-y-2 transition-all duration-300 ease-out pointer-events-none" id="mobile-menu">
-    <div class="max-w-md mx-auto rounded-3xl bg-[#0f0b1a] dark:bg-[#120d21] border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[80vh]">
-      
-      <!-- Lista de Enlaces -->
-      <nav class="flex flex-col p-2 overflow-y-auto divide-y divide-white/5" aria-label="Navegación móvil">
+  @if (chrome.mobileMenuOpen()) {
+    <div class="lg:hidden fixed top-16 left-0 w-full z-[100] px-4 opacity-100 translate-y-0 transition-all duration-300 ease-out pointer-events-none" id="mobile-menu">
+      <div class="max-w-md mx-auto rounded-3xl bg-[#0f0b1a] dark:bg-[#120d21] border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.6)] backdrop-blur-2xl overflow-hidden pointer-events-auto flex flex-col max-h-[80vh]">
         
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#hero-section">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">home</span> 
-            <span>Inicio</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
+        <!-- Lista de Enlaces -->
+        <nav class="flex flex-col p-2 overflow-y-auto divide-y divide-white/5" aria-label="Navegación móvil">
+          @for (link of mobileLinks; track link.href) {
+            <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" [href]="link.href" (click)="onMobileNavClick($event, link.href)">
+              <span class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">{{ link.icon }}</span> 
+                <span>{{ link.label }}</span>
+              </span>
+              <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+          }
+        </nav>
 
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#sobre-expojuy">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">pacemaker</span> 
-            <span>Ejes 2026</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
+        <!-- Botones de Acción al Pie -->
+        <div class="p-3 bg-[#0a0712] border-t border-white/10 flex flex-col gap-2 shrink-0">
+          <a class="mobile-nav-link w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-cyan-electric text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95" href="#entradas">
+            <span class="material-symbols-outlined text-sm">confirmation_number</span> 
+            <span>Comprar Entradas</span>
+          </a>
+        </div>
 
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#mapa">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">location_on</span> 
-            <span>Ubicación</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#expositores">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">storefront</span> 
-            <span>Expositores</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#agenda">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">calendar_month</span> 
-            <span>Agenda</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#novedades">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">newspaper</span> 
-            <span>Novedades</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-
-        <a class="mobile-nav-link flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-semibold text-slate-200 hover:text-brand-cyan-electric hover:bg-white/5 transition-all" href="#galeria">
-          <span class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-[20px] text-brand-cyan-electric">photo_library</span> 
-            <span>Galería</span>
-          </span>
-          <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-
-      </nav>
-
-      <!-- Botones de Acción al Pie -->
-      <div class="p-3 bg-[#0a0712] border-t border-white/10 flex flex-col gap-2 shrink-0">
-        <a class="mobile-nav-link w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-cyan-electric text-slate-950 font-bold text-xs uppercase tracking-wider transition-all shadow-md active:scale-95" href="#entradas">
-          <span class="material-symbols-outlined text-sm">confirmation_number</span> 
-          <span>Comprar Entradas</span>
-        </a>
       </div>
-
     </div>
-  </div>
+  }
 </header>

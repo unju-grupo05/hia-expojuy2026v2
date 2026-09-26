@@ -1,7 +1,18 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  ViewChild,
+  inject,
+  signal
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { AgendaApi } from '../../../services/apiAgenda.service';
-import { ChangeDetectorRef } from '@angular/core';
 
 export interface AgendaEventoPublico {
   id: number;
@@ -28,13 +39,16 @@ const RESUMEN_DIAS: Record<number, string> = {
   4: 'Rondas B2B & Cierre'
 };
 
+type ModalStatus = 'form' | 'enviando' | 'exito' | 'error';
+
 @Component({
   selector: 'app-agenda',
   standalone: true,
+  imports: [],
   templateUrl: './agenda.component.html',
   styleUrl: './agenda.component.css'
 })
-export class AgendaComponent implements OnInit {
+export class AgendaComponent implements OnInit, OnDestroy {
   agenda: any[] = [];
   dias: AgendaDia[] = [];
   cargando: boolean = true;
@@ -44,42 +58,58 @@ export class AgendaComponent implements OnInit {
   selectedActivityTitle: string = '';
   selectedActivityTime: string = '';
 
+  /**
+   * Estado del modal de recordatorio.
+   *
+   * Antes se controlaba con `document.getElementById` + `classList`
+   * (`modal-open`, `hidden`), lo que ademas deixaba el body bloqueado si el
+   * componente se destruia con el modal abierto.
+   */
+  readonly modalOpen = signal<boolean>(false);
+  readonly modalStatus = signal<ModalStatus>('form');
+  readonly modalErrorMessage = signal<string>('');
+  readonly modalSuccessMessage = signal<string>('');
+  readonly reminderEmail = signal<string>('');
+
+  @ViewChild('reminderEmailInput') reminderEmailInput?: ElementRef<HTMLInputElement>;
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  /** Temporizadores pendientes, cancelados en ngOnDestroy. */
+  private readonly pendingTimers = new Set<ReturnType<typeof setTimeout>>();
+
+  /** Observadores de reveal pendientes, desconectados en ngOnDestroy. */
+  private revealObserver: IntersectionObserver | null = null;
+  private observedRevealEls: Element[] = [];
+
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
-    private apiAgenda: AgendaApi,
-    private cdr: ChangeDetectorRef
+    private apiAgenda: AgendaApi
   ) {}
 
   ngOnInit(): void {
     this.obtenerAgenda();
-    if (isPlatformBrowser(this.platformId)) {
-      this.bindWindowGlobals();
-    }
   }
 
-  private bindWindowGlobals(): void {
-    const w = window as any;
-    w.switchDayTab = this.selectDay.bind(this);
-    w.openReminderModal = this.openReminderModal.bind(this);
-    w.closeReminderModal = this.closeReminderModal.bind(this);
-    w.submitReminder = this.submitReminder.bind(this);
+  /** Registra un setTimeout y garantiza su limpieza al destruir. */
+  private schedule(fn: () => void, delayMs: number): void {
+    const id = setTimeout(() => {
+      this.pendingTimers.delete(id);
+      fn();
+    }, delayMs);
+    this.pendingTimers.add(id);
   }
 
-  selectDay(dayNum: number, event?: Event): void {
+  private setBodyScrollLocked(locked: boolean): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    document.body.style.overflow = locked ? 'hidden' : '';
+  }
+
+  selectDay(dayNum: number): void {
     this.activeDay = dayNum;
-    if (isPlatformBrowser(this.platformId)) {
-      if (event && event.target) {
-        const btn = (event.target as HTMLElement).closest('.day-tab');
-        document.querySelectorAll('.day-tab').forEach(b => b.classList.remove('active-day'));
-        if (btn) btn.classList.add('active-day');
-      }
-
-      const targetDay = document.getElementById('day-' + dayNum);
-      if (targetDay) {
-        const hiddenCards = targetDay.querySelectorAll('.reveal-on-scroll');
-        hiddenCards.forEach(c => c.classList.add('is-visible'));
-      }
-    }
+    // El resaltado del tab y la visibilidad del dia se resuelven en la
+    // plantilla con `[class.active-day]` / `[class.hidden]`: ya no hace falta
+    // recorrer `.day-tab` con classList ni buscar `#day-N`.
   }
 
   openReminderModal(actId: number, title: string, time: string): void {
@@ -87,100 +117,83 @@ export class AgendaComponent implements OnInit {
     this.selectedActivityTitle = title;
     this.selectedActivityTime = time;
 
-    const modal = document.getElementById('reminder-modal');
-    const actName = document.getElementById('reminder-activity-name');
-    const actDate = document.getElementById('reminder-activity-date');
-    const success = document.getElementById('reminder-success');
-    const form = document.getElementById('reminder-form');
-    const errorBox = document.getElementById('reminder-error');
-    const emailInput = document.getElementById('reminder-email') as HTMLInputElement;
+    this.reminderEmail.set('');
+    this.modalErrorMessage.set('');
+    this.modalSuccessMessage.set('');
+    this.modalStatus.set('form');
+    this.modalOpen.set(true);
+    this.setBodyScrollLocked(true);
 
-    if (!modal) return;
-    if (actName) actName.textContent = title;
-    if (actDate) actDate.textContent = time;
-    if (emailInput) emailInput.value = '';
-    if (success) success.classList.add('hidden');
-    if (errorBox) errorBox.classList.add('hidden');
-    if (form) form.classList.remove('hidden');
-
-    modal.classList.add('modal-open');
-    document.body.style.overflow = 'hidden';
+    // Un turno de renduizado para que exista el input y poder enfocarlo.
+    this.schedule(() => this.reminderEmailInput?.nativeElement.focus(), 0);
   }
 
   closeReminderModal(): void {
-    const modal = document.getElementById('reminder-modal');
-    if (modal) {
-      modal.classList.remove('modal-open');
-      document.body.style.overflow = '';
-    }
+    this.modalOpen.set(false);
+    this.setBodyScrollLocked(false);
+  }
+
+  updateReminderEmail(value: string): void {
+    this.reminderEmail.set(value);
   }
 
   submitReminder(event: Event): void {
     event.preventDefault();
 
-    const emailInput = document.getElementById('reminder-email') as HTMLInputElement;
-    const form = document.getElementById('reminder-form');
-    const success = document.getElementById('reminder-success');
-    const successMsg = document.getElementById('reminder-success-msg');
-    const errorBox = document.getElementById('reminder-error');
-    const submitBtn = document.getElementById('reminder-submit-btn') as HTMLButtonElement;
+    const email = this.reminderEmail().trim();
+    if (!email || !this.selectedActivityId) return;
 
-    if (!emailInput || !emailInput.value || !this.selectedActivityId) return;
+    this.modalErrorMessage.set('');
+    this.modalStatus.set('enviando');
 
-    const email = emailInput.value.trim();
+    this.apiAgenda
+      .suscribirse(email, this.selectedActivityId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.modalSuccessMessage.set(
+            res?.message || 'Te avisaremos por correo cuando la actividad esté por comenzar.'
+          );
+          this.modalStatus.set('exito');
 
-    if (submitBtn) submitBtn.disabled = true;
-    if (errorBox) errorBox.classList.add('hidden');
-
-    this.apiAgenda.suscribirse(email, this.selectedActivityId).subscribe({
-      next: (res) => {
-        if (submitBtn) submitBtn.disabled = false;
-        if (form) form.classList.add('hidden');
-        if (successMsg && res?.message) successMsg.textContent = res.message;
-        if (success) success.classList.remove('hidden');
-
-        setTimeout(() => {
-          this.closeReminderModal();
-        }, 2500);
-      },
-      error: (err) => {
-        if (submitBtn) submitBtn.disabled = false;
-        if (errorBox) {
-          errorBox.textContent = err?.error?.message || 'Error al guardar el recordatorio. Inténtalo de nuevo.';
-          errorBox.classList.remove('hidden');
+          this.schedule(() => this.closeReminderModal(), 2500);
+        },
+        error: (err) => {
+          this.modalErrorMessage.set(
+            err?.error?.message || 'Error al guardar el recordatorio. Inténtalo de nuevo.'
+          );
+          this.modalStatus.set('error');
+          console.error('Error al suscribir recordatorio:', err);
         }
-        console.error('Error al suscribir recordatorio:', err);
-      }
-    });
+      });
   }
 
   //***********************SERVICIOS*************************
 
   obtenerAgenda(): void {
     this.cargando = true;
-    this.apiAgenda.getAgenda().subscribe({
-      next: (res) => {
-        const datos = res?.data || res;
-        this.agenda = Array.isArray(datos) ? [...datos] : [];
-        this.dias = this.agruparPorDia(this.agenda);
-        if (this.dias.length > 0) {
-          this.activeDay = this.dias[0].numero;
-        }
-        this.cargando = false;
-        this.cdr.detectChanges();
+    this.apiAgenda
+      .getAgenda()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          const datos = res?.data || res;
+          this.agenda = Array.isArray(datos) ? [...datos] : [];
+          this.dias = this.agruparPorDia(this.agenda);
+          if (this.dias.length > 0) {
+            this.activeDay = this.dias[0].numero;
+          }
+          this.cargando = false;
 
-        if (isPlatformBrowser(this.platformId)) {
-          setTimeout(() => {
-            this.activarScrollRevealLocal();
-          }, 100);
+          if (isPlatformBrowser(this.platformId)) {
+            this.schedule(() => this.activarScrollRevealLocal(), 100);
+          }
+        },
+        error: (err) => {
+          this.cargando = false;
+          console.error('Error al obtener agenda:', err);
         }
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.cdr.detectChanges();
-        console.error('Error al obtener agenda:', err);
-      }
-    });
+      });
   }
 
   private agruparPorDia(items: any[]): AgendaDia[] {
@@ -212,26 +225,54 @@ export class AgendaComponent implements OnInit {
   }
 
   private activarScrollRevealLocal(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    // Se desconecta cualquier observer previo: esta funcion se re-invoca en
+    // cada carga de datos y sin esto los observers se acumulaban.
+    this.desconectarRevealObserver();
+
     const reveals = document.querySelectorAll('#agenda .reveal-on-scroll');
-    
+    if (!reveals.length) return;
+
     if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.05 });
+      this.revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              this.revealObserver?.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.05 }
+      );
 
-      reveals.forEach(el => observer.observe(el));
+      reveals.forEach((el) => this.revealObserver!.observe(el));
+      this.observedRevealEls = Array.from(reveals);
     } else {
-      reveals.forEach(el => el.classList.add('is-visible'));
+      reveals.forEach((el) => el.classList.add('is-visible'));
     }
+  }
 
-    const w = window as any;
-    if (w.ScrollTrigger) {
-      w.ScrollTrigger.refresh();
+  private desconectarRevealObserver(): void {
+    if (!this.revealObserver) return;
+    this.observedRevealEls.forEach((el) => this.revealObserver!.unobserve(el));
+    this.revealObserver.disconnect();
+    this.revealObserver = null;
+    this.observedRevealEls = [];
+  }
+
+  ngOnDestroy(): void {
+    // 1. Cancelar temporizadores (reveal inicial y cierre automático del modal).
+    this.pendingTimers.forEach((id) => clearTimeout(id));
+    this.pendingTimers.clear();
+
+    // 2. Desconectar IntersectionObservers.
+    this.desconectarRevealObserver();
+
+    // 3. Liberar el bloqueo de scroll si el modal seguía abierto.
+    if (this.modalOpen()) {
+      this.setBodyScrollLocked(false);
     }
   }
 }

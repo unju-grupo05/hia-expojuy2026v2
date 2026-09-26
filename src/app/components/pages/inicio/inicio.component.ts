@@ -1,6 +1,16 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, Inject, PLATFORM_ID, ElementRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+  effect,
+  signal,
+  viewChild
+} from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { EjesComponent } from '../ejes/ejes.component';
 import { UbicacionPredioHubComponent } from '../ubicacion-predio-hub/ubicacion-predio-hub';
 import { ExpositoresComponent } from '../expositores/expositores.component';
@@ -9,16 +19,30 @@ import { NovedadesComponent } from '../publicaciones/publicaciones.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
 import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
+import { UiChromeService } from '../../../core/ui-chrome.service';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+
+interface ChatMessage {
+  sender: 'user' | 'bot';
+  text: string;
+}
+
+/** Subconjunto de la API de Web Speech usada por el chatbot. */
+interface SpeechRecognitionLike {
+  lang: string;
+  interimResults: boolean;
+  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
+  start(): void;
+  abort(): void;
+}
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     EjesComponent,
     UbicacionPredioHubComponent,
     ExpositoresComponent,
@@ -32,17 +56,62 @@ import Lenis from 'lenis';
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
-  @ViewChild(UbicacionPredioHubComponent) predioComponent!: UbicacionPredioHubComponent;
+  // ── View queries (signal based) ──────────────────────────────────────────
+  private readonly bgVideo = viewChild<ElementRef<HTMLVideoElement>>('bgVideo');
+  private readonly predioComponent = viewChild(UbicacionPredioHubComponent);
+  private readonly splashNode = viewChild<ElementRef<HTMLElement>>('splashNode');
+  private readonly splashLogo = viewChild<ElementRef<HTMLElement>>('splashLogo');
+  private readonly splashBadge = viewChild<ElementRef<HTMLElement>>('splashBadge');
+  private readonly heroSection = viewChild<ElementRef<HTMLElement>>('heroSection');
+  private readonly heroBg = viewChild<ElementRef<HTMLElement>>('heroBg');
+  private readonly chatMessagesBox = viewChild<ElementRef<HTMLDivElement>>('chatMessagesBox');
+  private readonly chatInputField = viewChild<ElementRef<HTMLInputElement>>('chatInputField');
 
-  private lenisInstance: Lenis | null = null;
-  private countdownInterval: any = null;
-
-  public chatMessages: Array<{ sender: 'user' | 'bot'; text: string }> = [
+  // ── Estado de UI (consumido por la plantilla) ───────────────────────────
+  readonly splashVisible = signal(true);
+  readonly countdown = signal({ days: '30', hours: '00', minutes: '00', seconds: '00' });
+  readonly chatOpen = signal(false);
+  readonly chatTyping = signal(false);
+  readonly chatDraft = signal('');
+  readonly chatMessages = signal<ChatMessage[]>([
     { sender: 'bot', text: '¡Hola! Soy PachAI, tu asistente virtual de ExpoJuy 2026. ¿En qué puedo ayudarte hoy?' }
-  ];
+  ]);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
+  // ── Recursos con teardown ───────────────────────────────────────────────
+  private lenisInstance: Lenis | null = null;
+  private lenisScrollUnsubscribe: (() => void) | null = null;
+  private gsapTickerFn: ((time: number) => void) | null = null;
+  private chromeScrollHandler: ((target: string) => void) | null = null;
+  private splashTimeline: gsap.core.Timeline | null = null;
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+  private readonly tweens: gsap.core.Tween[] = [];
+  private readonly scrollTriggers: ScrollTrigger[] = [];
+  private readonly observers: IntersectionObserver[] = [];
+  private readonly timeouts = new Set<ReturnType<typeof setTimeout>>();
+  private readonly typingTimers = new Set<ReturnType<typeof setTimeout>>();
+  private readonly rafIds = new Set<number>();
+  private readonly listenerCleanups: Array<() => void> = [];
+  private activeRecognition: SpeechRecognitionLike | null = null;
+  private bodyScrollLocked = false;
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private chrome: UiChromeService
+  ) {
+    // Autoscroll del hilo cuando llega un mensaje nuevo o el indicador de typing.
+    effect(() => {
+      this.chatMessages();
+      this.chatTyping();
+      const box = this.chatMessagesBox()?.nativeElement;
+      if (box) box.scrollTop = box.scrollHeight;
+    });
+
+    // La clase vive en <body> porque el CSS de la barra lateral tambien la consulta.
+    effect(() => {
+      if (typeof document === 'undefined') return;
+      document.body.classList.toggle('chat-open', this.chatOpen());
+    });
+  }
 
   ngOnInit(): void { }
 
@@ -52,88 +121,118 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     window.scrollTo(0, 0);
     gsap.registerPlugin(ScrollTrigger);
 
-    this.bindWindowGlobals();
     this.initSplashIntro();
     this.iniciarVideoFondo();
     this.initLenisSmoothScroll();
     this.initHeroParallax();
     this.revealHeroLayers();
     this.initHeroCursorParallax();
-    this.initReadingProgressBar();
     this.initScrollReveal();
     this.initCountdown();
-    this.initDarkMode();
-    this.initMobileMenu();
     this.initTextEffects();
-    this.initChatbot();
   }
 
   ngOnDestroy(): void {
-    if (this.lenisInstance) {
-      this.lenisInstance.destroy();
-      this.lenisInstance = null;
+    if (this.chromeScrollHandler) {
+      this.chrome.unregisterScrollHandler(this.chromeScrollHandler);
+      this.chromeScrollHandler = null;
     }
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
-    ScrollTrigger.getAll().forEach(t => t.kill());
-  }
 
-  // =========================================================================
-  // BINDING DE MÉTODOS GLOBALES EN WINDOW
-  // =========================================================================
-  private bindWindowGlobals(): void {
-    const w = window as any;
-    w.smoothScrollTo = this.smoothScrollTo.bind(this);
-    w.toggleChatbot = this.toggleChatbot.bind(this);
-    w.closeChatbot = this.closeChatbot.bind(this);
+    if (this.gsapTickerFn) {
+      gsap.ticker.remove(this.gsapTickerFn);
+      this.gsapTickerFn = null;
+    }
+
+    this.lenisScrollUnsubscribe?.();
+    this.lenisScrollUnsubscribe = null;
+    this.lenisInstance?.destroy();
+    this.lenisInstance = null;
+
+    this.splashTimeline?.kill();
+    this.splashTimeline = null;
+
+    this.clearCountdown();
+
+    for (const tween of this.tweens) tween.kill();
+    this.tweens.length = 0;
+
+    for (const trigger of this.scrollTriggers) trigger.kill();
+    this.scrollTriggers.length = 0;
+
+    for (const observer of this.observers) observer.disconnect();
+    this.observers.length = 0;
+
+    for (const timeout of this.timeouts) clearTimeout(timeout);
+    this.timeouts.clear();
+
+    for (const timer of this.typingTimers) clearTimeout(timer);
+    this.typingTimers.clear();
+
+    for (const rafId of this.rafIds) cancelAnimationFrame(rafId);
+    this.rafIds.clear();
+
+    for (const cleanup of this.listenerCleanups) cleanup();
+    this.listenerCleanups.length = 0;
+
+    this.activeRecognition?.abort();
+    this.activeRecognition = null;
+
+    this.releaseBodyScrollLock();
+    document.body.classList.remove('chat-open');
   }
 
   // =========================================================================
   // SPLASH INTRO & VIDEO DE FONDO
   // =========================================================================
   private initSplashIntro(): void {
-    const splash = document.getElementById('splash-intro');
-    const logo = document.getElementById('splash-logo');
-    const badge = document.getElementById('splash-badge');
+    const splash = this.splashNode()?.nativeElement;
+    const logo = this.splashLogo()?.nativeElement;
+    const badge = this.splashBadge()?.nativeElement;
 
     if (!splash || !logo) {
+      this.splashVisible.set(false);
       this.revealHeroLayers();
       return;
     }
 
-    document.body.style.overflow = 'hidden';
+    this.lockBodyScroll();
 
-    const tl = gsap.timeline({
+    const timeline = gsap.timeline({
       onComplete: () => {
-        splash.remove();
-        document.body.style.overflow = '';
+        // El overlay se retira con `@if`, no con `remove()`: asi Angular sigue
+        // siendo dueño del nodo y no queda un hole en el DOM.
+        this.splashVisible.set(false);
+        this.releaseBodyScrollLock();
 
         window.scrollTo(0, 0);
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
 
-        if (this.lenisInstance) {
-          this.lenisInstance.scrollTo(0, { immediate: true });
-        }
+        this.lenisInstance?.scrollTo(0, { immediate: true });
 
         ScrollTrigger.refresh();
         this.revealHeroLayers();
       }
     });
+    this.splashTimeline = timeline;
 
-    tl.to(logo, {
+    timeline.to(logo, {
       opacity: 1,
       scale: 1,
       duration: 0.6,
       ease: 'back.out(1.7)'
-    })
-      .to(badge, {
+    });
+
+    if (badge) {
+      timeline.to(badge, {
         opacity: 0,
         y: 10,
         duration: 0.3,
         delay: 0.3
-      })
+      });
+    }
+
+    timeline
       .to(logo, {
         scale: 14,
         opacity: 0,
@@ -148,15 +247,39 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       }, 'zoom+=0.1');
   }
 
+  private lockBodyScroll(): void {
+    this.bodyScrollLocked = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  private releaseBodyScrollLock(): void {
+    if (!this.bodyScrollLocked) return;
+    this.bodyScrollLocked = false;
+    document.body.style.overflow = '';
+  }
+
+  private clearCountdown(): void {
+    if (this.countdownInterval === null) return;
+    clearInterval(this.countdownInterval);
+    this.countdownInterval = null;
+  }
+
   private iniciarVideoFondo(): void {
-    if (this.bgVideo?.nativeElement) {
-      const video = this.bgVideo.nativeElement;
-      video.muted = true;
-      video.defaultMuted = true;
-      video.play().catch(() => {
-        window.addEventListener('click', () => video.play(), { once: true });
-      });
-    }
+    const video = this.bgVideo()?.nativeElement;
+    if (!video) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.play().catch(() => {
+      // Autoplay bloqueado: se reintenta en el primer gesto del usuario y el
+      // listener se elimina tanto por `once` como en el teardown.
+      const resumeOnFirstGesture = () => {
+        window.removeEventListener('click', resumeOnFirstGesture);
+        video.play().catch(() => { /* el navegador puede seguir bloqueandolo */ });
+      };
+      window.addEventListener('click', resumeOnFirstGesture, { once: true });
+      this.listenerCleanups.push(() => window.removeEventListener('click', resumeOnFirstGesture));
+    });
   }
 
   // =========================================================================
@@ -172,44 +295,52 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       touchMultiplier: 1.0,
       infinite: false
     });
+    this.lenisInstance = lenis;
 
-    lenis.on('scroll', (e: any) => {
-      if (e.scroll <= 0) {
+    // `lenis.on` devuelve la funcion de baja: no hace falta `off` ni busquedas.
+    this.lenisScrollUnsubscribe = lenis.on('scroll', (instance) => {
+      if (instance.animatedScroll <= 0) {
         window.scrollTo(0, 0);
       }
       ScrollTrigger.update();
     });
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
+    this.gsapTickerFn = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(this.gsapTickerFn);
     gsap.ticker.lagSmoothing(0);
 
-    this.lenisInstance = lenis;
-    (window as any).lenis = lenis;
+    // El menu movil del header (persistente, fuera de esta ruta) navega
+    // mediante el servicio: asi el smooth scroll tiene un unico dueno.
+    this.chromeScrollHandler = (target: string) => this.smoothScrollTo(target);
+    this.chrome.registerScrollHandler(this.chromeScrollHandler);
   }
 
-  public smoothScrollTo(target: string | HTMLElement, options?: { offset?: number; duration?: number }): void {
-    const opts = options || {};
+  /** Los CTA del hero usan el mismo scroll que el rail y el menu movil. */
+  onAnchorClick(event: Event, target: string): void {
+    event.preventDefault();
+    this.smoothScrollTo(target);
+  }
+
+  private smoothScrollTo(target: string, options?: { offset?: number; duration?: number }): void {
+    const opts = options ?? {};
+    const id = target.replace(/^#/, '');
+
     let el: HTMLElement | null = null;
 
-    if (typeof target === 'string') {
-      if (target === '#mapa' || target === '#ubicacion') {
-        el = document.getElementById('mapa') || document.getElementById('mapa-ubicacion');
-        if (this.predioComponent) {
-          const tabToSet = target === '#ubicacion' ? 'ubicacion' : 'predio';
-          this.predioComponent.switchTab(tabToSet);
-        }
-      } else {
-        el = document.querySelector(target) as HTMLElement;
+    if (id === 'mapa' || id === 'ubicacion') {
+      const predio = this.predioComponent();
+      if (predio) {
+        predio.switchTab(id === 'ubicacion' ? 'ubicacion' : 'predio');
+        el = predio.host.nativeElement;
       }
-    } else {
-      el = target;
+    } else if (id === 'hero-section') {
+      el = this.heroSection()?.nativeElement ?? null;
     }
 
+    el = el ?? this.chrome.resolveSectionElement(id);
     if (!el) return;
 
-    if (this.lenisInstance && typeof this.lenisInstance.scrollTo === 'function') {
+    if (this.lenisInstance) {
       this.lenisInstance.scrollTo(el, {
         offset: typeof opts.offset === 'number' ? opts.offset : -76,
         duration: typeof opts.duration === 'number' ? opts.duration : 1.1
@@ -222,14 +353,13 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   // HERO LAYERS & PARALLAX
   // =========================================================================
-  public revealHeroLayers(): void {
-    const hero = document.getElementById('hero-section');
-    if (!hero) return;
-    const layers = Array.from(hero.querySelectorAll('.hero-layer')) as HTMLElement[];
+  private revealHeroLayers(): void {
+    const layers = Array.from(
+      this.heroSection()?.nativeElement.querySelectorAll<HTMLElement>('.hero-layer') ?? []
+    );
     if (!layers.length) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       layers.forEach(l => {
         l.style.opacity = '1';
         l.style.visibility = 'visible';
@@ -239,7 +369,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     gsap.set(layers, { opacity: 0, y: 40, visibility: 'hidden' });
-    gsap.to(layers, {
+    this.tweens.push(gsap.to(layers, {
       opacity: 1,
       y: 0,
       visibility: 'visible',
@@ -249,161 +379,112 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       ease: 'expo.out',
       overwrite: true,
       clearProps: 'opacity,transform,visibility'
-    });
+    }));
   }
 
   private initHeroParallax(): void {
-    const bg = document.getElementById('hero-bg');
+    const bg = this.heroBg()?.nativeElement;
     if (!bg) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    gsap.fromTo(bg,
+    const tween = gsap.fromTo(bg,
       { y: 0 },
       {
         y: -80,
         ease: 'none',
         scrollTrigger: {
-          trigger: '#hero-section',
+          trigger: this.heroSection()?.nativeElement ?? bg,
           start: 'top top',
           end: 'bottom top',
           scrub: 0.6
         }
       }
     );
+
+    this.tweens.push(tween);
+    if (tween.scrollTrigger) this.scrollTriggers.push(tween.scrollTrigger);
   }
 
   private initHeroCursorParallax(): void {
-    const hero = document.getElementById('hero-section');
-    const pNodes = document.querySelectorAll('.parallax-elem') as NodeListOf<HTMLElement>;
+    const hero = this.heroSection()?.nativeElement;
+    if (!hero) return;
 
-    if (!hero || !pNodes.length) return;
+    const pNodes = Array.from(hero.querySelectorAll<HTMLElement>('.parallax-elem'));
+    if (!pNodes.length) return;
 
-    hero.addEventListener('mousemove', (e: MouseEvent) => {
+    const onMouseMove = (e: MouseEvent) => {
       const bounds = hero.getBoundingClientRect();
       const mouseX = (e.clientX - bounds.left) / bounds.width - 0.5;
       const mouseY = (e.clientY - bounds.top) / bounds.height - 0.5;
 
       pNodes.forEach(node => {
-        const depth = parseFloat(node.getAttribute('data-depth') || '0.04');
+        const depth = parseFloat(node.dataset['depth'] || '0.04');
         const transX = mouseX * depth * 240;
         const transY = mouseY * depth * 240;
         node.style.transform = `translate3d(${transX}px, ${transY}px, 0)`;
       });
-    });
+    };
 
-    hero.addEventListener('mouseleave', () => {
+    const onMouseLeave = () => {
       pNodes.forEach(node => {
         node.style.transform = 'translate3d(0, 0, 0)';
         node.style.transition = 'transform 0.4s ease-out';
       });
-    });
+    };
 
-    hero.addEventListener('mouseenter', () => {
+    const onMouseEnter = () => {
       pNodes.forEach(node => {
         node.style.transition = 'none';
       });
+    };
+
+    hero.addEventListener('mousemove', onMouseMove);
+    hero.addEventListener('mouseleave', onMouseLeave);
+    hero.addEventListener('mouseenter', onMouseEnter);
+
+    this.listenerCleanups.push(() => {
+      hero.removeEventListener('mousemove', onMouseMove);
+      hero.removeEventListener('mouseleave', onMouseLeave);
+      hero.removeEventListener('mouseenter', onMouseEnter);
     });
-  }
-
-  // =========================================================================
-  // PROGRESS BAR & SIDE RAIL
-  // =========================================================================
-  private initReadingProgressBar(): void {
-    const readingBar = document.getElementById('reading-progress');
-
-    const sectionMap = [
-      { navTarget: 'hero-section', elementId: 'hero-section' },
-      { navTarget: 'sobre-expojuy', elementId: 'sobre-expojuy' },
-      { navTarget: 'mapa', elementId: 'mapa' },
-      { navTarget: 'expositores', elementId: 'expositores' },
-      { navTarget: 'agenda', elementId: 'agenda' },
-      { navTarget: 'novedades', elementId: 'novedades' },
-      { navTarget: 'galeria', elementId: 'galeria' },
-      { navTarget: 'acreditaciones-section', elementId: 'acreditaciones-section' }
-    ];
-
-    const railIndicators = document.querySelectorAll('.rail-indicator');
-    const navItems = document.querySelectorAll('header nav a.nav-item');
-
-    window.addEventListener('scroll', () => {
-      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-
-      if (readingBar) {
-        readingBar.style.width = scrolled + '%';
-      }
-
-      const scrollPos = window.scrollY + 280;
-
-      sectionMap.forEach((item) => {
-        const el = document.getElementById(item.elementId);
-        if (el) {
-          const top = el.offsetTop;
-          const h = el.offsetHeight;
-
-          if (scrollPos >= top && scrollPos < top + h) {
-            railIndicators.forEach((r) => {
-              const target = r.getAttribute('data-nav-target');
-              const dot = r.querySelector('.rail-dot');
-              if (dot) {
-                if (target === item.navTarget) {
-                  dot.classList.add('bg-brand-cyan-electric', 'scale-150');
-                  dot.classList.remove('bg-slate-400/60', 'dark:bg-slate-600');
-                } else {
-                  dot.classList.remove('bg-brand-cyan-electric', 'scale-150');
-                  dot.classList.add('bg-slate-400/60', 'dark:bg-slate-600');
-                }
-              }
-            });
-
-            navItems.forEach((navEl) => {
-              const href = (navEl as HTMLAnchorElement).getAttribute('href')?.replace('#', '');
-              if (href === item.navTarget) {
-                navEl.classList.add('text-brand-cyan-electric');
-                navEl.classList.remove('text-slate-700', 'dark:text-white', 'dark:text-purple-300');
-              } else {
-                navEl.classList.remove('text-brand-cyan-electric');
-                navEl.classList.add('text-slate-700', 'dark:text-purple-300');
-              }
-            });
-
-          }
-        }
-      });
-    }, { passive: true });
   }
 
   // =========================================================================
   // SCROLL REVEAL (INTERSECTION OBSERVER)
   // =========================================================================
   private initScrollReveal(): void {
-    // Ejecutamos un timeout breve para permitir que componentes como Ejes carguen sus datos
-    setTimeout(() => {
+    // Timeout breve para que componentes como Ejes carguen sus datos.
+    const timeout = setTimeout(() => {
+      this.timeouts.delete(timeout);
+
       const reveals = document.querySelectorAll('.reveal-on-scroll');
-      if (!reveals.length) return;
+      if (!reveals.length) {
+        ScrollTrigger.refresh();
+        return;
+      }
 
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
           entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              observer.unobserve(entry.target);
-            }
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
           });
         }, {
-          threshold: 0.05, // Umbral más bajo para que active apenas asome en pantalla
+          threshold: 0.05,
           rootMargin: '50px 0px 0px 0px'
         });
 
         reveals.forEach(el => observer.observe(el));
+        this.observers.push(observer);
       } else {
         reveals.forEach(el => el.classList.add('is-visible'));
       }
 
-      // Notifica a GSAP que refresque las posiciones del scroll
       ScrollTrigger.refresh();
     }, 300);
+
+    this.timeouts.add(timeout);
   }
 
   // =========================================================================
@@ -413,104 +494,24 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     const targetDate = new Date('2026-10-09T09:00:00-03:00').getTime();
 
     const updateTimer = () => {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
+      const difference = targetDate - Date.now();
 
-      if (difference > 0) {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-        const dEl = document.getElementById('cd-days');
-        const hEl = document.getElementById('cd-hours');
-        const mEl = document.getElementById('cd-mins');
-        const sEl = document.getElementById('cd-secs');
-
-        if (dEl) dEl.textContent = String(days).padStart(2, '0');
-        if (hEl) hEl.textContent = String(hours).padStart(2, '0');
-        if (mEl) mEl.textContent = String(minutes).padStart(2, '0');
-        if (sEl) sEl.textContent = String(seconds).padStart(2, '0');
+      if (difference <= 0) {
+        this.countdown.set({ days: '00', hours: '00', minutes: '00', seconds: '00' });
+        this.clearCountdown();
+        return;
       }
+
+      this.countdown.set({
+        days: String(Math.floor(difference / 86400000)).padStart(2, '0'),
+        hours: String(Math.floor((difference % 86400000) / 3600000)).padStart(2, '0'),
+        minutes: String(Math.floor((difference % 3600000) / 60000)).padStart(2, '0'),
+        seconds: String(Math.floor((difference % 60000) / 1000)).padStart(2, '0')
+      });
     };
 
     updateTimer();
     this.countdownInterval = setInterval(updateTimer, 1000);
-  }
-
-  // =========================================================================
-  // DARK MODE TOGGLE
-  // =========================================================================
-  private initDarkMode(): void {
-    const toggleBtn = document.getElementById('theme-toggle');
-    const root = document.documentElement;
-
-    const updateIcon = () => {
-      if (!toggleBtn) return;
-      const isDark = root.classList.contains('dark');
-      toggleBtn.innerHTML = isDark
-        ? '<span class="material-symbols-outlined text-[20px]">light_mode</span>'
-        : '<span class="material-symbols-outlined text-[20px]">dark_mode</span>';
-    };
-
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
-        const isDark = root.classList.toggle('dark');
-        localStorage.setItem('expojuy-theme', isDark ? 'dark' : 'light');
-        updateIcon();
-        const w = window as any;
-        if (typeof w.setLocationMapTheme === 'function') {
-          w.setLocationMapTheme(isDark);
-        }
-      });
-    }
-
-    updateIcon();
-  }
-
-  // =========================================================================
-  // MOBILE HAMBURGER MENU
-  // =========================================================================
-  private initMobileMenu(): void {
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-    const menuIcon = document.getElementById('menu-icon');
-
-    if (!mobileMenu || !mobileMenuBtn) return;
-
-    let isMenuOpen = false;
-
-    const toggleMenu = (open?: boolean) => {
-      isMenuOpen = typeof open === 'boolean' ? open : !isMenuOpen;
-      mobileMenuBtn.setAttribute('aria-expanded', String(isMenuOpen));
-
-      if (isMenuOpen) {
-        mobileMenu.classList.remove('invisible', 'opacity-0', '-translate-y-3');
-        mobileMenu.classList.add('opacity-100', 'translate-y-0');
-        if (menuIcon) menuIcon.textContent = 'close';
-        document.body.style.overflow = 'hidden';
-      } else {
-        mobileMenu.classList.add('invisible', 'opacity-0', '-translate-y-3');
-        mobileMenu.classList.remove('opacity-100', 'translate-y-0');
-        if (menuIcon) menuIcon.textContent = 'menu';
-        document.body.style.overflow = '';
-      }
-    };
-
-    mobileMenuBtn.addEventListener('click', () => toggleMenu());
-
-    mobileMenu.querySelectorAll('.mobile-nav-link').forEach(link => {
-      link.addEventListener('click', (e: Event) => {
-        e.preventDefault();
-        const href = (link as HTMLAnchorElement).getAttribute('href');
-        toggleMenu(false);
-        if (href && href.startsWith('#')) {
-          setTimeout(() => {
-            this.smoothScrollTo(href);
-          }, 300);
-        }
-      });
-    });
   }
 
   // =========================================================================
@@ -519,37 +520,47 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private initTextEffects(): void {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const counters = Array.from(document.querySelectorAll('.count-up')) as HTMLElement[];
+    const counters = Array.from(document.querySelectorAll<HTMLElement>('.count-up'));
     if (counters.length) {
       if (reduced) {
         counters.forEach(el => {
-          el.textContent = (parseFloat(el.getAttribute('data-count') || '0')) + (el.getAttribute('data-suffix') || '');
+          el.textContent = (parseFloat(el.dataset['count'] || '0')) + (el.dataset['suffix'] || '');
         });
       } else if ('IntersectionObserver' in window) {
         const io = new IntersectionObserver((entries) => {
           entries.forEach(e => {
             if (!e.isIntersecting) return;
             const el = e.target as HTMLElement;
-            const target = parseFloat(el.getAttribute('data-count') || '0');
-            const suffix = el.getAttribute('data-suffix') || '';
+            const target = parseFloat(el.dataset['count'] || '0');
+            const suffix = el.dataset['suffix'] || '';
             const duration = 1200;
             const start = performance.now();
+
             const step = (now: number) => {
+              this.rafIds.delete(frame);
               const p = Math.min((now - start) / duration, 1);
               const eased = 1 - Math.pow(1 - p, 3);
               el.textContent = Math.round(target * eased) + suffix;
-              if (p < 1) requestAnimationFrame(step);
+              if (p < 1) {
+                const next = requestAnimationFrame(step);
+                this.rafIds.add(next);
+              }
             };
-            requestAnimationFrame(step);
+
+            const frame = requestAnimationFrame(step);
+            this.rafIds.add(frame);
             io.unobserve(el);
           });
         }, { threshold: 0.4 });
+
         counters.forEach(el => io.observe(el));
+        this.observers.push(io);
       }
     }
 
-    document.querySelectorAll('.blur-split').forEach(h => {
-      if (reduced) return;
+    if (reduced) return;
+
+    document.querySelectorAll<HTMLElement>('.blur-split').forEach(h => {
       const text = (h.textContent || '').replace(/\s+/g, ' ').trim();
       if (!text) return;
 
@@ -576,149 +587,108 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       h.appendChild(frag);
 
       const chars = h.querySelectorAll('.bs-char');
-      if ('IntersectionObserver' in window) {
-        const io = new IntersectionObserver((entries) => {
-          entries.forEach(e => {
-            if (e.isIntersecting) {
-              gsap.fromTo(chars,
-                { opacity: 0, y: '0.5em', filter: 'blur(10px)' },
-                {
-                  opacity: 1,
-                  y: 0,
-                  filter: 'blur(0px)',
-                  duration: 0.9,
-                  ease: 'power3.out',
-                  stagger: 0.018,
-                  clearProps: 'filter'
-                }
-              );
-              io.disconnect();
+      if (!('IntersectionObserver' in window)) return;
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          this.tweens.push(gsap.fromTo(chars,
+            { opacity: 0, y: '0.5em', filter: 'blur(10px)' },
+            {
+              opacity: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              duration: 0.9,
+              ease: 'power3.out',
+              stagger: 0.018,
+              clearProps: 'filter'
             }
-          });
-        }, { threshold: 0.25 });
-        io.observe(h);
-      }
+          ));
+          io.disconnect();
+        });
+      }, { threshold: 0.25 });
+
+      io.observe(h);
+      this.observers.push(io);
     });
   }
 
   // =========================================================================
   // PACHAI CHATBOT FLOTANTE
   // =========================================================================
-  private initChatbot(): void {
-    this.renderChatMessages();
-  }
-
-  public toggleChatbot(): void {
-    const panel = document.getElementById('chatbot-panel');
-    const launcher = document.getElementById('chatbot-launcher');
-    if (!panel || !launcher) return;
-
-    const isOpen = panel.classList.contains('is-open');
-    if (isOpen) {
-      this.closeChatbot();
-    } else {
-      panel.classList.add('is-open');
-      panel.setAttribute('aria-hidden', 'false');
-      launcher.setAttribute('aria-expanded', 'true');
-      document.body.classList.add('chat-open');
-      const input = document.getElementById('chatbot-input') as HTMLInputElement | null;
-      if (input) input.focus();
+  toggleChatbot(): void {
+    const next = !this.chatOpen();
+    this.chatOpen.set(next);
+    if (next) {
+      this.chatInputField()?.nativeElement.focus();
     }
   }
 
-  public closeChatbot(): void {
-    const panel = document.getElementById('chatbot-panel');
-    const launcher = document.getElementById('chatbot-launcher');
-    if (!panel || !launcher) return;
-
-    panel.classList.remove('is-open');
-    panel.setAttribute('aria-hidden', 'true');
-    launcher.setAttribute('aria-expanded', 'false');
-    document.body.classList.remove('chat-open');
+  closeChatbot(): void {
+    this.chatOpen.set(false);
   }
 
-  public sendChatMessage(event: Event): void {
+  sendChatMessage(event: Event): void {
     event.preventDefault();
-    const input = document.getElementById('chatbot-input') as HTMLInputElement | null;
-    if (!input) return;
-
-    const text = input.value.trim();
-    if (!text) return;
-
-    this.chatMessages.push({ sender: 'user', text });
-    this.renderChatMessages();
-    input.value = '';
-
-    this.showChatTyping();
-    setTimeout(() => {
-      this.hideChatTyping();
-      this.chatMessages.push({ sender: 'bot', text: this.getBotReply(text) });
-      this.renderChatMessages();
-    }, 750);
+    this.submitChatDraft();
   }
 
-  public toggleVoiceInput(): void {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      this.chatMessages.push({
-        sender: 'bot',
-        text: 'Tu navegador no soporta reconocimiento de voz nativo. Por favor escribe tu consulta.'
-      });
-      this.renderChatMessages();
+  updateChatDraft(value: string): void {
+    this.chatDraft.set(value);
+  }
+
+  private submitChatDraft(text?: string): void {
+    const message = (text ?? this.chatDraft()).trim();
+    if (!message) return;
+
+    this.chatMessages.update(messages => [...messages, { sender: 'user', text: message }]);
+    this.chatDraft.set('');
+    this.chatTyping.set(true);
+
+    const timer = setTimeout(() => {
+      this.typingTimers.delete(timer);
+      this.chatTyping.set(false);
+      this.chatMessages.update(messages => [
+        ...messages,
+        { sender: 'bot', text: this.getBotReply(message) }
+      ]);
+    }, 750);
+
+    this.typingTimers.add(timer);
+  }
+
+  toggleVoiceInput(): void {
+    const win = window as unknown as {
+      SpeechRecognition?: new () => SpeechRecognitionLike;
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+    };
+    const SpeechRecognitionCtor = win.SpeechRecognition || win.webkitSpeechRecognition;
+
+    if (!SpeechRecognitionCtor) {
+      this.chatMessages.update(messages => [
+        ...messages,
+        { sender: 'bot', text: 'Tu navegador no soporta reconocimiento de voz nativo. Por favor escribe tu consulta.' }
+      ]);
       return;
     }
 
     try {
-      const recognition = new SpeechRecognition();
+      const recognition = new SpeechRecognitionCtor();
       recognition.lang = 'es-AR';
       recognition.interimResults = false;
-      recognition.onresult = (e: any) => {
-        const transcript = e.results[0][0].transcript;
-        const input = document.getElementById('chatbot-input') as HTMLInputElement | null;
-        if (input) {
-          input.value = transcript;
-          const form = document.getElementById('chatbot-form') as HTMLFormElement | null;
-          if (form) form.dispatchEvent(new Event('submit'));
-        }
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        this.chatDraft.set(transcript);
+        this.submitChatDraft(transcript);
       };
+      this.activeRecognition = recognition;
       recognition.start();
     } catch {
-      this.chatMessages.push({
-        sender: 'bot',
-        text: 'No se pudo activar el micrófono. Puedes escribir tu consulta directamente.'
-      });
-      this.renderChatMessages();
+      this.chatMessages.update(messages => [
+        ...messages,
+        { sender: 'bot', text: 'No se pudo activar el micrófono. Puedes escribir tu consulta directamente.' }
+      ]);
     }
-  }
-
-  private renderChatMessages(): void {
-    const el = document.getElementById('chatbot-messages');
-    if (!el) return;
-
-    el.innerHTML = '';
-    this.chatMessages.forEach(m => {
-      const bubble = document.createElement('div');
-      bubble.className = 'chatbot-message chatbot-message--' + m.sender;
-      bubble.textContent = m.text;
-      el.appendChild(bubble);
-    });
-    el.scrollTop = el.scrollHeight;
-  }
-
-  private showChatTyping(): void {
-    const el = document.getElementById('chatbot-messages');
-    if (!el) return;
-    const bubble = document.createElement('div');
-    bubble.className = 'chatbot-message chatbot-message--bot chatbot-message--typing';
-    bubble.id = 'chatbot-typing';
-    bubble.innerHTML = '<span></span><span></span><span></span>';
-    el.appendChild(bubble);
-    el.scrollTop = el.scrollHeight;
-  }
-
-  private hideChatTyping(): void {
-    const t = document.getElementById('chatbot-typing');
-    if (t) t.remove();
   }
 
   private getBotReply(text: string): string {
