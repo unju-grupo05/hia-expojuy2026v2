@@ -71,4 +71,21 @@ export class NavbarComponent {
   public onLogout(): void {
     this.authService.logout();
   }
+
+  /**
+   * Iniciales del administrador para mostrar cuando el backend no aporta un avatar.
+   * Evita depender de un servicio externo de imágenes.
+   */
+  public userInitials(): string {
+    const nombre = this.authService.currentUser()?.name?.trim() || '';
+    if (!nombre) {
+      return 'AD';
+    }
+    const partes = nombre.split(/\s+/).filter(Boolean);
+    const iniciales = partes
+      .slice(0, 2)
+      .map((parte) => parte.charAt(0).toUpperCase())
+      .join('');
+    return iniciales || 'AD';
+  }
 }

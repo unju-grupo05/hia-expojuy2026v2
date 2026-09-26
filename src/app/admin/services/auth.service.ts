@@ -4,12 +4,23 @@ import { Router } from '@angular/router';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import {
+  clearAuthStorage,
+  isTokenExpired,
+  readAuthToken,
+  readAuthUser,
+  writeAuthStorage
+} from '../../core/auth-storage';
+
+export { AUTH_TOKEN_KEY, AUTH_USER_KEY } from '../../core/auth-storage';
 
 export interface AdminUser {
   id: string;
   email: string;
   name: string;
   role: string;
+  /** URL de avatar provista por el backend. Opcional: la UI debe mostrar un fallback local. */
   avatar?: string;
 }
 
@@ -23,9 +34,6 @@ export interface AuthResponse {
   user: AdminUser;
 }
 
-const TOKEN_KEY = 'expojuy_admin_token';
-const USER_KEY = 'expojuy_admin_user';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -35,8 +43,7 @@ export class AuthService {
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
 
-  private urlHost = 'http://localhost:3000';
-  private loginUrl = this.urlHost + '/api/usuarios/login';
+  private loginUrl = `${environment.apiUrl}/usuarios/login`;
 
   public readonly isAuthenticated = signal<boolean>(false);
   public readonly currentUser = signal<AdminUser | null>(null);
@@ -49,28 +56,28 @@ export class AuthService {
   private checkInitialAuthState(): void {
     if (!this.isBrowser) return;
 
-    try {
-      const token = localStorage.getItem(TOKEN_KEY);
-      const savedUser = localStorage.getItem(USER_KEY);
+    const token = readAuthToken();
 
-      if (token) {
-        this.isAuthenticated.set(true);
-        if (savedUser) {
-          this.currentUser.set(JSON.parse(savedUser));
-        } else {
-          this.currentUser.set({
-            id: 'admin-01',
-            email: 'admin@expojuy.com',
-            name: 'Administrador ExpoJuy',
-            role: 'Super Admin',
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
-          });
-        }
-      }
-    } catch {
+    // Un token vencido o ilegible no habilita sesión: se limpian los restos
+    // para no mostrar un panel "autenticado" cuya primera petición saldrá con 401.
+    if (!token || isTokenExpired(token)) {
+      clearAuthStorage();
       this.isAuthenticated.set(false);
       this.currentUser.set(null);
+      return;
     }
+
+    this.isAuthenticated.set(true);
+    this.currentUser.set(
+      readAuthUser<AdminUser>() ?? {
+        // Sin datos de perfil persistidos: se construye un usuario mínimo
+        // SIN imagen externa. El avatar real debe provenir del backend.
+        id: 'admin-01',
+        email: '',
+        name: 'Administrador ExpoJuy',
+        role: 'admin'
+      }
+    );
   }
 
   public login(credentials: LoginCredentials): Observable<AuthResponse> {
@@ -102,13 +109,11 @@ export class AuthService {
           email: emailTrimmed || '',
           name: [res.usuario?.nombre, res.usuario?.apellido].filter(Boolean).join(' ') || 'Administrador ExpoJuy',
           role: res.usuario?.rol || 'admin',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'
+          // Sin avatar por defecto: sólo se usa si el backend lo envía.
+          avatar: res.usuario?.avatar ?? undefined
         };
 
-        if (this.isBrowser) {
-          localStorage.setItem(TOKEN_KEY, res.token);
-          localStorage.setItem(USER_KEY, JSON.stringify(usuario));
-        }
+        writeAuthStorage(res.token, usuario);
 
         this.isAuthenticated.set(true);
         this.currentUser.set(usuario);
@@ -119,7 +124,7 @@ export class AuthService {
       catchError((httpError: HttpErrorResponse) => {
         this.isLoading.set(false);
 
-        let message = 'No se pudo conectar con el servidor. Verifica que el Backend esté activo en el puerto 3000.';
+        let message = 'No se pudo conectar con el servidor. Verificá que la API esté disponible.';
         if (httpError.status === 401) {
           message = httpError.error?.msg || 'Contraseña incorrecta.';
         } else if (httpError.status === 404) {
@@ -134,10 +139,7 @@ export class AuthService {
   }
 
   public logout(): void {
-    if (this.isBrowser) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-    }
+    clearAuthStorage();
     this.isAuthenticated.set(false);
     this.currentUser.set(null);
     this.router.navigate(['/admin/login']);
@@ -145,6 +147,29 @@ export class AuthService {
 
   public getToken(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return readAuthToken();
+  }
+
+  /**
+   * Indica si hay una sesión vigente: el token existe y su claim `exp` no venció.
+   * Si está vencido, limpia los restos de sesión para no dejar credenciales muertas.
+   * Es la comprobación que deben usar los guards de ruta.
+   */
+  public hasValidSession(): boolean {
+    if (!this.isBrowser) return false;
+
+    const token = readAuthToken();
+    if (!token) {
+      return false;
+    }
+
+    if (isTokenExpired(token)) {
+      clearAuthStorage();
+      this.isAuthenticated.set(false);
+      this.currentUser.set(null);
+      return false;
+    }
+
+    return true;
   }
 }

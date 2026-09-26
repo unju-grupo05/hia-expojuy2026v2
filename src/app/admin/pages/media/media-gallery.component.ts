@@ -106,7 +106,7 @@ export class MediaGalleryComponent implements OnInit {
 
     this.apiMedia.uploadImage(file).subscribe({
       next: (res) => {
-        const webpUrl = `${this.apiMedia.urlHost}${res.url}`;
+        const webpUrl = this.apiMedia.normalizeImageUrl(res.url);
         const maxOrden = this.images().reduce((max, img) => Math.max(max, img.orden), 0);
 
         this.galeriaApi.postGaleria({

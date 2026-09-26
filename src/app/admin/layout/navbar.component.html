@@ -25,11 +25,19 @@
     
     <!-- User Badge -->
     <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60">
-      <img
-        [src]="authService.currentUser()?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80'"
-        alt="Avatar Administrador"
-        class="w-7 h-7 rounded-full object-cover ring-2 ring-primary/30"
-      />
+      @if (authService.currentUser()?.avatar) {
+        <img
+          [src]="authService.currentUser()!.avatar"
+          alt="Avatar Administrador"
+          class="w-7 h-7 rounded-full object-cover ring-2 ring-primary/30"
+        />
+      } @else {
+        <span
+          class="w-7 h-7 rounded-full bg-primary/15 text-primary dark:bg-primary/25 dark:text-brand-cyan-electric ring-2 ring-primary/30 flex items-center justify-center text-[10px] font-black"
+          aria-hidden="true">
+          {{ userInitials() }}
+        </span>
+      }
       <div class="hidden md:flex flex-col text-start">
         <span class="text-xs font-bold text-slate-800 dark:text-slate-100 leading-none">
           {{ authService.currentUser()?.name || 'Administrador' }}

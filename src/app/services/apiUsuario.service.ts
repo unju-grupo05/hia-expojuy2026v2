@@ -1,79 +1,63 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-@Injectable({
-providedIn: 'root',})
+import { environment } from '../../environments/environment';
+import { clearAuthStorage, readAuthToken } from '../core/auth-storage';
 
+/**
+ * Servicio de usuarios.
+ *
+ * La sesión se gestiona de forma única en `core/auth-storage.ts` (claves
+ * `AUTH_TOKEN_KEY` en `localStorage`). Este servicio ya NO lee claves de
+ * `sessionStorage`, que pertenecían al sistema de autenticación anterior.
+ */
+@Injectable({
+  providedIn: 'root'
+})
 export class ApiGestionUsuario {
   hostBase: string;
-  constructor(private _http:HttpClient) {
-    this.hostBase = "http://localhost:3000/api/usuarios/";
+
+  constructor(private http: HttpClient) {
+    this.hostBase = `${environment.apiUrl}/usuarios/`;
   }
 
-  public login(identificador: string, password: string):Observable<any> {
+  public login(identificador: string, password: string): Observable<unknown> {
     const httpOption = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
       })
-    }
-    let body = JSON.stringify({ identificador: identificador, password: password }); //Convierte el objeto a JSON para enviarlo al backend
-    return this._http.post(this.hostBase + 'login', body, httpOption);
+    };
+    const body = JSON.stringify({ identificador, password });
+    return this.http.post(this.hostBase + 'login', body, httpOption);
   }
 
-  public logout() {
-    sessionStorage.removeItem("legajo");
-    sessionStorage.removeItem("nombre");
-    sessionStorage.removeItem("apellido");
-    sessionStorage.removeItem("rol");
-    sessionStorage.removeItem("token");
+  /** Cierra la sesión eliminando todos los restos de credenciales. */
+  public logout(): void {
+    clearAuthStorage();
   }
 
-  //devuelve true si el usuario está logueado
-  public userLoggedIn(){
-    var resultado = false;
-    var usuario = sessionStorage.getItem("legajo");
-    if(usuario!=null){
-      resultado = true;
-    }
-    return resultado;
+  public userLoggedIn(): boolean {
+    return readAuthToken() !== null;
   }
 
-  //devuelve el nombre del usuario logueado
-  public userLogged(){
-    var usuario = sessionStorage.getItem("nombre");
-    return usuario;
-  }
-  //devuelve el rol del usuario logueado
-  public roleLogged(){
-    var role = sessionStorage.getItem("rol");
-    return role;
-  }
-
-  //devuelve el apellido del usuario logueado
-  public apellidoLogged(){
-    var apellido = sessionStorage.getItem("apellido");
-    return apellido;
-  }
-  
-  //Login Verificacion
-  public loginVerificacion(correo: string): Observable<any> {
+  public loginVerificacion(correo: string): Observable<unknown> {
     const httpOption = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json'
       })
-    }
-    let body = JSON.stringify({ correo: correo }); //Convierte el objeto a JSON para enviarlo al backend
-    return this._http.post(this.hostBase + 'login-verificacion', body, httpOption);
+    };
+    const body = JSON.stringify({ correo });
+    return this.http.post(this.hostBase + 'login-verificacion', body, httpOption);
   }
 
-  public registrar(usuario: any): Observable<any> {
-    const token = sessionStorage.getItem('token');
+  public registrar(usuario: unknown): Observable<unknown> {
+    const token = readAuthToken();
     const httpOption = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       })
-    }
-    return this._http.post(this.hostBase + 'registro', usuario, httpOption);
+    };
+    return this.http.post(this.hostBase + 'registro', usuario, httpOption);
   }
 }

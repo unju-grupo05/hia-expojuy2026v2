@@ -45,7 +45,7 @@ export class PostFormModalComponent {
     fecha: [this.hoyIso(), [Validators.required]],
     status: ['published' as 'published' | 'draft', [Validators.required]],
     displaySize: ['small' as 'large' | 'small', [Validators.required]],
-    imageUrl: ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80', [Validators.required]],
+    imageUrl: ['', [Validators.required]],
     body: ['', [Validators.required, Validators.minLength(20)]]
   });
 
@@ -62,7 +62,7 @@ export class PostFormModalComponent {
       title: val.title?.trim() || 'Título de ejemplo para la publicación',
       category: val.category || 'Categoría',
       date: this.postToEdit()?.date || 'Fecha actual',
-      imageUrl: val.imageUrl?.trim() || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+      imageUrl: val.imageUrl?.trim() || '',
       body: val.body?.trim() || 'Resumen descriptivo del contenido oficial de la noticia.',
       slug: val.slug || 'slug-ejemplo'
     };
@@ -90,7 +90,7 @@ export class PostFormModalComponent {
           fecha: this.hoyIso(),
           status: 'published',
           displaySize: 'small',
-          imageUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80',
+          imageUrl: '',
           body: ''
         });
       }
@@ -135,7 +135,7 @@ export class PostFormModalComponent {
 
     this.apiMedia.uploadImage(file).subscribe({
       next: (res) => {
-        const webpUrl = `${this.apiMedia.urlHost}${res.url}`;
+        const webpUrl = this.apiMedia.normalizeImageUrl(res.url);
         this.postForm.patchValue({ imageUrl: webpUrl });
         this.isUploadingImage.set(false);
         input.value = '';

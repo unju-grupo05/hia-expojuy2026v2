@@ -279,7 +279,6 @@ export class Masterplan3dService {
     this.scene.add(this.roofGroup);
   }
 
-  // Corrección crítica: apaga el grupo completo de vigas y techo
   public setRoofVisibility(visible: boolean, animate: boolean = true): void {
     this.roofVisible = visible;
     if (!this.roofGroup) return;
@@ -406,7 +405,6 @@ export class Masterplan3dService {
   private buildProps(): void {
     const payload = this.dataService.BLENDER_PAYLOAD;
 
-    // Cartel del Pórtico de Entrada Principal
     const portico = payload.portico;
     const porticoGroup = new THREE.Group();
     porticoGroup.position.set(portico.x, 0, portico.z);
@@ -445,7 +443,6 @@ export class Masterplan3dService {
     const porticoTex = new THREE.CanvasTexture(pCanvas);
     porticoTex.needsUpdate = true;
 
-    // Se utiliza MeshBasicMaterial para que brille intensamente sin depender de la luz cenital
     const beamMat = new THREE.MeshBasicMaterial({ map: porticoTex });
     const beam = new THREE.Mesh(new THREE.BoxGeometry(16, 2.8, 1.6), beamMat);
     beam.position.y = 5.8;
@@ -462,7 +459,6 @@ export class Masterplan3dService {
 
     this.scene.add(porticoGroup);
 
-    // Demás props
     payload.props.forEach(prop => {
       if (prop.id === 'DEC_01' || prop.id.includes('DEC_01')) return;
 
