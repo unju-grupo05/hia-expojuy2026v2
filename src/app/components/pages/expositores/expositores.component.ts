@@ -5,7 +5,7 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Exhibitor } from '../../models/exhibitor.model';
 import { B2BMeetingRequest } from '../../models/b2b-meeting.model';
 import { ExpositorApi } from '../../../services/apiExpositores.service';
-import { B2BMeetingService } from '../../../services/b2b-meeting.service';
+import { B2BMeetingService } from '../../../services/apiB2B-meeting.service';
 
 @Component({
   selector: 'app-expositores',

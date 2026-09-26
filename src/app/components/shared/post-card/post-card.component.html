@@ -1,12 +1,14 @@
 @if (size() === 'large') {
   <!-- Tarjeta Grande / Panorámica (Estilo Cauchari) -->
   <article class="relative overflow-hidden min-h-[320px] sm:min-h-[360px] bg-slate-900 rounded-3xl transition-all duration-300 hover:-translate-y-1 group w-full shadow-lg border border-white/10 select-none">
-    <img
-      class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-      [alt]="post().title"
-      loading="lazy"
-      [src]="post().imageUrl"
-    />
+    @if (post().imageUrl) {
+      <img
+        class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        [alt]="post().title"
+        loading="lazy"
+        [src]="post().imageUrl"
+      />
+    }
     <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-transparent"></div>
     
     <!-- Tag de categoría superior -->
@@ -36,12 +38,14 @@
   <!-- Tarjeta Pequeña / Estándar (Estilo Ventanilla / Cobertura) -->
   <article class="bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-cyan-electric group w-full select-none">
     <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
-      <img
-        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-        [alt]="post().title"
-        loading="lazy"
-        [src]="post().imageUrl"
-      />
+      @if (post().imageUrl) {
+        <img
+          class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          [alt]="post().title"
+          loading="lazy"
+          [src]="post().imageUrl"
+        />
+      }
       <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 text-brand-cyan-electric border border-brand-cyan-electric/30 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">
         {{ post().category }}
       </span>

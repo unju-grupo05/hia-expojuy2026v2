@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { readAuthToken } from '../core/auth-storage';
 
 export interface Eje {
   id: number;
@@ -15,16 +17,11 @@ export interface Eje {
 })
 export class ApiEjes {
 
-  urlHost: string = "http://localhost:3000";
-  urlBase: string = this.urlHost + "/api/ejes/";
+  urlBase: string = `${environment.apiUrl}/ejes/`;
   constructor(private http: HttpClient) { }
 
   private obtenerToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return (
-      localStorage.getItem('expojuy_admin_token') ||
-      sessionStorage.getItem('token')
-    );
+    return readAuthToken();
   }
 
   private httpOptionsConAuth() {
@@ -37,7 +34,7 @@ export class ApiEjes {
     };
   }
 
-  //***********************OBTENER (listar público)*************************
+  //***********************OBTENER*************************
   getEjes(): Observable<any> {
     let httpOptions = {
       headers: new HttpHeaders({
@@ -47,22 +44,21 @@ export class ApiEjes {
     return this.http.get(this.urlBase, httpOptions)
   }
 
-  //***********************OBTENER POR ID*************************
   getEjeById(id: number): Observable<any> {
     return this.http.get(this.urlBase + id)
   }
 
-  //***********************CREAR (desde CMS)*************************
+  //***********************CREAR*************************
   postEje(eje: any): Observable<any> {
     return this.http.post(this.urlBase, eje, this.httpOptionsConAuth())
   }
 
-  //***********************MODIFICAR (desde CMS)*************************
+  //***********************MODIFICAR*************************
   putModificarEje(id: number, eje: any): Observable<any> {
     return this.http.put(this.urlBase + id, eje, this.httpOptionsConAuth())
   }
 
-  //***********************ELIMINACION FISICA (desde CMS)*************************
+  //***********************ELIMINACION FISICA*************************
   deleteEje(id: number): Observable<any> {
     return this.http.delete(this.urlBase + id, this.httpOptionsConAuth())
   }

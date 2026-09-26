@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { readAuthToken } from '../core/auth-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExpositorApi {
 
-  urlHost: string = "http://localhost:3000";
-  urlBase: string = this.urlHost + "/api/expositores/";
+  urlBase: string = `${environment.apiUrl}/expositores/`;
   constructor(private http: HttpClient) { }
 
   private obtenerToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return (
-      localStorage.getItem('expojuy_admin_token') ||
-      sessionStorage.getItem('token')
-    );
+    return readAuthToken();
   }
 
   private httpOptionsConAuth() {
@@ -48,7 +45,6 @@ export class ExpositorApi {
     return this.http.get(this.urlBase, { ...httpOptions, params: httpParams })
   }
 
-  //***********************OBTENER POR ID*************************
   getExpositorPorId(id: string): Observable<any> {
     return this.http.get(this.urlBase + id)
   }

@@ -20,9 +20,8 @@ export class LoginComponent {
   public showPassword = signal<boolean>(false);
 
   public loginForm = this.fb.group({
-    email: ['lautaro@gmail.com', [Validators.required, Validators.email]],
-    password: ['admin', [Validators.required, Validators.minLength(4)]],
-    rememberMe: [true]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(4)]]
   });
 
   public onSubmit(): void {
@@ -46,14 +45,6 @@ export class LoginComponent {
         this.errorMessage.set(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
       }
     });
-  }
-
-  public fillDemoCredentials(): void {
-    this.loginForm.patchValue({
-      email: 'lautaro@gmail.com',
-      password: 'admin'
-    });
-    this.errorMessage.set(null);
   }
 
   public togglePasswordVisibility(): void {

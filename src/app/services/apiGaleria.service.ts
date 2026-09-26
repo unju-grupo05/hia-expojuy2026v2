@@ -1,22 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../environments/environment';
+import { readAuthToken } from '../core/auth-storage';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GaleriaApi {
 
-  urlHost: string = "http://localhost:3000";
-  urlBase: string = this.urlHost + "/api/galerias/";
+  urlBase: string = `${environment.apiUrl}/galerias/`;
   constructor(private http: HttpClient) { }
 
   private obtenerToken(): string | null {
-    if (typeof window === 'undefined') return null;
-    return (
-      localStorage.getItem('expojuy_admin_token') ||
-      sessionStorage.getItem('token')
-    );
+    return readAuthToken();
   }
 
   private httpOptionsConAuth() {
@@ -39,7 +36,6 @@ export class GaleriaApi {
     return this.http.get(this.urlBase, httpOptions)
   }
 
-  //***********************OBTENER POR ID*************************
   getGaleriaById(id: number | string): Observable<any> {
     return this.http.get(this.urlBase + id)
   }
