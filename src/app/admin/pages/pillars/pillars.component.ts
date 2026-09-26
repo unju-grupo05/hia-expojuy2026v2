@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-modal.component';
 import { ApiEjes } from '../../../services/apiEjes.service';
+import { Eje, EjePayload } from '../../../models/eje.model';
 
 @Component({
   selector: 'app-pillars',
@@ -39,7 +40,7 @@ export class PillarsComponent implements OnInit {
     this.cargarEjes();
   }
 
-  private mapearEjeDesdeApi(api: any): Pillar {
+  private mapearEjeDesdeApi(api: Eje): Pillar {
     return {
       id: Number(api.id),
       title: api.nombre,
@@ -49,7 +50,7 @@ export class PillarsComponent implements OnInit {
     };
   }
 
-  private mapearEjeParaApi(data: PillarFormData): any {
+  private mapearEjeParaApi(data: PillarFormData): EjePayload {
     return {
       nombre: data.title,
       descripcion: data.description,
@@ -62,8 +63,7 @@ export class PillarsComponent implements OnInit {
     this.isLoading.set(true);
     this.apiEjes.getEjes().subscribe({
       next: (res) => {
-        const datos = res?.data || res;
-        this.pillars.set(Array.isArray(datos) ? datos.map(this.mapearEjeDesdeApi) : []);
+        this.pillars.set((res.data ?? []).map((eje) => this.mapearEjeDesdeApi(eje)));
         this.isLoading.set(false);
       },
       error: (err) => {

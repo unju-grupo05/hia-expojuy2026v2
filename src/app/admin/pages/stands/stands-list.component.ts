@@ -41,9 +41,17 @@ export class StandsListComponent {
 
     this.apiExpositores.getExpositores({ page: 1, pageSize: 500 }).subscribe({
       next: (res) => {
-        const datos = res?.data && Array.isArray(res.data.items) ? res.data : res;
-        const items: Stand[] = Array.isArray(datos.items) ? datos.items : [];
-        this.stands.set(items);
+        // El contrato de `/expositores` siempre envuelve la lista en `data`.
+        // `Stand` exige textos no nulos, asi que el DTO se normaliza en el borde.
+        this.stands.set((res.data?.items ?? []).map((expositor) => ({
+          id: expositor.id,
+          name: expositor.name,
+          stand: expositor.stand,
+          category: expositor.category,
+          subtitle: expositor.subtitle ?? '',
+          description: expositor.description ?? '',
+          origin: expositor.origin ?? ''
+        })));
         this.loading.set(false);
       },
       error: (err) => {

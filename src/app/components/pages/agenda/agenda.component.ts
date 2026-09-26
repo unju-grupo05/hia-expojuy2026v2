@@ -13,6 +13,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { AgendaApi } from '../../../services/apiAgenda.service';
+import { AgendaEvento } from '../../../models/agenda.model';
 
 export interface AgendaEventoPublico {
   id: number;
@@ -49,7 +50,7 @@ type ModalStatus = 'form' | 'enviando' | 'exito' | 'error';
   styleUrl: './agenda.component.css'
 })
 export class AgendaComponent implements OnInit, OnDestroy {
-  agenda: any[] = [];
+  agenda: AgendaEvento[] = [];
   dias: AgendaDia[] = [];
   cargando: boolean = true;
   activeDay: number = 1;
@@ -177,8 +178,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          const datos = res?.data || res;
-          this.agenda = Array.isArray(datos) ? [...datos] : [];
+          this.agenda = res.data ?? [];
           this.dias = this.agruparPorDia(this.agenda);
           if (this.dias.length > 0) {
             this.activeDay = this.dias[0].numero;
@@ -196,7 +196,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
       });
   }
 
-  private agruparPorDia(items: any[]): AgendaDia[] {
+  private agruparPorDia(items: AgendaEvento[]): AgendaDia[] {
     const mapa = new Map<number, AgendaDia>();
 
     for (const item of items) {

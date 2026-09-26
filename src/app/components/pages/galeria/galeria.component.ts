@@ -1,9 +1,14 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { GaleriaItem } from '../../../models/galeria.model';
 import { ApiMediaService } from '../../../services/apiMedia.service';
 
-export interface GaleriaItem {
+/**
+ * View model del carrusel. Se deriva de `GaleriaItem` (contrato de la API)
+ * normalizando los textos opcionales: el template no tiene que chequear nulos.
+ */
+export interface GaleriaItemView {
   id: number;
   titulo: string;
   descripcion: string;
@@ -25,12 +30,12 @@ export class GaleriaComponent implements OnInit {
   // El resto se muestran en un carrusel paginado.
   readonly carouselPageSize = 6;
 
-  readonly items = signal<GaleriaItem[]>([]);
+  readonly items = signal<GaleriaItemView[]>([]);
   readonly accordionItems = computed(() => this.items().slice(0, this.accordionLimit));
   readonly carouselItems = computed(() => this.items().slice(this.accordionLimit));
-  readonly carouselPages = computed<GaleriaItem[][]>(() => {
+  readonly carouselPages = computed<GaleriaItemView[][]>(() => {
     const rest = this.carouselItems();
-    const pages: GaleriaItem[][] = [];
+    const pages: GaleriaItemView[][] = [];
     for (let i = 0; i < rest.length; i += this.carouselPageSize) {
       pages.push(rest.slice(i, i + this.carouselPageSize));
     }
@@ -58,8 +63,8 @@ export class GaleriaComponent implements OnInit {
 
     this.galeriaApi.getGaleria().subscribe({
       next: (res) => {
-        const items = Array.isArray(res?.data) ? res.data : [];
-        const mapped: GaleriaItem[] = items.map((g: any) => ({
+        const items: GaleriaItem[] = res.data ?? [];
+        const mapped: GaleriaItemView[] = items.map((g) => ({
           id: g.id,
           titulo: g.titulo || '',
           descripcion: g.descripcion || '',

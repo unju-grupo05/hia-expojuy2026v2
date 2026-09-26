@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { B2BMeetingRequest } from '../components/models/b2b-meeting.model';
 import { API_URL } from '../core/api-url';
+import { B2BMeetingRequest, B2BMeetingResponse } from '../models/b2b-meeting.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class B2BMeetingService {
 
   constructor(private readonly http: HttpClient) {}
 
-  createB2BMeeting(request: B2BMeetingRequest): Observable<any> {
-    return this.http.post<any>(this.urlBase, request);
+  createB2BMeeting(request: B2BMeetingRequest): Observable<B2BMeetingResponse> {
+    return this.http.post<B2BMeetingResponse>(this.urlBase, request);
   }
 }

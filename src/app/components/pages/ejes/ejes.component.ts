@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ApiEjes } from '../../../services/apiEjes.service';
+import { Eje } from '../../../models/eje.model';
 
 @Component({
   selector: 'app-ejes',
@@ -12,7 +13,7 @@ import { ApiEjes } from '../../../services/apiEjes.service';
   styleUrl: './ejes.component.css'
 })
 export class EjesComponent implements OnInit, OnDestroy {
-  ejes: any[] = [];
+  ejes: Eje[] = [];
   cargando: boolean = true;
 
   private readonly destroyRef = inject(DestroyRef);
@@ -36,8 +37,7 @@ export class EjesComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          const datos = res?.data || res;
-          this.ejes = Array.isArray(datos) ? [...datos] : [];
+          this.ejes = res.data ?? [];
           this.cargando = false;
 
           // Forzamos la detección de cambios en Angular

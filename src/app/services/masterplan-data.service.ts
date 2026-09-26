@@ -4,18 +4,14 @@ import { catchError } from 'rxjs/operators';
 import { BlenderPayload, CommercialStatus, PointOfInterest, StandData } from '../components/models/stand.model';
 import { SectorActivity } from '../components/models/sector-info.model';
 import { ExpositorApi } from './apiExpositores.service';
+import { Expositor } from '../models/expositor.model';
+import { PaginatedResponse } from '../models/api-response.model';
 
-/** Registro de expositor tal como lo expone `GET /api/expositores`. */
-export interface ExpositorRecord {
-  id: string;
-  name: string;
-  stand: string;
-  category: string;
-  subtitle?: string | null;
-  description?: string | null;
-  origin?: string | null;
-  email?: string | null;
-}
+/**
+ * El masterplan ya no mantiene su propio shape de expositor: consume el
+ * contrato unico `Expositor` de `GET /api/expositores`.
+ */
+export type ExpositorRecord = Expositor;
 
 @Injectable({
   providedIn: 'root'
@@ -346,13 +342,13 @@ export class MasterplanDataService {
   /** Recorre todas las páginas del endpoint paginado y concatena los items. */
   private fetchTodasLasPaginas(pageSize: number): Observable<ExpositorRecord[]> {
     return this.expositorApi.getExpositores({ page: 1, pageSize }).pipe(
-      expand((res: any) => {
-        const data = res?.data;
+      expand((res: PaginatedResponse<Expositor>) => {
+        const data = res.data;
         if (!data?.hasMore) return EMPTY;
         return this.expositorApi.getExpositores({ page: (data.page ?? 1) + 1, pageSize });
       }),
       reduce(
-        (acc: ExpositorRecord[], res: any) => acc.concat(res?.data?.items ?? []),
+        (acc: ExpositorRecord[], res: PaginatedResponse<Expositor>) => acc.concat(res.data?.items ?? []),
         [] as ExpositorRecord[]
       )
     );

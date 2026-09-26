@@ -1,19 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { API_URL } from '../core/api-url';
+import { ApiResponse, PaginatedResponse } from '../models/api-response.model';
+import { Expositor, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
+
+export type { Expositor, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExpositorApi {
 
-  urlBase: string = `${environment.apiUrl}/expositores/`;
+  urlBase: string = `${API_URL}/expositores/`;
   constructor(private http: HttpClient) { }
 
   //***********************OBTENER*************************
-  getExpositores(params?: { page?: number; pageSize?: number; category?: string; search?: string }): Observable<any> {
-    let httpOptions = {
+  getExpositores(params?: ExpositorQuery): Observable<PaginatedResponse<Expositor>> {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
       })
@@ -27,25 +31,25 @@ export class ExpositorApi {
       if (params.search) httpParams = httpParams.set('search', params.search);
     }
 
-    return this.http.get(this.urlBase, { ...httpOptions, params: httpParams })
+    return this.http.get<PaginatedResponse<Expositor>>(this.urlBase, { ...httpOptions, params: httpParams });
   }
 
-  getExpositorPorId(id: string): Observable<any> {
-    return this.http.get(this.urlBase + id)
+  getExpositorPorId(id: string): Observable<ApiResponse<Expositor>> {
+    return this.http.get<ApiResponse<Expositor>>(this.urlBase + id);
   }
 
   //***********************CREAR*************************
-  postExpositor(expositor: any): Observable<any> {
-    return this.http.post(this.urlBase, expositor)
+  postExpositor(expositor: ExpositorPayload): Observable<ApiResponse<Expositor>> {
+    return this.http.post<ApiResponse<Expositor>>(this.urlBase, expositor);
   }
 
   //***********************MODIFICAR*************************
-  putModificarExpositor(id: string, expositor: any): Observable<any> {
-    return this.http.put(this.urlBase + id, expositor)
+  putModificarExpositor(id: string, expositor: ExpositorPayload): Observable<ApiResponse<Expositor>> {
+    return this.http.put<ApiResponse<Expositor>>(this.urlBase + id, expositor);
   }
 
   //***********************ELIMINACION FISICA*************************
-  deleteExpositor(id: string): Observable<any> {
-    return this.http.delete(this.urlBase + id)
+  deleteExpositor(id: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(this.urlBase + id);
   }
 }

@@ -6,6 +6,11 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
+  AuthCredentials,
+  AuthLoginResponse,
+  AuthUsuarioClaims
+} from '../../models/auth.model';
+import {
   clearAuthStorage,
   isTokenExpired,
   readAuthToken,
@@ -24,10 +29,7 @@ export interface AdminUser {
   avatar?: string;
 }
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+export type LoginCredentials = AuthCredentials;
 
 export interface AuthResponse {
   token: string;
@@ -98,19 +100,21 @@ export class AuthService {
       password
     };
 
-    return this.http.post<{ msg: string; token: string; usuario: any }>(this.loginUrl, body, httpOptions).pipe(
+    return this.http.post<AuthLoginResponse>(this.loginUrl, body, httpOptions).pipe(
       map((res) => {
         if (!res?.token) {
-          throw new Error('Respuesta inválida del servidor.');
+          throw new Error('Respuesta invǭlida del servidor.');
         }
 
+        const claims: AuthUsuarioClaims = res.usuario;
+
         const usuario: AdminUser = {
-          id: res.usuario?.legajo || 'admin-01',
+          id: claims?.legajo || 'admin-01',
           email: emailTrimmed || '',
-          name: [res.usuario?.nombre, res.usuario?.apellido].filter(Boolean).join(' ') || 'Administrador ExpoJuy',
-          role: res.usuario?.rol || 'admin',
-          // Sin avatar por defecto: sólo se usa si el backend lo envía.
-          avatar: res.usuario?.avatar ?? undefined
+          name: [claims?.nombre, claims?.apellido].filter(Boolean).join(' ') || 'Administrador ExpoJuy',
+          role: claims?.rol || 'admin',
+          // Sin avatar por defecto: s��lo se usa si el backend lo env��a.
+          avatar: claims?.avatar ?? undefined
         };
 
         writeAuthStorage(res.token, usuario);
