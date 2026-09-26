@@ -1,6 +1,5 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../../environments/environment';
@@ -21,18 +20,19 @@ function esPeticionALaApi(url: string): boolean {
   const normalizada = normalizarUrl(url);
 
   // `environment.apiUrl` puede ser absoluta (dev) o relativa (prod).
-  if (environment.apiUrl.startsWith('/')) {
-    return normalizada === environment.apiUrl || normalizada.startsWith(`${environment.apiUrl}/`);
-  }
-
-  return normalizada.startsWith(environment.apiUrl);
+  // Se exige coincidencia exacta o un segmento "/" posterior, para no adjuntar
+  // el token a URLs que sólo comparten prefijo (ej. `/api-publico`).
+  return (
+    normalizada === environment.apiUrl || normalizada.startsWith(`${environment.apiUrl}/`)
+  );
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
-  const router = inject(Router);
 
   const esLogin = RUTAS_PUBLICAS_SIN_TOKEN.some((ruta) => normalizarUrl(req.url).endsWith(ruta));
+  // El token se obtiene del punto único de acceso (`AUTH_TOKEN_KEY` =
+  // 'expojuy_admin_token' en localStorage); el interceptor no lee el storage.
   const token = authService.getToken();
   const debeEnviarToken = !!token && esPeticionALaApi(req.url) && !esLogin;
 
@@ -46,11 +46,13 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
-      // Un 401 en el login es "credenciales incorrectas", no "sesión expirada":
-      // no se debe cerrar la sesión ni navegar en ese caso.
-      if (error.status === 401 && !esLogin) {
+      // Sólo se cierra la sesión si esta petición LLEVABA el token adjunto.
+      // Así un 401 en una consulta pública (sin token) o en el propio login
+      // —"credenciales incorrectas", no "sesión expirada"— no expulsa al
+      // usuario ni borra una sesión válida.
+      if (error.status === 401 && debeEnviarToken) {
+        // `logout()` ya limpia el storage y redirige a /admin/login.
         authService.logout();
-        router.navigate(['/admin/login']);
       }
       return throwError(() => error);
     })

@@ -44,7 +44,7 @@
         <span class="material-symbols-outlined text-sm">storefront</span>
         <span>Expositores Destacados</span>
       </h4>
-      <div class="flex flex-wrap gap-1.5 expositores-list">
+      <div *ngIf="featuredCompanies().length > 0; else sinExpositores" class="flex flex-wrap gap-1.5 expositores-list">
         <span *ngFor="let exp of featuredCompanies(); let i = index"
           class="px-2.5 py-1 rounded-full text-xs font-semibold border transition-all"
           [class.bg-brand-cyan-electric/15]="i === 0" [class.text-brand-cyan-accessible]="i === 0"
@@ -53,6 +53,11 @@
           {{ exp }}
         </span>
       </div>
+      <ng-template #sinExpositores>
+        <p class="text-xs text-on-surface-variant/70">
+          {{ isLoadingExpositores() ? 'Cargando expositores...' : 'Todavía no hay expositores asignados.' }}
+        </p>
+      </ng-template>
     </div>
 
   </div>

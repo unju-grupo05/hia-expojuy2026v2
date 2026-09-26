@@ -672,7 +672,8 @@ export class Masterplan3dService {
       this.pickableStands.push(hitBox);
       this.scene.add(flagGroup);
 
-      this.animatedBanners.push({ mesh: bannerMesh, baseHeight: poi.y + 1.8, speed: 1.5 + Math.random() });
+      // Velocidad fija: el visor debe ser reproducible entre recargas.
+      this.animatedBanners.push({ mesh: bannerMesh, baseHeight: poi.y + 1.8, speed: 2 });
     });
   }
 
