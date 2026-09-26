@@ -2,7 +2,7 @@ import { Component, effect, inject, input, output, signal, computed } from '@ang
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PostCardComponent, PostCardData } from '../../../components/shared/post-card/post-card.component';
-import { ApiMediaService } from '../../../services/apiMedia.service';
+import { MediaService } from '../../../services/media.service';
 
 export interface Post {
   id: string;
@@ -26,7 +26,7 @@ export type PostFormData = Omit<Post, 'id'> & { id?: string };
 })
 export class PostFormModalComponent {
   private fb = inject(FormBuilder);
-  private apiMedia = inject(ApiMediaService);
+  private mediaService = inject(MediaService);
 
   public isOpen = input<boolean>(false);
   public postToEdit = input<Post | null>(null);
@@ -133,9 +133,9 @@ export class PostFormModalComponent {
     this.isUploadingImage.set(true);
     this.uploadImageError.set(null);
 
-    this.apiMedia.uploadImage(file).subscribe({
+    this.mediaService.uploadImage(file).subscribe({
       next: (res) => {
-        const webpUrl = this.apiMedia.normalizeImageUrl(res.url);
+        const webpUrl = this.mediaService.normalizeImageUrl(res.url);
         this.postForm.patchValue({ imageUrl: webpUrl });
         this.isUploadingImage.set(false);
         input.value = '';

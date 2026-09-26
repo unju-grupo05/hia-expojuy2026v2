@@ -1,12 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiNoticiasService } from '../../../services/apiNoticias.service';
-import { ApiMediaService } from '../../../services/apiMedia.service';
+import { NoticiasService } from '../../../services/noticias.service';
+import { MediaService } from '../../../services/media.service';
 import { NoticiaDTO } from '../../../models/noticia.model';
 
 /**
  * View model de la grilla publica. Se deriva de `NoticiaDTO` (contrato de la
- * API): la imagen pasa por `ApiMediaService`, la fecha se formatea y el cuerpo
+ * API): la imagen pasa por `MediaService`, la fecha se formatea y el cuerpo
  * se parte en parrafos para el modal.
  */
 interface NewsItem {
@@ -51,8 +51,8 @@ export class NovedadesComponent implements OnInit {
   };
 
   constructor(
-    private apiNoticias: ApiNoticiasService,
-    private apiMedia: ApiMediaService
+    private noticiasService: NoticiasService,
+    private mediaService: MediaService
   ) {}
 
   ngOnInit(): void {
@@ -63,12 +63,12 @@ export class NovedadesComponent implements OnInit {
     this.loadingNews.set(true);
     this.newsError.set(false);
 
-    this.apiNoticias.getNoticias().subscribe({
+    this.noticiasService.getNoticias().subscribe({
       next: (res) => {
         const items: NoticiaDTO[] = res.data ?? [];
         const parsed: NewsItem[] = items.map((n) => ({
           id: String(n.id),
-          img: this.apiMedia.normalizeImageUrl(n.imagen || ''),
+          img: this.mediaService.normalizeImageUrl(n.imagen || ''),
           badge: n.categoria || 'Noticia',
           date: this.formatFecha(n.fecha),
           title: n.titulo || '',

@@ -10,7 +10,7 @@ export type { GaleriaItem, GaleriaPayload } from '../models/galeria.model';
 @Injectable({
   providedIn: 'root',
 })
-export class GaleriaApi {
+export class GaleriaService {
 
   urlBase: string = `${API_URL}/galerias/`;
   constructor(private http: HttpClient) { }

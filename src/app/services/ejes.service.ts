@@ -10,7 +10,7 @@ export type { Eje, EjePayload } from '../models/eje.model';
 @Injectable({
   providedIn: 'root',
 })
-export class ApiEjes {
+export class EjesService {
 
   urlBase: string = `${API_URL}/ejes/`;
   constructor(private http: HttpClient) { }

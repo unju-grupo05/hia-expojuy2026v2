@@ -13,7 +13,7 @@ export interface NoticiaDTO {
   titulo: string;
   categoria: string;
   descripcion: string;
-  /** Nombre del archivo en el servidor; la URL absoluta la arma `ApiMediaService`. */
+  /** Nombre del archivo en el servidor; la URL absoluta la arma `MediaService`. */
   imagen: string | null;
   /** `DATEONLY` de Sequelize: siempre `YYYY-MM-DD`. */
   fecha: string;

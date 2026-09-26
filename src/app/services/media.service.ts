@@ -25,7 +25,7 @@ export interface MediaItemData {
 @Injectable({
   providedIn: 'root',
 })
-export class ApiMediaService {
+export class MediaService {
   public readonly urlBase: string = `${API_URL}/admin/media`;
 
   constructor(private http: HttpClient) {}

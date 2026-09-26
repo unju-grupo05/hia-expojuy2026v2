@@ -3,7 +3,7 @@ export interface GaleriaItem {
   id: number;
   titulo: string;
   descripcion: string | null;
-  /** Nombre del archivo; la URL absoluta la arma `ApiMediaService`. */
+  /** Nombre del archivo; la URL absoluta la arma `MediaService`. */
   imagen: string;
   seccion: string | null;
   orden: number;

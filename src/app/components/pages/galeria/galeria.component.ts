@@ -1,8 +1,8 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { GaleriaService } from '../../../services/galeria.service';
 import { GaleriaItem } from '../../../models/galeria.model';
-import { ApiMediaService } from '../../../services/apiMedia.service';
+import { MediaService } from '../../../services/media.service';
 
 /**
  * View model del carrusel. Se deriva de `GaleriaItem` (contrato de la API)
@@ -49,8 +49,8 @@ export class GaleriaComponent implements OnInit {
   public currentPage = 0;
 
   constructor(
-    private galeriaApi: GaleriaApi,
-    private apiMedia: ApiMediaService
+    private galeriaService: GaleriaService,
+    private mediaService: MediaService
   ) {}
 
   ngOnInit(): void {
@@ -61,14 +61,14 @@ export class GaleriaComponent implements OnInit {
     this.loading.set(true);
     this.error.set(false);
 
-    this.galeriaApi.getGaleria().subscribe({
+    this.galeriaService.getGaleria().subscribe({
       next: (res) => {
         const items: GaleriaItem[] = res.data ?? [];
         const mapped: GaleriaItemView[] = items.map((g) => ({
           id: g.id,
           titulo: g.titulo || '',
           descripcion: g.descripcion || '',
-          imagen: this.apiMedia.normalizeImageUrl(g.imagen || ''),
+          imagen: this.mediaService.normalizeImageUrl(g.imagen || ''),
           seccion: g.seccion || '',
           orden: g.orden ?? 0
         }));

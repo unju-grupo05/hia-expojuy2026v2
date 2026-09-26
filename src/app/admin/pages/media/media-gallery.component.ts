@@ -1,9 +1,9 @@
 import { Component, computed, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { GaleriaApi } from '../../../services/apiGaleria.service';
+import { GaleriaService } from '../../../services/galeria.service';
 import { GaleriaItem } from '../../../models/galeria.model';
-import { ApiMediaService } from '../../../services/apiMedia.service';
+import { MediaService } from '../../../services/media.service';
 
 export interface MediaItem {
   id: string;
@@ -40,8 +40,8 @@ export class MediaGalleryComponent implements OnInit {
   public saving = signal(false);
 
   constructor(
-    private galeriaApi: GaleriaApi,
-    private apiMedia: ApiMediaService
+    private galeriaService: GaleriaService,
+    private mediaService: MediaService
   ) {}
 
   ngOnInit(): void {
@@ -61,13 +61,13 @@ export class MediaGalleryComponent implements OnInit {
     this.loading.set(true);
     this.loadError.set(false);
 
-    this.galeriaApi.getGaleria().subscribe({
+    this.galeriaService.getGaleria().subscribe({
       next: (res) => {
         const items: GaleriaItem[] = res.data ?? [];
         const mapped: MediaItem[] = items.map((g) => ({
           id: String(g.id),
           name: g.titulo || '',
-          url: this.apiMedia.normalizeImageUrl(g.imagen || ''),
+          url: this.mediaService.normalizeImageUrl(g.imagen || ''),
           size: g.imagen?.endsWith('.webp') ? 'WebP' : 'Original',
           dimensions: 'WebP (1920 max)',
           uploadedAt: g.createdAt ? String(g.createdAt).slice(0, 10) : '',
@@ -105,12 +105,12 @@ export class MediaGalleryComponent implements OnInit {
     this.uploading.set(true);
     this.showToast('Subiendo y optimizando imagen a WebP...');
 
-    this.apiMedia.uploadImage(file).subscribe({
+    this.mediaService.uploadImage(file).subscribe({
       next: (res) => {
-        const webpUrl = this.apiMedia.normalizeImageUrl(res.url);
+        const webpUrl = this.mediaService.normalizeImageUrl(res.url);
         const maxOrden = this.images().reduce((max, img) => Math.max(max, img.orden), 0);
 
-        this.galeriaApi.postGaleria({
+        this.galeriaService.postGaleria({
           titulo: file.name.replace(/\.[^/.]+$/, ''),
           descripcion: '',
           imagen: webpUrl,
@@ -171,7 +171,7 @@ export class MediaGalleryComponent implements OnInit {
 
     this.saving.set(true);
 
-    this.galeriaApi.putModificarGaleria(edit.id, {
+    this.galeriaService.putModificarGaleria(edit.id, {
       titulo: edit.titulo,
       descripcion: edit.descripcion,
       imagen: edit.url,
@@ -196,7 +196,7 @@ export class MediaGalleryComponent implements OnInit {
     if (!img) return;
 
     if (confirm(`¿Deseas eliminar la imagen "${img.name}" de la biblioteca?`)) {
-      this.galeriaApi.deleteGaleria(id).subscribe({
+      this.galeriaService.deleteGaleria(id).subscribe({
         next: () => {
           this.showToast('Imagen eliminada de la biblioteca.');
           this.cargarGaleria();

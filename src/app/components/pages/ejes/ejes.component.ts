@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, DestroyRef, ChangeDetectorRef, Inject, PL
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ApiEjes } from '../../../services/apiEjes.service';
+import { EjesService } from '../../../services/ejes.service';
 import { Eje } from '../../../models/eje.model';
 
 @Component({
@@ -21,7 +21,7 @@ export class EjesComponent implements OnInit, OnDestroy {
   private observers: IntersectionObserver[] = [];
 
   constructor(
-    private apiEjes: ApiEjes,
+    private ejesService: EjesService,
     private cdr: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
@@ -32,7 +32,7 @@ export class EjesComponent implements OnInit, OnDestroy {
 
   obtenerEjes(): void {
     this.cargando = true;
-    this.apiEjes
+    this.ejesService
       .getEjes()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Post, PostFormData, PostFormModalComponent } from './post-form-modal.component';
 import { PostCardComponent } from '../../../components/shared/post-card/post-card.component';
-import { ApiNoticiasService } from '../../../services/apiNoticias.service';
-import { ApiMediaService } from '../../../services/apiMedia.service';
+import { NoticiasService } from '../../../services/noticias.service';
+import { MediaService } from '../../../services/media.service';
 import { NoticiaDTO, NoticiaPayload } from '../../../models/noticia.model';
 
 @Component({
@@ -28,8 +28,8 @@ export class PostsListComponent {
   public saving = signal<boolean>(false);
 
   constructor(
-    private apiNoticias: ApiNoticiasService,
-    private apiMedia: ApiMediaService
+    private noticiasService: NoticiasService,
+    private mediaService: MediaService
   ) {}
 
   ngOnInit(): void {
@@ -40,7 +40,7 @@ export class PostsListComponent {
     this.loading.set(true);
     this.loadError.set(false);
 
-    this.apiNoticias.getNoticias(true).subscribe({
+    this.noticiasService.getNoticias(true).subscribe({
       next: (res) => {
         // `NoticiaDTO` es el contrato de la API (campos en espanol). `Post` es el
         // view model del panel: traduce los nombres y decide el `status`.
@@ -53,7 +53,7 @@ export class PostsListComponent {
           date: n.fecha || '',
           status: n.vigente === false ? 'draft' : 'published',
           displaySize: 'small',
-          imageUrl: this.apiMedia.normalizeImageUrl(n.imagen || ''),
+          imageUrl: this.mediaService.normalizeImageUrl(n.imagen || ''),
           body: n.descripcion || ''
         }));
         this.posts.set(mapped);
@@ -129,7 +129,7 @@ export class PostsListComponent {
     };
 
     if (formData.id) {
-      this.apiNoticias.putModificarNoticias(formData.id, payload).subscribe({
+      this.noticiasService.putModificarNoticias(formData.id, payload).subscribe({
         next: () => {
           this.saving.set(false);
           this.closeModal();
@@ -143,7 +143,7 @@ export class PostsListComponent {
         }
       });
     } else {
-      this.apiNoticias.postNoticias(payload).subscribe({
+      this.noticiasService.postNoticias(payload).subscribe({
         next: () => {
           this.saving.set(false);
           this.closeModal();
@@ -164,7 +164,7 @@ export class PostsListComponent {
     if (!postToDelete) return;
 
     if (confirm(`¿Estás seguro de eliminar la publicación "${postToDelete.title}"?`)) {
-      this.apiNoticias.deleteNoticias(id).subscribe({
+      this.noticiasService.deleteNoticias(id).subscribe({
         next: () => {
           this.showToast('Publicación eliminada correctamente.');
           this.cargarNoticias();
