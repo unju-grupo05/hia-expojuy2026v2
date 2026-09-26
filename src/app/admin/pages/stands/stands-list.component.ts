@@ -2,7 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Stand, StandFormData, StandFormModalComponent, CATEGORY_OPTIONS } from './stand-form-modal.component';
-import { ExpositorApi } from '../../../services/apiExpositores.service';
+import { ExpositoresService } from '../../../services/expositores.service';
 
 @Component({
   selector: 'app-stands-list',
@@ -29,7 +29,7 @@ export class StandsListComponent {
     return map;
   }, {} as Record<string, string>);
 
-  constructor(private apiExpositores: ExpositorApi) {}
+  constructor(private expositoresService: ExpositoresService) {}
 
   ngOnInit(): void {
     this.cargarStands();
@@ -39,7 +39,7 @@ export class StandsListComponent {
     this.loading.set(true);
     this.loadError.set(false);
 
-    this.apiExpositores.getExpositores({ page: 1, pageSize: 500 }).subscribe({
+    this.expositoresService.getExpositores({ page: 1, pageSize: 500 }).subscribe({
       next: (res) => {
         // El contrato de `/expositores` siempre envuelve la lista en `data`.
         // `Stand` exige textos no nulos, asi que el DTO se normaliza en el borde.
@@ -108,7 +108,7 @@ export class StandsListComponent {
 
   public saveStand(formData: StandFormData): void {
     if (formData.id) {
-      this.apiExpositores.putModificarExpositor(formData.id, {
+      this.expositoresService.putModificarExpositor(formData.id, {
         name: formData.name,
         stand: formData.stand,
         category: formData.category,
@@ -126,7 +126,7 @@ export class StandsListComponent {
         }
       });
     } else {
-      this.apiExpositores.postExpositor({
+      this.expositoresService.postExpositor({
         name: formData.name,
         stand: formData.stand,
         category: formData.category,
@@ -153,7 +153,7 @@ export class StandsListComponent {
     if (!standToDelete) return;
 
     if (confirm(`¿Eliminar el expositor "${standToDelete.name}"?`)) {
-      this.apiExpositores.deleteExpositor(id).subscribe({
+      this.expositoresService.deleteExpositor(id).subscribe({
         next: () => {
           this.showToast('Expositor eliminado del catálogo.');
           this.cargarStands();

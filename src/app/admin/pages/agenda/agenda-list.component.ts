@@ -2,7 +2,7 @@ import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AgendaEvent, AgendaEventFormData, AgendaFormModalComponent } from './agenda-form-modal.component';
-import { AgendaApi } from '../../../services/apiAgenda.service';
+import { AgendaService } from '../../../services/agenda.service';
 import { AgendaEvento, AgendaPayload } from '../../../models/agenda.model';
 
 @Component({
@@ -12,7 +12,7 @@ import { AgendaEvento, AgendaPayload } from '../../../models/agenda.model';
   templateUrl: './agenda-list.component.html'
 })
 export class AgendaListComponent implements OnInit {
-  private apiAgenda = inject(AgendaApi);
+  private agendaService = inject(AgendaService);
 
   public events = signal<AgendaEvent[]>([]);
   public isLoading = signal<boolean>(true);
@@ -85,7 +85,7 @@ export class AgendaListComponent implements OnInit {
 
   private cargarAgenda(): void {
     this.isLoading.set(true);
-    this.apiAgenda.getAgenda().subscribe({
+    this.agendaService.getAgenda().subscribe({
       next: (res) => {
         this.events.set((res.data ?? []).map((evento) => this.mapearEventoDesdeApi(evento)));
         this.isLoading.set(false);
@@ -128,8 +128,8 @@ export class AgendaListComponent implements OnInit {
     const payload = this.mapearEventoParaApi(formData);
 
     const request = formData.id
-      ? this.apiAgenda.putModificarAgenda(formData.id, payload)
-      : this.apiAgenda.postAgenda(payload);
+      ? this.agendaService.putModificarAgenda(formData.id, payload)
+      : this.agendaService.postAgenda(payload);
 
     request.subscribe({
       next: () => {
@@ -155,7 +155,7 @@ export class AgendaListComponent implements OnInit {
     if (!eventToDelete) return;
 
     if (confirm(`¿Eliminar la actividad "${eventToDelete.titulo}"?`)) {
-      this.apiAgenda.deleteActividad(id).subscribe({
+      this.agendaService.deleteActividad(id).subscribe({
         next: () => {
           this.events.update(list => list.filter(e => e.id !== id));
           this.showToast('Actividad eliminada de la agenda.', 'success');

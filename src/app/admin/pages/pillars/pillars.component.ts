@@ -2,7 +2,7 @@ import { Component, computed, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-modal.component';
-import { ApiEjes } from '../../../services/apiEjes.service';
+import { EjesService } from '../../../services/ejes.service';
 import { Eje, EjePayload } from '../../../models/eje.model';
 
 @Component({
@@ -12,7 +12,7 @@ import { Eje, EjePayload } from '../../../models/eje.model';
   templateUrl: './pillars.component.html'
 })
 export class PillarsComponent implements OnInit {
-  private apiEjes = inject(ApiEjes);
+  private ejesService = inject(EjesService);
 
   public pillars = signal<Pillar[]>([]);
   public isLoading = signal<boolean>(true);
@@ -61,7 +61,7 @@ export class PillarsComponent implements OnInit {
 
   private cargarEjes(): void {
     this.isLoading.set(true);
-    this.apiEjes.getEjes().subscribe({
+    this.ejesService.getEjes().subscribe({
       next: (res) => {
         this.pillars.set((res.data ?? []).map((eje) => this.mapearEjeDesdeApi(eje)));
         this.isLoading.set(false);
@@ -96,8 +96,8 @@ export class PillarsComponent implements OnInit {
     const payload = this.mapearEjeParaApi(formData);
 
     const request = formData.id
-      ? this.apiEjes.putModificarEje(formData.id, payload)
-      : this.apiEjes.postEje(payload);
+      ? this.ejesService.putModificarEje(formData.id, payload)
+      : this.ejesService.postEje(payload);
 
     request.subscribe({
       next: () => {
@@ -123,7 +123,7 @@ export class PillarsComponent implements OnInit {
     if (!pillarToDelete) return;
 
     if (confirm(`¿Eliminar el pilar "${pillarToDelete.title}"?`)) {
-      this.apiEjes.deleteEje(id).subscribe({
+      this.ejesService.deleteEje(id).subscribe({
         next: () => {
           this.pillars.update(list => list.filter(p => p.id !== id));
           this.showToast('Pilar eliminado correctamente.', 'success');

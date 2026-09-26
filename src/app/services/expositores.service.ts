@@ -10,7 +10,7 @@ export type { Expositor, ExpositorPayload, ExpositorQuery } from '../models/expo
 @Injectable({
   providedIn: 'root',
 })
-export class ExpositorApi {
+export class ExpositoresService {
 
   urlBase: string = `${API_URL}/expositores/`;
   constructor(private http: HttpClient) { }

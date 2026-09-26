@@ -8,7 +8,7 @@ import { NoticiaDTO, NoticiaPayload } from '../models/noticia.model';
 @Injectable({
   providedIn: 'root',
 })
-export class ApiNoticiasService {
+export class NoticiasService {
 
   urlBase: string = `${API_URL}/noticias/`;
   constructor(private http: HttpClient) { }

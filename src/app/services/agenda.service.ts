@@ -13,7 +13,7 @@ import {
 @Injectable({
   providedIn: 'root',
 })
-export class AgendaApi {
+export class AgendaService {
 
   urlBase: string = `${API_URL}/agendas/`;
   constructor(private http: HttpClient) { }

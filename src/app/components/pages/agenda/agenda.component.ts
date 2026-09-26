@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
-import { AgendaApi } from '../../../services/apiAgenda.service';
+import { AgendaService } from '../../../services/agenda.service';
 import { AgendaEvento } from '../../../models/agenda.model';
 
 export interface AgendaEventoPublico {
@@ -85,7 +85,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
-    private apiAgenda: AgendaApi
+    private agendaService: AgendaService
   ) {}
 
   ngOnInit(): void {
@@ -147,7 +147,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
     this.modalErrorMessage.set('');
     this.modalStatus.set('enviando');
 
-    this.apiAgenda
+    this.agendaService
       .suscribirse(email, this.selectedActivityId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -173,7 +173,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
 
   obtenerAgenda(): void {
     this.cargando = true;
-    this.apiAgenda
+    this.agendaService
       .getAgenda()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

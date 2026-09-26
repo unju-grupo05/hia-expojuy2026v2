@@ -3,7 +3,7 @@ import { EMPTY, Observable, expand, reduce } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BlenderPayload, CommercialStatus, PointOfInterest, StandData } from '../components/models/stand.model';
 import { SectorActivity } from '../components/models/sector-info.model';
-import { ExpositorApi } from './apiExpositores.service';
+import { ExpositoresService } from './expositores.service';
 import { Expositor } from '../models/expositor.model';
 import { PaginatedResponse } from '../models/api-response.model';
 
@@ -17,7 +17,7 @@ export type ExpositorRecord = Expositor;
   providedIn: 'root'
 })
 export class MasterplanDataService {
-  private readonly expositorApi = inject(ExpositorApi);
+  private readonly expositoresService = inject(ExpositoresService);
 
   // Estado Reactivo con Angular Signals
   public selectedStand = signal<StandData | null>(null);
@@ -341,11 +341,11 @@ export class MasterplanDataService {
 
   /** Recorre todas las páginas del endpoint paginado y concatena los items. */
   private fetchTodasLasPaginas(pageSize: number): Observable<ExpositorRecord[]> {
-    return this.expositorApi.getExpositores({ page: 1, pageSize }).pipe(
+    return this.expositoresService.getExpositores({ page: 1, pageSize }).pipe(
       expand((res: PaginatedResponse<Expositor>) => {
         const data = res.data;
         if (!data?.hasMore) return EMPTY;
-        return this.expositorApi.getExpositores({ page: (data.page ?? 1) + 1, pageSize });
+        return this.expositoresService.getExpositores({ page: (data.page ?? 1) + 1, pageSize });
       }),
       reduce(
         (acc: ExpositorRecord[], res: PaginatedResponse<Expositor>) => acc.concat(res.data?.items ?? []),

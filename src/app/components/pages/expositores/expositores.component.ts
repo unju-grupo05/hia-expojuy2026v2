@@ -15,8 +15,8 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, Validati
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Expositor } from '../../../models/expositor.model';
 import { B2BMeetingRequest } from '../../../models/b2b-meeting.model';
-import { ExpositorApi } from '../../../services/apiExpositores.service';
-import { B2BMeetingService } from '../../../services/apiB2B-meeting.service';
+import { ExpositoresService } from '../../../services/expositores.service';
+import { B2BMeetingService } from '../../../services/b2b-meeting.service';
 
 @Component({
   selector: 'app-expositores',
@@ -65,7 +65,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   private currentSearchQuery = '';
 
   constructor(
-    private apiExpositores: ExpositorApi,
+    private expositoresService: ExpositoresService,
     private b2bMeetingService: B2BMeetingService,
     private formBuilder: FormBuilder,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -91,7 +91,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.loadingExhibitors.set(true);
     this.exhibitorsError.set(false);
 
-    this.apiExpositores
+    this.expositoresService
       .getExpositores({
         page: this.currentExhibitorPage,
         pageSize: this.pageSize,
