@@ -41,7 +41,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{MAIN DIAMOND}',
       badge: '{MAIN DIAMOND}',
       desc: 'Líder mundial en tecnologías de litio y extracción sustentable en la Puna jujeña, acelerando la transición energética y almacenamiento de nueva generación.',
-      img: './Img/Sponsors/1-Exar.webp',
+      img: './img/sponsors/1-Exar.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-behind'
     },
@@ -51,7 +51,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{PLATINUM SPONSOR}',
       badge: '{PLATINUM}',
       desc: 'Alianza de integración subcontinental que promueve el comercio exterior, la conectividad logística y el desarrollo de la Zona de Integración del Centro Oeste Sudamericano.',
-      img: './Img/Sponsors/2-Compañia-Seguros.webp',
+      img: './img/sponsors/2-Compañia-Seguros.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-front'
     },
@@ -61,7 +61,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{GLOBAL PARTNER}',
       badge: '{GLOBAL PARTNER}',
       desc: 'Operador del parque solar Cauchari, uno de los más altos y eficientes del planeta, impulsando la descarbonización industrial en el Cono Sur.',
-      img: './Img/Sponsors/3-cannava.webp',
+      img: './img/sponsors/3-cannava.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-behind'
     }
@@ -74,7 +74,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{MAIN DIAMOND}',
       badge: '{MAIN DIAMOND}',
       desc: 'Entidad financiera multilateral que canaliza capital estratégico en infraestructura portuaria, ferrocarril y corredores bioceánicos de Sudamérica.',
-      img: './Img/Sponsors/4-Kelimpio.webp',
+      img: './img/sponsors/4-Kelimpio.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-front'
     },
@@ -84,7 +84,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{GOLD SPONSOR}',
       badge: '{GOLD SPONSOR}',
       desc: 'Infraestructura en la nube soberana con centros de datos de alta eficiencia energética, computación cuántica y ciberseguridad para el sector corporativo.',
-      img: './Img/Sponsors/5-jujuyacompaña.webp',
+      img: './img/sponsors/5-jujuyacompaña.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-behind'
     },
@@ -94,7 +94,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{TECH PARTNER}',
       badge: '{TECH PARTNER}',
       desc: 'Soluciones de telemetría IoT, robótica autónoma y analítica predictiva diseñadas para la extracción mineral de huella cero y máxima seguridad operativa.',
-      img: './Img/Sponsors/6-municipalidad.webp',
+      img: './img/sponsors/6-municipalidad.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-front'
     }
@@ -107,7 +107,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{INSTITUTIONAL}',
       badge: '{INSTITUTIONAL}',
       desc: 'Organismo rector que potencia el comercio internacional del Noroeste Argentino con los mercados del Asia-Pacífico y el Mercosur ampliado.',
-      img: './Img/Sponsors/7-CFI.webp',
+      img: './img/sponsors/7-CFI.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-behind'
     },
@@ -117,7 +117,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{PLATINUM SPONSOR}',
       badge: '{PLATINUM}',
       desc: 'Flota multimodal de transporte bioceánico por el Paso de Jama hacia puertos chilenos, garantizando tiempos récord y trazabilidad integral.',
-      img: './Img/Sponsors/8-Camara-comercio.webp',
+      img: './img/sponsors/8-Camara-comercio.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-front'
     },
@@ -127,7 +127,7 @@ export class Sponsors implements AfterViewInit, OnDestroy {
       role: '{CREATIVE PARTNER}',
       badge: '{CREATIVE}',
       desc: 'Ecosistema de innovación tecnológica y economía del conocimiento jujeña que incuba startups y proyectos de software de exportación.',
-      img: './Img/Sponsors/9-secretaria-turismo.webp',
+      img: './img/sponsors/9-secretaria-turismo.webp',
       website: 'https://expojuy.com.ar',
       layerClass: 'sponsor-layer-behind'
     }

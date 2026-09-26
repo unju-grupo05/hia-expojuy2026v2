@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { API_URL, ASSETS_BASE } from '../core/api-url';
-import { readAuthToken } from '../core/auth-storage';
 
 export interface UploadMediaResponse {
   id: string;
@@ -31,29 +30,14 @@ export class ApiMediaService {
 
   constructor(private http: HttpClient) {}
 
-  private obtenerToken(): string | null {
-    return readAuthToken();
-  }
-
-  private httpOptionsConAuth() {
-    const token = this.obtenerToken();
-    return {
-      headers: new HttpHeaders({
-        ...(token ? { Authorization: `Bearer ${token}` } : {})
-      })
-    };
-  }
-
+  // El token lo adjunta el AuthInterceptor. En `uploadImage` NO se fija
+  // Content-Type a propósito: el navegador debe generar el boundary de
+  // multipart/form-data al enviar el FormData.
   public uploadImage(file: File): Observable<UploadMediaResponse> {
     const formData = new FormData();
     formData.append('image', file);
 
-    const token = this.obtenerToken();
-    const headers = new HttpHeaders({
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    });
-
-    return this.http.post<UploadMediaResponse>(`${this.urlBase}/upload`, formData, { headers });
+    return this.http.post<UploadMediaResponse>(`${this.urlBase}/upload`, formData);
   }
 
   public getMedias(): Observable<{ success: boolean; data: MediaItemData[] }> {
@@ -61,7 +45,7 @@ export class ApiMediaService {
   }
 
   public deleteMedia(id: string): Observable<{ success: boolean; message: string }> {
-    return this.http.delete<{ success: boolean; message: string }>(`${this.urlBase}/${id}`, this.httpOptionsConAuth());
+    return this.http.delete<{ success: boolean; message: string }>(`${this.urlBase}/${id}`);
   }
 
   public normalizeImageUrl(url: string | null | undefined): string {
@@ -77,10 +61,10 @@ export class ApiMediaService {
     if (cleanUrl.startsWith('uploads/')) {
       return `${ASSETS_BASE}/${cleanUrl}`;
     }
-    if (cleanUrl.startsWith('./Img/')) {
+    if (cleanUrl.startsWith('./img/')) {
       return cleanUrl.replace(/^\.\//, '/');
     }
-    if (cleanUrl.startsWith('Img/')) {
+    if (cleanUrl.startsWith('img/')) {
       return `/${cleanUrl}`;
     }
     if (cleanUrl.startsWith('./')) {

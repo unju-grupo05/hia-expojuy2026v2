@@ -12,7 +12,12 @@ import { SectorActivity } from '../../../../models/sector-info.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SidebarComponent {
-  public stand = computed(() => this.dataService.selectedStand());
+  public stand = computed(() => {
+    // `dataVersion` actúa como dependencia: al llegar los expositores de la BD
+    // el stand se muta en el sitio, y esto fuerza a releer sus datos.
+    this.dataService.dataVersion();
+    return this.dataService.selectedStand();
+  });
   public isDismissed = signal<boolean>(false);
 
   // Determina si la tarjeta debe mostrarse en mobile
@@ -31,23 +36,37 @@ export class SidebarComponent {
     return { text: 'OCUPADO', color: '#ef4444' };
   });
 
+  /** Categorías de la BD que se priorizan para cada sector del predio. */
+  private static readonly CATEGORIAS_POR_SECTOR: Record<string, string[]> = {
+    corporativo: ['mineria', 'energia'],
+    descubierto: ['logistica', 'tecnologia'],
+    artesano: ['agro'],
+    cubierto: ['tecnologia', 'agro']
+  };
+
   public featuredCompanies = computed(() => {
     const s = this.stand();
-    if (!s) return [];
+    const lista: string[] = [];
+    if (s?.company) lista.push(s.company);
 
-    const list: string[] = [s.company || 'Expositor Oficial'];
-    let poolKey = 'tech';
-    if (s.sectorKey === 'artesano') poolKey = 'artesanias';
-    else if (s.sectorKey === 'descubierto') poolKey = 'maquinaria';
-    else if (s.sectorKey === 'corporativo') poolKey = 'mineria';
+    // Expositores reales de PostgreSQL. El orden lo fija la respuesta de la API,
+    // por lo que la lista es estable entre recargas.
+    const categorias = s ? (SidebarComponent.CATEGORIAS_POR_SECTOR[s.sectorKey] ?? []) : [];
+    const todos = this.dataService.expositores();
 
-    const pool = this.dataService.STATED_COMPANIES[poolKey as keyof typeof this.dataService.STATED_COMPANIES] || this.dataService.STATED_COMPANIES.tech;
-    pool.slice(0, 3).forEach(c => {
-      if (!list.includes(c)) list.push(c);
+    const candidatos = todos.filter((e) => !lista.includes(e.name));
+    const priorizados = categorias.length > 0
+      ? candidatos.filter((e) => categorias.includes((e.category || '').toLowerCase()))
+      : [];
+
+    [...priorizados, ...candidatos].forEach((e) => {
+      if (lista.length < 3) lista.push(e.name);
     });
 
-    return list;
+    return lista;
   });
+
+  public isLoadingExpositores = computed(() => this.dataService.isLoadingExpositores());
 
   public activities = computed<SectorActivity[]>(() => {
     const s = this.stand();

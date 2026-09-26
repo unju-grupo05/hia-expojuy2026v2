@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { readAuthToken } from '../core/auth-storage';
 
 @Injectable({
   providedIn: 'root',
@@ -11,20 +10,6 @@ export class ApiNoticiasService {
 
   urlBase: string = `${environment.apiUrl}/noticias/`;
   constructor(private http: HttpClient) { }
-
-  private obtenerToken(): string | null {
-    return readAuthToken();
-  }
-
-  private httpOptionsConAuth() {
-    const token = this.obtenerToken();
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      })
-    };
-  }
 
   //***********************OBTENER*************************
   getNoticias(incluirBorradores?: boolean): Observable<any> {
@@ -48,16 +33,16 @@ export class ApiNoticiasService {
 
   //***********************CREAR*************************
   postNoticias(actividad: any): Observable<any> {
-    return this.http.post(this.urlBase, actividad, this.httpOptionsConAuth())
+    return this.http.post(this.urlBase, actividad)
   }
 
   //***********************MODIFICAR*************************
   putModificarNoticias(id: number | string, actividad: any): Observable<any> {
-    return this.http.put(this.urlBase + id, actividad, this.httpOptionsConAuth())
+    return this.http.put(this.urlBase + id, actividad)
   }
 
   //***********************ELIMINACION FISICA*************************
   deleteNoticias(id: number | string): Observable<any> {
-    return this.http.delete(this.urlBase + id, this.httpOptionsConAuth())
+    return this.http.delete(this.urlBase + id)
   }
 }

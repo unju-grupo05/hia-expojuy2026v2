@@ -1,24 +1,53 @@
-import { Injectable, signal } from '@angular/core';
-import { BlenderPayload, PointOfInterest, StandData, SectorKey } from '../components/models/stand.model';
+import { Injectable, inject, signal } from '@angular/core';
+import { EMPTY, Observable, expand, reduce } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { BlenderPayload, CommercialStatus, PointOfInterest, StandData } from '../components/models/stand.model';
 import { SectorActivity } from '../components/models/sector-info.model';
+import { ExpositorApi } from './apiExpositores.service';
+
+/** Registro de expositor tal como lo expone `GET /api/expositores`. */
+export interface ExpositorRecord {
+  id: string;
+  name: string;
+  stand: string;
+  category: string;
+  subtitle?: string | null;
+  description?: string | null;
+  origin?: string | null;
+  email?: string | null;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class MasterplanDataService {
+  private readonly expositorApi = inject(ExpositorApi);
+
   // Estado Reactivo con Angular Signals
   public selectedStand = signal<StandData | null>(null);
   public activeFilter = signal<string>('all');
   public searchQuery = signal<string>('');
 
-  public readonly STATED_COMPANIES = {
-    mineria: ["Jujuy Litio S.A.", "Exar Energía & Litio", "Sales de Jujuy", "Mina Pirquitas", "JEMSE Estatal", "Lithium Tech Andes", "Puna Mining Corp", "Solar & Baterías Jujuy"],
-    agro: ["Cooperativa de Tabacaleros", "Ledesma S.A.A.I.", "Valles Calchaquíes Gourmet", "Bodega Fernando", "Hortalizas Perico", "Finca El Chañar", "Cítricos San Pedro"],
-    tech: ["Polo Tecnológico Jujuy", "Telecom Argentina", "Banco Macro", "Consejo de la Microempresa", "Unju Innova", "BioJujuy Lab", "Andes Cloud Systems", "Fibra Óptica Jujuy"],
-    artesanias: ["Hilanderías de Yavi", "Cerámica Quebradeña", "Tejidos Puna Viva", "Orfebrería Tilcareña", "Maderas Nativas Yungas", "Filigrana de Humahuaca", "Telares de Casabindo"],
-    gastro: ["Empanadas Las Vicuñitas", "Humitas Don Sixto", "Cerveza Tilcarock", "Asador Criollo Quebradeño", "Chivito & Cordero Yala", "Tamales El Carmen", "GastroTruck Tilcara", "Alfajores Jujeñitos"],
-    maquinaria: ["Scania Camiones Puna", "Caterpillar Minera", "Toyota Hilux Derudder", "John Deere Agro", "Ford Trucks Jujuy", "Komatsu Maquinarias", "Agronorte Jujuy"]
-  };
+  /** Expositores reales de PostgreSQL, cargados desde `/api/expositores`. */
+  public readonly expositores = signal<ExpositorRecord[]>([]);
+  public readonly isLoadingExpositores = signal<boolean>(false);
+
+  /**
+   * Se incrementa cada vez que llegan datos de la BD.
+   *
+   * La geometría de los stands proviene de Blender y no cambia, pero `company`,
+   * `status` y `desc` sí se actualizan desde la base. Como Three.js conserva la
+   * referencia de cada objeto `StandData`, los stands se mutan en el sitio; este
+   * contador es la dependencia que obliga a las vistas a recalcularse.
+   */
+  public readonly dataVersion = signal(0);
+
+  /** Catálogo de stands YA procesado, para no recalcularlo en cada lectura. */
+  private standsCache: StandData[] | null = null;
+
+  constructor() {
+    this.cargarExpositores();
+  }
 
   public readonly SECTOR_ACTIVITIES: Record<string, SectorActivity[]> = {
     cubierto: [
@@ -237,7 +266,14 @@ export class MasterplanDataService {
   };
 
   public getStandsProcessed(): StandData[] {
-    return this.BLENDER_PAYLOAD.stands.map(item => {
+    if (this.standsCache) {
+      return this.standsCache;
+    }
+
+    // La GEOMETRÍA (posición, tamaño, rotación) es fija: proviene del export de
+    // Blender y no existe en la base. Lo que sí viene de PostgreSQL es la
+    // asignación de expositor, y se aplica después sobre estos mismos objetos.
+    this.standsCache = this.BLENDER_PAYLOAD.stands.map(item => {
       let rotY = item.rotY || 0;
       let w = item.w;
       let l = item.l;
@@ -263,25 +299,159 @@ export class MasterplanDataService {
       else if (["CUB-C29", "CUB-C33", "CUB-C32"].includes(item.id)) { rotY = -Math.PI / 2; }
       else if (["CUB-C30", "CUB-C34", "CUB-C31"].includes(item.id)) { rotY = Math.PI / 2; }
 
-      let poolKey = 'tech';
-      if (item.sectorKey === 'artesano') poolKey = 'artesanias';
-      else if (item.sectorKey === 'descubierto') poolKey = 'maquinaria';
-      else if (item.sectorKey === 'corporativo') poolKey = 'mineria';
-
-      const pool = this.STATED_COMPANIES[poolKey as keyof typeof this.STATED_COMPANIES] || this.STATED_COMPANIES.tech;
-      const status = item.status || 'disponible';
-      const company = item.company || pool[Math.floor(Math.random() * pool.length)];
-
       return {
         ...item,
         w,
         l,
         rotY,
-        status,
-        company,
+        status: item.status || 'disponible' as CommercialStatus,
         area: item.area || `${(w * l).toFixed(1)} m²`
       };
     });
+
+    // Si los expositores llegaron antes del primer render, se aplican de inmediato.
+    if (this.expositores().length > 0) {
+      this.aplicarExpositoresAStands(this.expositores());
+    }
+
+    return this.standsCache;
+  }
+
+  /**
+   * Carga paginada de `/api/expositores` y sincroniza los stands con la BD.
+   * Si la API falla, el visor sigue funcionando con la geometría y sin
+   * empresas asignadas: no se inventan datos.
+   */
+  public cargarExpositores(): void {
+    if (this.isLoadingExpositores()) return;
+
+    this.isLoadingExpositores.set(true);
+
+    this.fetchTodasLasPaginas(200)
+      .pipe(
+        catchError(() => {
+          console.warn('[Masterplan] No se pudieron cargar los expositores; el visor sigue con la geometría estática.');
+          return EMPTY;
+        })
+      )
+      .subscribe((items) => {
+        this.isLoadingExpositores.set(false);
+        if (items.length === 0) return;
+
+        this.expositores.set(items);
+        this.aplicarExpositoresAStands(items);
+      });
+  }
+
+  /** Recorre todas las páginas del endpoint paginado y concatena los items. */
+  private fetchTodasLasPaginas(pageSize: number): Observable<ExpositorRecord[]> {
+    return this.expositorApi.getExpositores({ page: 1, pageSize }).pipe(
+      expand((res: any) => {
+        const data = res?.data;
+        if (!data?.hasMore) return EMPTY;
+        return this.expositorApi.getExpositores({ page: (data.page ?? 1) + 1, pageSize });
+      }),
+      reduce(
+        (acc: ExpositorRecord[], res: any) => acc.concat(res?.data?.items ?? []),
+        [] as ExpositorRecord[]
+      )
+    );
+  }
+
+  /**
+   * Cruza cada expositor con su stand usando el campo `stand` de la BD
+   * (ej. "Stand A-12 · Pab. Minería") contra el id/nombre del stand 3D
+   * (ej. "CUB-A12" / "Stand A12"). La asignación es determinista: sin
+   * `Math.random()`, la misma BD siempre produce el mismo mapa.
+   */
+  private aplicarExpositoresAStands(items: ExpositorRecord[]): void {
+    const stands = this.getStandsProcessedSinRecursion();
+
+    const porCodigo = new Map<string, ExpositorRecord>();
+    for (const item of items) {
+      const codigo = this.normalizarCodigo(item.stand);
+      if (codigo && !porCodigo.has(codigo)) {
+        porCodigo.set(codigo, item);
+      }
+    }
+
+    let asignados = 0;
+
+    for (const stand of stands) {
+      const expositor = this.buscarExpositorParaStand(stand, porCodigo);
+
+      if (!expositor) {
+        // Sin expositor en la BD: el stand queda disponible, sin empresa inventada.
+        stand.company = undefined;
+        stand.status = 'disponible';
+        continue;
+      }
+
+      asignados++;
+      stand.company = expositor.name;
+      stand.status = 'ocupado';
+      stand.desc = [expositor.subtitle, expositor.origin && `Origen: ${expositor.origin}`]
+        .filter(Boolean)
+        .join(' · ') || expositor.description || undefined;
+    }
+
+    this.dataVersion.update((v) => v + 1);
+
+    if (asignados > 0) {
+      console.info(`[Masterplan] ${asignados} stands sincronizados con /api/expositores.`);
+    }
+  }
+
+  /** Variante de `getStandsProcessed` que no re-dispara la sincronización. */
+  private getStandsProcessedSinRecursion(): StandData[] {
+    const cache = this.standsCache;
+    if (cache) return cache;
+    return this.getStandsProcessed();
+  }
+
+  private buscarExpositorParaStand(
+    stand: StandData,
+    porCodigo: Map<string, ExpositorRecord>
+  ): ExpositorRecord | undefined {
+    for (const candidato of this.codigosCandidatosDelStand(stand)) {
+      const expositor = porCodigo.get(candidato);
+      if (expositor) return expositor;
+    }
+    return undefined;
+  }
+
+  /**
+   * Códigos con los que un stand puede aparecer en la BD.
+   * "CUB-B1" → ['B1'] · "EXT-P-06" → ['P06','EXT06'] · "CORP-G2" → ['G2','CORPG2']
+   */
+  private codigosCandidatosDelStand(stand: StandData): string[] {
+    const candidatos: string[] = [];
+
+    const desdeId = this.normalizarCodigo(stand.id.split('-').slice(1).join('-'));
+    if (desdeId) candidatos.push(desdeId);
+
+    const desdeNombre = this.normalizarCodigo(stand.name.replace(/^stand\s*/i, ''));
+    if (desdeNombre) candidatos.push(desdeNombre);
+
+    return [...new Set(candidatos)];
+  }
+
+  /**
+   * Reduce un rótulo de stand a un código comparable: sin separadores, sin
+   * ceros a la izquierda y en mayúsculas.
+   * "Stand A-12 · Pab. Minería" → "A12" · "B-03" → "B3" · "E-04" → "E4"
+   */
+  private normalizarCodigo(rotulo: string | null | undefined): string {
+    if (!rotulo) return '';
+
+    // Se corta en el separador de pabellón ("·") para quedar sólo con el código.
+    const codigo = rotulo.split('·')[0];
+
+    return codigo
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, '')
+      .replace(/^STAND/, '')
+      .replace(/0+(\d)/g, '$1');
   }
 
   public selectStand(stand: StandData | null): void {

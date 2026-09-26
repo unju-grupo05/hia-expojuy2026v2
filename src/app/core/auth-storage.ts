@@ -13,9 +13,10 @@ export const AUTH_TOKEN_KEY = 'expojuy_admin_token';
 export const AUTH_USER_KEY = 'expojuy_admin_user';
 
 /**
- * Claves usadas por el servicio de autenticación obsoleto (`ApiGestionUsuario`),
- * que leía de `sessionStorage`. Nada las escribe hoy, pero se limpian al
- * iniciar sesión y al cerrar sesión para no dejar fragmentos de sesión activos.
+ * Claves usadas por el servicio de autenticación obsoleto (`ApiGestionUsuario`,
+ * ya eliminado), que leía de `sessionStorage`. Nada las escribe hoy, pero se
+ * limpian al iniciar sesión y al cerrar sesión para no dejar fragmentos de
+ * sesión activos de versiones anteriores.
  */
 export const LEGACY_SESSION_KEYS = ['token', 'legajo', 'nombre', 'apellido', 'rol'] as const;
 

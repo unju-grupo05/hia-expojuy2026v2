@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { readAuthToken } from '../core/auth-storage';
 
 export interface Eje {
   id: number;
@@ -20,20 +19,6 @@ export class ApiEjes {
   urlBase: string = `${environment.apiUrl}/ejes/`;
   constructor(private http: HttpClient) { }
 
-  private obtenerToken(): string | null {
-    return readAuthToken();
-  }
-
-  private httpOptionsConAuth() {
-    const token = this.obtenerToken();
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      })
-    };
-  }
-
   //***********************OBTENER*************************
   getEjes(): Observable<any> {
     let httpOptions = {
@@ -50,16 +35,16 @@ export class ApiEjes {
 
   //***********************CREAR*************************
   postEje(eje: any): Observable<any> {
-    return this.http.post(this.urlBase, eje, this.httpOptionsConAuth())
+    return this.http.post(this.urlBase, eje)
   }
 
   //***********************MODIFICAR*************************
   putModificarEje(id: number, eje: any): Observable<any> {
-    return this.http.put(this.urlBase + id, eje, this.httpOptionsConAuth())
+    return this.http.put(this.urlBase + id, eje)
   }
 
   //***********************ELIMINACION FISICA*************************
   deleteEje(id: number): Observable<any> {
-    return this.http.delete(this.urlBase + id, this.httpOptionsConAuth())
+    return this.http.delete(this.urlBase + id)
   }
 }
