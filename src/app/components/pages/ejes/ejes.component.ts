@@ -1,5 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, OnDestroy, DestroyRef, ChangeDetectorRef, Inject, PLATFORM_ID, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ApiEjes } from '../../../services/apiEjes.service';
 
 @Component({
@@ -9,9 +11,13 @@ import { ApiEjes } from '../../../services/apiEjes.service';
   templateUrl: './ejes.component.html',
   styleUrl: './ejes.component.css'
 })
-export class EjesComponent implements OnInit {
+export class EjesComponent implements OnInit, OnDestroy {
   ejes: any[] = [];
   cargando: boolean = true;
+
+  private readonly destroyRef = inject(DestroyRef);
+  private revealTimeouts = new Set<ReturnType<typeof setTimeout>>();
+  private observers: IntersectionObserver[] = [];
 
   constructor(
     private apiEjes: ApiEjes,
@@ -25,33 +31,40 @@ export class EjesComponent implements OnInit {
 
   obtenerEjes(): void {
     this.cargando = true;
-    this.apiEjes.getEjes().subscribe({
-      next: (res) => {
-        const datos = res?.data || res;
-        this.ejes = Array.isArray(datos) ? [...datos] : [];
-        this.cargando = false;
+    this.apiEjes
+      .getEjes()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          const datos = res?.data || res;
+          this.ejes = Array.isArray(datos) ? [...datos] : [];
+          this.cargando = false;
 
-        // Forzamos la detección de cambios en Angular
-        this.cdr.detectChanges();
+          // Forzamos la detección de cambios en Angular
+          this.cdr.detectChanges();
 
-        // Si estamos en el navegador, re-activamos las animaciones de scroll tras insertar las cards
-        if (isPlatformBrowser(this.platformId)) {
-          setTimeout(() => {
-            this.activarScrollRevealLocal();
-          }, 100);
+          // Si estamos en el navegador, re-activamos las animaciones de scroll tras insertar las cards
+          if (isPlatformBrowser(this.platformId)) {
+            const timeout = setTimeout(() => {
+              this.revealTimeouts.delete(timeout);
+              this.activarScrollRevealLocal();
+            }, 100);
+            this.revealTimeouts.add(timeout);
+          }
+        },
+        error: (err) => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+          console.error('Error al obtener ejes:', err);
         }
-      },
-      error: (err) => {
-        this.cargando = false;
-        this.cdr.detectChanges();
-        console.error('Error al obtener ejes:', err);
-      }
-    });
+      });
   }
 
   private activarScrollRevealLocal(): void {
     const reveals = document.querySelectorAll('#sobre-expojuy .reveal-on-scroll');
-    
+
+    if (!reveals.length) return;
+
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -63,14 +76,21 @@ export class EjesComponent implements OnInit {
       }, { threshold: 0.05 });
 
       reveals.forEach(el => observer.observe(el));
+      this.observers.push(observer);
     } else {
       reveals.forEach(el => el.classList.add('is-visible'));
     }
 
-    // Refrescar GSAP ScrollTrigger si está cargado en window
-    const w = window as any;
-    if (w.ScrollTrigger) {
-      w.ScrollTrigger.refresh();
-    }
+    // `refresh()` es idempotente: el observer anterior ya soltó los nodos que
+    // entro en viewport, y los nuevos se re-observan en cada recarga de datos.
+    ScrollTrigger.getAll().forEach(trigger => trigger.refresh());
+  }
+
+  ngOnDestroy(): void {
+    for (const timeout of this.revealTimeouts) clearTimeout(timeout);
+    this.revealTimeouts.clear();
+
+    for (const observer of this.observers) observer.disconnect();
+    this.observers.length = 0;
   }
 }

@@ -34,6 +34,16 @@ export class Masterplan3dService {
   private carpetMaterialsCache: Map<number, THREE.MeshLambertMaterial> = new Map();
   private sharedMaterials: Map<string, THREE.Material> = new Map();
 
+  /**
+   * Texturas creadas con canvas (CanvasTexture) que no son referenciadas por
+   * ningún campo de la clase. `material.dispose()` NO libera las texturas, por
+   * lo que se registran aquí para liberarlas explícitamente en `destroy()`.
+   */
+  private canvasTextures: Set<THREE.Texture> = new Set();
+
+  /** Evita que `destroy()` se ejecute dos veces o tras un re-init. */
+  private isDestroyed = false;
+
   private tempVec = new THREE.Vector3();
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
@@ -52,6 +62,7 @@ export class Masterplan3dService {
   ) {}
 
   public init(canvas: HTMLCanvasElement, wrapper: HTMLElement, pinEl: HTMLElement, pinTextEl: HTMLElement): void {
+    this.isDestroyed = false;
     this.canvas = canvas;
     this.wrapper = wrapper;
     this.pinElement = pinEl;
@@ -366,7 +377,7 @@ export class Masterplan3dService {
     iCtx.textBaseline = 'middle';
     iCtx.fillText('i', 128, 130);
 
-    const iTex = new THREE.CanvasTexture(iCanvas);
+    const iTex = this.trackTexture(new THREE.CanvasTexture(iCanvas));
     iTex.needsUpdate = true;
     const iBadge = new THREE.Mesh(
       new THREE.PlaneGeometry(1.5, 1.5),
@@ -390,7 +401,7 @@ export class Masterplan3dService {
     bCtx.textBaseline = 'middle';
     bCtx.fillText('★ BOLETERÍAS ★', 256, 64);
 
-    const signTex = new THREE.CanvasTexture(bCanvas);
+    const signTex = this.trackTexture(new THREE.CanvasTexture(bCanvas));
     signTex.needsUpdate = true;
     const signMesh = new THREE.Mesh(
       new THREE.BoxGeometry(9.0, 1.0, 0.15),
@@ -440,7 +451,7 @@ export class Masterplan3dService {
     ctx.font = 'bold 28px sans-serif';
     ctx.fillText('CONECTANDO PAÍSES • CREANDO OPORTUNIDADES', 512, 190);
 
-    const porticoTex = new THREE.CanvasTexture(pCanvas);
+    const porticoTex = this.trackTexture(new THREE.CanvasTexture(pCanvas));
     porticoTex.needsUpdate = true;
 
     const beamMat = new THREE.MeshBasicMaterial({ map: porticoTex });
@@ -631,7 +642,7 @@ export class Masterplan3dService {
       bCtx.font = 'bold 44px sans-serif';
       bCtx.fillText(poi.sub, 512, 210);
 
-      const bannerTex = new THREE.CanvasTexture(bCanvas);
+      const bannerTex = this.trackTexture(new THREE.CanvasTexture(bCanvas));
       bannerTex.needsUpdate = true;
       const bannerMesh = new THREE.Mesh(
         new THREE.PlaneGeometry(9.0, 2.8),
@@ -991,6 +1002,7 @@ export class Masterplan3dService {
   }
 
   public handleResize(): void {
+    if (this.isDestroyed) return;
     if (!this.wrapper || !this.renderer || !this.camera) return;
     const width = this.wrapper.clientWidth;
     const height = this.wrapper.clientHeight;
@@ -1088,21 +1100,28 @@ export class Masterplan3dService {
 
   private isLoopPaused = false;
 
+  /** Registra una textura creada por código para liberarla en `destroy()`. */
+  private trackTexture<T extends THREE.Texture>(texture: T): T {
+    this.canvasTextures.add(texture);
+    return texture;
+  }
+
   public pauseLoop(): void {
     this.isLoopPaused = true;
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = 0;
     }
   }
 
   public resumeLoop(): void {
-    if (!this.isLoopPaused) return;
+    if (this.isDestroyed || !this.isLoopPaused) return;
     this.isLoopPaused = false;
     this.ngZone.runOutsideAngular(() => this.renderLoop());
   }
 
   private renderLoop(): void {
-    if (this.isLoopPaused) return;
+    if (this.isLoopPaused || this.isDestroyed) return;
     this.animationFrameId = requestAnimationFrame(() => this.renderLoop());
 
     this.controls.update();
@@ -1117,33 +1136,151 @@ export class Masterplan3dService {
     this.renderer.render(this.scene, this.camera);
   }
 
+  /**
+   * Liberacion completa de la escena. Es idempotente: puede invocarse mas de
+   * una vez sin efectos secundarios, y bloquea cualquier `resumeLoop()` o
+   * `handleResize()` posterior (p. ej. los setTimeout del fullscreen).
+   */
   public destroy(): void {
-    cancelAnimationFrame(this.animationFrameId);
+    if (this.isDestroyed) return;
+    this.isDestroyed = true;
 
+    // 1. Detener el bucle de render.
+    this.isLoopPaused = true;
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = 0;
+    }
+
+    // 2. Desregistrar listeners de window / canvas.
     window.removeEventListener('resize', this.resizeHandler);
     if (this.canvas) {
       this.canvas.removeEventListener('wheel', this.wheelHandler);
-      this.canvas.removeEventListener('pointerdown', this.pointerDownHandler);
+      if (this.pointerDownHandler) {
+        this.canvas.removeEventListener('pointerdown', this.pointerDownHandler);
+        this.pointerDownHandler = undefined as unknown as (e: PointerEvent) => void;
+      }
     }
 
-    this.scene.traverse((obj) => {
-      if ((obj as THREE.Mesh).isMesh) {
-        const mesh = obj as THREE.Mesh;
-        if (mesh.geometry) mesh.geometry.dispose();
-        if (mesh.material) {
-          if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(m => m.dispose());
-          } else {
-            mesh.material.dispose();
+    // 3. Detener los tweens de GSAP que escriben sobre camara y materiales.
+    if (this.camera) {
+      gsap.killTweensOf(this.camera);
+      gsap.killTweensOf(this.camera.position);
+    }
+    if (this.controls) {
+      gsap.killTweensOf(this.controls);
+      gsap.killTweensOf(this.controls.target);
+    }
+    if (this.roofMat) {
+      gsap.killTweensOf(this.roofMat);
+    }
+
+    // 4. Recorrer la escena liberando TODOS los recursos, no solo mallas.
+    //    `isMesh` dejaba fuera LineSegments (el highlight), Line y Points.
+    const disposedTextures = new Set<THREE.Texture>();
+    const disposedMaterials = new Set<THREE.Material>();
+    const disposedGeometries = new Set<THREE.BufferGeometry>();
+
+    const disposeMaterial = (material: THREE.Material): void => {
+      if (!material || disposedMaterials.has(material)) return;
+      disposedMaterials.add(material);
+
+      // Los mapas de un material no se liberan con material.dispose().
+      for (const key of Object.keys(material)) {
+        const value = (material as unknown as Record<string, unknown>)[key];
+        if (value instanceof THREE.Texture) {
+          if (!disposedTextures.has(value)) {
+            disposedTextures.add(value);
+            value.dispose();
           }
         }
       }
-    });
+      material.dispose();
+    };
 
-    this.carpetMaterialsCache.clear();
+    if (this.scene) {
+      this.scene.traverse((obj) => {
+        const anyObj = obj as THREE.Mesh & {
+          geometry?: THREE.BufferGeometry;
+          material?: THREE.Material | THREE.Material[];
+        };
+
+        if (anyObj.geometry && !disposedGeometries.has(anyObj.geometry)) {
+          disposedGeometries.add(anyObj.geometry);
+          anyObj.geometry.dispose();
+        }
+
+        if (anyObj.material) {
+          if (Array.isArray(anyObj.material)) {
+            anyObj.material.forEach(disposeMaterial);
+          } else {
+            disposeMaterial(anyObj.material);
+          }
+        }
+      });
+    }
+
+    // 5. Texturas de canvas registradas (4 CanvasTexture).
+    this.canvasTextures.forEach((texture) => {
+      if (!disposedTextures.has(texture)) {
+        disposedTextures.add(texture);
+        texture.dispose();
+      }
+    });
+    this.canvasTextures.clear();
+
+    // 6. Materiales compartidos / flyweight.
+    this.sharedMaterials.forEach((material) => {
+      if (!disposedMaterials.has(material)) {
+        disposedMaterials.add(material);
+        material.dispose();
+      }
+    });
     this.sharedMaterials.clear();
-    this.controls.dispose();
-    this.renderer.dispose();
-    this.scene.clear();
+    this.carpetMaterialsCache.forEach((material) => {
+      if (!disposedMaterials.has(material)) {
+        disposedMaterials.add(material);
+        material.dispose();
+      }
+    });
+    this.carpetMaterialsCache.clear();
+
+    // 7. Render target de sombras de la luz direccional.
+    if (this.sunLight) {
+      if (this.sunLight.shadow) {
+        this.sunLight.shadow.map?.dispose();
+        this.sunLight.shadow.map = null;
+      }
+      this.sunLight.dispose();
+    }
+
+    // 8. Vaciar las colecciones internas: retenian mallas ya liberadas.
+    this.pickableStands = [];
+    this.animatedBanners = [];
+    this.standMeshesMap = {};
+    this.highlightBox = undefined as unknown as THREE.LineSegments;
+    this.currentSelectedStand = null;
+    this.roofGroup = undefined as unknown as THREE.Group;
+    this.roofMat = undefined as unknown as THREE.MeshStandardMaterial;
+
+    // 9. Liberar el renderer y el contexto WebGL.
+    if (this.controls) {
+      this.controls.dispose();
+    }
+    if (this.renderer) {
+      this.renderer.renderLists.dispose();
+      this.renderer.dispose();
+      // Libera el contexto GPU de forma definitiva.
+      this.renderer.forceContextLoss();
+    }
+    if (this.scene) {
+      this.scene.clear();
+    }
+
+    // 10. Soltar referencias a nodos del DOM.
+    this.canvas = undefined as unknown as HTMLCanvasElement;
+    this.wrapper = undefined as unknown as HTMLElement;
+    this.pinElement = undefined as unknown as HTMLElement;
+    this.pinTextElement = undefined as unknown as HTMLElement;
   }
 }

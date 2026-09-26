@@ -1,25 +1,28 @@
 <!-- Splash Overlay Fijo -->
-<div id="splash-intro" class="fixed top-0 left-0 w-full h-screen z-[9999] flex flex-col items-center justify-center bg-[#0B0813] overflow-hidden pointer-events-auto">
-  <div class="absolute w-[500px] h-[500px] bg-brand-cyan-electric/20 rounded-full blur-[120px] pointer-events-none"></div>
+@if (splashVisible()) {
+  <div #splashNode id="splash-intro" class="fixed top-0 left-0 w-full h-screen z-[9999] flex flex-col items-center justify-center bg-[#0B0813] overflow-hidden pointer-events-auto">
+    <div class="absolute w-[500px] h-[500px] bg-brand-cyan-electric/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-  <div class="relative z-10 flex flex-col items-center gap-6">
-    <img 
-      src="./img/expojuy26_isologotipo.png" 
-      alt="ExpoJuy 2026" 
-      class="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_35px_rgba(0,194,209,0.6)] transform scale-75 opacity-0" 
-      id="splash-logo"
-    >
-    <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md" id="splash-badge">
-      <span class="w-2 h-2 rounded-full bg-brand-cyan-electric animate-ping"></span>
-      <span class="text-[11px] font-mono font-bold tracking-widest text-brand-cyan-electric uppercase">Cargando ExpoJuy 2026</span>
+    <div class="relative z-10 flex flex-col items-center gap-6">
+      <img
+        src="./img/expojuy26_isologotipo.png"
+        alt="ExpoJuy 2026"
+        class="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_35px_rgba(0,194,209,0.6)] transform scale-75 opacity-0"
+        #splashLogo
+        id="splash-logo"
+      >
+      <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md" #splashBadge id="splash-badge">
+        <span class="w-2 h-2 rounded-full bg-brand-cyan-electric animate-ping"></span>
+        <span class="text-[11px] font-mono font-bold tracking-widest text-brand-cyan-electric uppercase">Cargando ExpoJuy 2026</span>
+      </div>
     </div>
   </div>
-</div>
+}
 
 <!-- Hero pegado al techo -->
-<section class="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-brand-slate-dark text-white pt-16 pb-16" id="hero-section">
+<section #heroSection class="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-brand-slate-dark text-white pt-16 pb-16" id="hero-section">
     <!-- Parallel Layer de Fondo (video + scrims) — parallax vertical suave, sin distorsión de escala -->
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" id="hero-bg">
+    <div #heroBg class="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" id="hero-bg">
       <!-- Looping Visual Layer featuring Jujuy Landscape (Ken-burns / Ambient Zoom) -->
       <div class="absolute inset-0 overflow-hidden">
         <video #bgVideo class="w-full h-full object-cover" autoplay muted loop playsinline src="./img/VideoFondo.mp4"></video>
@@ -89,11 +92,11 @@
 
           <!-- CTA Group -->
           <div class="hero-layer flex flex-wrap items-center gap-4 pt-2">
-            <a class="inline-flex items-center justify-center gap-2 font-display text-sm font-bold text-brand-slate-dark bg-brand-cyan-electric hover:bg-[#2fe2f0] rounded-full px-7 py-3.5 transition-all duration-300 shadow-[0_6px_25px_rgba(0,194,209,0.35)] hover:-translate-y-0.5 dark:!text-brand-slate-dark" href="#acreditaciones-section">
+            <a class="inline-flex items-center justify-center gap-2 font-display text-sm font-bold text-brand-slate-dark bg-brand-cyan-electric hover:bg-[#2fe2f0] rounded-full px-7 py-3.5 transition-all duration-300 shadow-[0_6px_25px_rgba(0,194,209,0.35)] hover:-translate-y-0.5 dark:!text-brand-slate-dark" href="#acreditaciones-section" (click)="onAnchorClick($event, '#acreditaciones-section')">
               <span>Acreditarse Ahora</span>
               <span class="material-symbols-outlined text-base">arrow_forward</span>
             </a>
-            <a class="inline-flex items-center justify-center gap-2 font-display text-sm font-semibold text-white hover:text-brand-cyan-electric bg-white/10 hover:bg-white/15 border border-white/20 rounded-full px-6 py-3.5 backdrop-blur-md transition-all" href="#mapa">
+            <a class="inline-flex items-center justify-center gap-2 font-display text-sm font-semibold text-white hover:text-brand-cyan-electric bg-white/10 hover:bg-white/15 border border-white/20 rounded-full px-6 py-3.5 backdrop-blur-md transition-all" href="#mapa" (click)="onAnchorClick($event, '#mapa')">
               <span class="material-symbols-outlined text-base">map</span>
               <span>Explorar Predio Ferial</span>
             </a>
@@ -140,19 +143,19 @@
                 <!-- Countdown Matrix -->
                 <div class="grid grid-cols-4 gap-2 pt-3 text-center">
                   <div class="p-2.5 rounded-xl bg-white/10 border border-white/10">
-                    <div class="font-display text-xl sm:text-2xl font-black text-white" id="cd-days">30</div>
+                    <div class="font-display text-xl sm:text-2xl font-black text-white">{{ countdown().days }}</div>
                     <div class="text-[9px] uppercase tracking-wider text-slate-300 font-semibold">Días</div>
                   </div>
                   <div class="p-2.5 rounded-xl bg-white/10 border border-white/10">
-                    <div class="font-display text-xl sm:text-2xl font-black text-white" id="cd-hours">14</div>
+                    <div class="font-display text-xl sm:text-2xl font-black text-white">{{ countdown().hours }}</div>
                     <div class="text-[9px] uppercase tracking-wider text-slate-300 font-semibold">Horas</div>
                   </div>
                   <div class="p-2.5 rounded-xl bg-white/10 border border-white/10">
-                    <div class="font-display text-xl sm:text-2xl font-black text-white" id="cd-mins">28</div>
+                    <div class="font-display text-xl sm:text-2xl font-black text-white">{{ countdown().minutes }}</div>
                     <div class="text-[9px] uppercase tracking-wider text-slate-300 font-semibold">Min</div>
                   </div>
                   <div class="p-2.5 rounded-xl bg-brand-cyan-electric/20 border border-brand-cyan-electric/40">
-                    <div class="font-display text-xl sm:text-2xl font-black text-brand-cyan-electric" id="cd-secs">50</div>
+                    <div class="font-display text-xl sm:text-2xl font-black text-brand-cyan-electric">{{ countdown().seconds }}</div>
                     <div class="text-[9px] uppercase tracking-wider text-brand-cyan-electric font-semibold">Seg</div>
                   </div>
                 </div>
@@ -169,7 +172,7 @@
                 </div>
               </div>
 
-              <a class="w-full mt-2 inline-flex items-center justify-center gap-2 py-3 rounded-2xl bg-brand-cyan-electric text-brand-slate-dark hover:bg-[#2fe2f0] font-display text-xs font-extrabold uppercase tracking-wider transition-all duration-200 shadow-md" href="#acreditaciones-section">
+              <a class="w-full mt-2 inline-flex items-center justify-center gap-2 py-3 rounded-2xl bg-brand-cyan-electric text-brand-slate-dark hover:bg-[#2fe2f0] font-display text-xs font-extrabold uppercase tracking-wider transition-all duration-200 shadow-md" href="#acreditaciones-section" (click)="onAnchorClick($event, '#acreditaciones-section')">
                 <span>Obtener Pase Profesional</span>
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
               </a>
@@ -192,11 +195,11 @@
   
 <!-- PachAI: Asistente Virtual Flotante -->
 <div class="chatbot-root">
-  <button class="chatbot-launcher" id="chatbot-launcher" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="chatbot-panel" aria-label="Abrir asistente virtual PachAI" (click)="toggleChatbot()">
+  <button class="chatbot-launcher" id="chatbot-launcher" type="button" aria-haspopup="dialog" [attr.aria-expanded]="chatOpen()" aria-controls="chatbot-panel" aria-label="Abrir asistente virtual PachAI" (click)="toggleChatbot()">
     <i class="bx bx-bot"></i>
     <span class="chatbot-launcher-dot"></span>
   </button>
-  <div class="chatbot-panel" id="chatbot-panel" role="dialog" aria-modal="false" aria-labelledby="chatbot-title" aria-hidden="true">
+  <div class="chatbot-panel" id="chatbot-panel" role="dialog" aria-modal="false" aria-labelledby="chatbot-title" [class.is-open]="chatOpen()" [attr.aria-hidden]="!chatOpen()">
     <div class="chatbot-header">
       <div class="chatbot-header-info">
         <span class="chatbot-avatar"><i class="bx bx-bot"></i></span>
@@ -204,9 +207,16 @@
       </div>
       <button class="chatbot-close" id="chatbot-close" type="button" aria-label="Cerrar asistente" (click)="closeChatbot()"><i class="bx bx-x"></i></button>
     </div>
-    <div class="chatbot-messages" id="chatbot-messages" aria-live="polite"></div>
+    <div class="chatbot-messages" id="chatbot-messages" aria-live="polite" #chatMessagesBox>
+      @for (message of chatMessages(); track $index) {
+        <div class="chatbot-message chatbot-message--{{ message.sender }}">{{ message.text }}</div>
+      }
+      @if (chatTyping()) {
+        <div class="chatbot-message chatbot-message--bot chatbot-message--typing"><span></span><span></span><span></span></div>
+      }
+    </div>
     <form class="chatbot-input-row" id="chatbot-form" (submit)="sendChatMessage($event)">
-      <input type="text" id="chatbot-input" placeholder="Escribí tu consulta..." aria-label="Escribí tu consulta para PachAI" autocomplete="off">
+      <input #chatInputField type="text" id="chatbot-input" name="chatInput" [value]="chatDraft()" (input)="updateChatDraft($any($event.target).value)" placeholder="Escribí tu consulta..." aria-label="Escribí tu consulta para PachAI" autocomplete="off">
       <button type="button" id="chatbot-mic" class="chatbot-mic" aria-label="Dictar mensaje por voz" (click)="toggleVoiceInput()"><i class="bx bx-microphone"></i></button>
       <button type="submit" aria-label="Enviar mensaje"><i class="bx bx-send"></i></button>
     </form>
