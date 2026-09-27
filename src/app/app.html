@@ -1,6 +1,6 @@
 @if (!isAdminRoute()) {
   <app-stardust [active]="stardustEnabled" />
-  <app-social-sidebar (stardustToggle)="onStardustToggle($event)" />
+  <app-social-sidebar [stardustEnabled]="stardustEnabled" (stardustToggle)="onStardustToggle($event)" />
 
   <app-portal-layout />
 } @else {

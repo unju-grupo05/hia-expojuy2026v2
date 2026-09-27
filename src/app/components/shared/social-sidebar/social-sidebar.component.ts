@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Output, OnInit, PLATFORM_ID } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, Output, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 
 export const STARDUST_STORAGE_KEY = 'expojuy-stardust';
@@ -17,10 +17,10 @@ interface SocialLink {
   styleUrls: ['./social-sidebar.component.css']
 })
 export class SocialSidebarComponent implements OnInit {
+  @Input() public stardustEnabled = true;
   @Output() stardustToggle = new EventEmitter<boolean>();
 
   public isOpen = false;
-  public stardustEnabled = true;
 
   public socials: SocialLink[] = [
     { label: 'Instagram', url: 'https://www.instagram.com/expojuy/', icon: 'bxl-instagram' },
@@ -32,8 +32,10 @@ export class SocialSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    const saved = localStorage.getItem(STARDUST_STORAGE_KEY);
-    this.stardustEnabled = saved === null ? true : saved === 'true';
+    this.stardustEnabled = true;
+    try {
+      localStorage.setItem(STARDUST_STORAGE_KEY, 'true');
+    } catch {}
   }
 
   public toggleMenu(): void {
@@ -43,7 +45,9 @@ export class SocialSidebarComponent implements OnInit {
   public toggleStardust(): void {
     this.stardustEnabled = !this.stardustEnabled;
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(STARDUST_STORAGE_KEY, String(this.stardustEnabled));
+      try {
+        localStorage.setItem(STARDUST_STORAGE_KEY, String(this.stardustEnabled));
+      } catch {}
     }
     this.stardustToggle.emit(this.stardustEnabled);
   }
