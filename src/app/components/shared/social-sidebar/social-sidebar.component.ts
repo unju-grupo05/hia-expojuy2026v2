@@ -32,8 +32,10 @@ export class SocialSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     if (!isPlatformBrowser(this.platformId)) return;
-    const saved = localStorage.getItem(STARDUST_STORAGE_KEY);
-    this.stardustEnabled = saved !== 'false';
+    this.stardustEnabled = true;
+    try {
+      localStorage.setItem(STARDUST_STORAGE_KEY, 'true');
+    } catch {}
   }
 
   public toggleMenu(): void {
@@ -43,7 +45,9 @@ export class SocialSidebarComponent implements OnInit {
   public toggleStardust(): void {
     this.stardustEnabled = !this.stardustEnabled;
     if (isPlatformBrowser(this.platformId)) {
-      localStorage.setItem(STARDUST_STORAGE_KEY, String(this.stardustEnabled));
+      try {
+        localStorage.setItem(STARDUST_STORAGE_KEY, String(this.stardustEnabled));
+      } catch {}
     }
     this.stardustToggle.emit(this.stardustEnabled);
   }

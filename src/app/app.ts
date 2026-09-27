@@ -22,8 +22,10 @@ export class AppComponent {
     private router: Router
   ) {
     if (isPlatformBrowser(this.platformId)) {
-      const saved = localStorage.getItem(STARDUST_STORAGE_KEY);
-      this.stardustEnabled = saved !== 'false';
+      this.stardustEnabled = true;
+      try {
+        localStorage.setItem(STARDUST_STORAGE_KEY, 'true');
+      } catch {}
       this.isAdminRoute.set(window.location.pathname.startsWith('/admin'));
     }
 
