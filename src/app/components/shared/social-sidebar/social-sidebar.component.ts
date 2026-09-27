@@ -20,7 +20,6 @@ export class SocialSidebarComponent implements OnInit {
   @Output() stardustToggle = new EventEmitter<boolean>();
 
   public isOpen = false;
-  public panelOpen = false;
   public stardustEnabled = true;
 
   public socials: SocialLink[] = [
@@ -39,13 +38,6 @@ export class SocialSidebarComponent implements OnInit {
 
   public toggleMenu(): void {
     this.isOpen = !this.isOpen;
-    if (!this.isOpen) {
-      this.panelOpen = false;
-    }
-  }
-
-  public togglePanel(): void {
-    this.panelOpen = !this.panelOpen;
   }
 
   public toggleStardust(): void {
