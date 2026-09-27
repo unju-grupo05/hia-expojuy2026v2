@@ -50,10 +50,10 @@ type ModalStatus = 'form' | 'enviando' | 'exito' | 'error';
   styleUrl: './agenda.component.css'
 })
 export class AgendaComponent implements OnInit, OnDestroy {
-  agenda: AgendaEvento[] = [];
-  dias: AgendaDia[] = [];
-  cargando: boolean = true;
-  activeDay: number = 1;
+  readonly agenda = signal<AgendaEvento[]>([]);
+  readonly dias = signal<AgendaDia[]>([]);
+  readonly cargando = signal<boolean>(true);
+  readonly activeDay = signal<number>(1);
 
   selectedActivityId: number | null = null;
   selectedActivityTitle: string = '';
@@ -75,6 +75,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   @ViewChild('reminderEmailInput') reminderEmailInput?: ElementRef<HTMLInputElement>;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly hostRef = inject(ElementRef<HTMLElement>);
 
   /** Temporizadores pendientes, cancelados en ngOnDestroy. */
   private readonly pendingTimers = new Set<ReturnType<typeof setTimeout>>();
@@ -107,10 +108,17 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   selectDay(dayNum: number): void {
-    this.activeDay = dayNum;
-    // El resaltado del tab y la visibilidad del dia se resuelven en la
-    // plantilla con `[class.active-day]` / `[class.hidden]`: ya no hace falta
-    // recorrer `.day-tab` con classList ni buscar `#day-N`.
+    this.activeDay.set(dayNum);
+    if (isPlatformBrowser(this.platformId)) {
+      this.schedule(() => {
+        const activeContainer = this.hostRef.nativeElement.querySelector(`#day-${dayNum}`);
+        if (activeContainer) {
+          activeContainer.querySelectorAll('.reveal-on-scroll').forEach((el: Element) => {
+            el.classList.add('is-visible');
+          });
+        }
+      }, 0);
+    }
   }
 
   openReminderModal(actId: number, title: string, time: string): void {
@@ -172,25 +180,27 @@ export class AgendaComponent implements OnInit, OnDestroy {
   //***********************SERVICIOS*************************
 
   obtenerAgenda(): void {
-    this.cargando = true;
+    this.cargando.set(true);
     this.agendaService
       .getAgenda()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.agenda = res.data ?? [];
-          this.dias = this.agruparPorDia(this.agenda);
-          if (this.dias.length > 0) {
-            this.activeDay = this.dias[0].numero;
+          const raw = res.data ?? [];
+          this.agenda.set(raw);
+          const agrupados = this.agruparPorDia(raw);
+          this.dias.set(agrupados);
+          if (agrupados.length > 0) {
+            this.activeDay.set(agrupados[0].numero);
           }
-          this.cargando = false;
+          this.cargando.set(false);
 
           if (isPlatformBrowser(this.platformId)) {
-            this.schedule(() => this.activarScrollRevealLocal(), 100);
+            this.schedule(() => this.activarScrollRevealLocal(), 50);
           }
         },
         error: (err) => {
-          this.cargando = false;
+          this.cargando.set(false);
           console.error('Error al obtener agenda:', err);
         }
       });
@@ -227,31 +237,14 @@ export class AgendaComponent implements OnInit, OnDestroy {
   private activarScrollRevealLocal(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    // Se desconecta cualquier observer previo: esta funcion se re-invoca en
-    // cada carga de datos y sin esto los observers se acumulaban.
     this.desconectarRevealObserver();
 
-    const reveals = document.querySelectorAll('#agenda .reveal-on-scroll');
+    const reveals = this.hostRef.nativeElement.querySelectorAll('.reveal-on-scroll');
     if (!reveals.length) return;
 
-    if ('IntersectionObserver' in window) {
-      this.revealObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              this.revealObserver?.unobserve(entry.target);
-            }
-          });
-        },
-        { threshold: 0.05 }
-      );
-
-      reveals.forEach((el) => this.revealObserver!.observe(el));
-      this.observedRevealEls = Array.from(reveals);
-    } else {
-      reveals.forEach((el) => el.classList.add('is-visible'));
-    }
+    reveals.forEach((el: Element) => {
+      el.classList.add('is-visible');
+    });
   }
 
   private desconectarRevealObserver(): void {
