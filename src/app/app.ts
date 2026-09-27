@@ -23,7 +23,7 @@ export class AppComponent {
   ) {
     if (isPlatformBrowser(this.platformId)) {
       const saved = localStorage.getItem(STARDUST_STORAGE_KEY);
-      this.stardustEnabled = saved === null ? true : saved === 'true';
+      this.stardustEnabled = saved !== 'false';
       this.isAdminRoute.set(window.location.pathname.startsWith('/admin'));
     }
 
