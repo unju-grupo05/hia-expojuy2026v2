@@ -1,6 +1,6 @@
-<section class="w-full py-20 lg:py-28 bg-surface-container-low text-on-surface" id="agenda">
+<section class="w-full py-20 lg:py-28 bg-surface-container-low text-on-surface" id="agenda-section">
   <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="reveal-on-scroll max-w-2xl mb-10 space-y-2">
+    <div class="reveal-on-scroll is-visible max-w-2xl mb-10 space-y-2">
       <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
         <span class="material-symbols-outlined text-sm">calendar_month</span>
         Programa Oficial de Conferencias
@@ -9,7 +9,7 @@
       <p class="text-sm sm:text-base text-on-surface-variant">Selecciona cada día ferial para consultar ponencias, disertantes internacionales y salas asignadas.</p>
     </div>
 
-    @if (cargando) {
+    @if (cargando()) {
       <div class="flex items-center justify-start md:justify-center gap-2 overflow-x-auto pb-4 mb-8">
         @for (i of [1, 2, 3, 4]; track $index) {
           <div class="px-5 py-3 rounded-full bg-white/60 border border-slate-200 animate-pulse w-40"></div>
@@ -32,28 +32,28 @@
           </div>
         }
       </div>
-    } @else if (dias.length === 0) {
-      <div class="reveal-on-scroll p-12 rounded-3xl bg-white border border-primary/10 shadow-xs text-center">
+    } @else if (dias().length === 0) {
+      <div class="reveal-on-scroll is-visible p-12 rounded-3xl bg-white border border-primary/10 shadow-xs text-center">
         <span class="material-symbols-outlined text-5xl text-primary/30 mb-3">calendar_month</span>
         <h3 class="font-display text-lg font-bold text-brand-slate-dark">Sin actividades programadas</h3>
         <p class="text-sm text-on-surface-variant mt-1">La agenda oficial se publicará próximamente. Consultá más tarde.</p>
       </div>
     } @else {
-      <div class="reveal-on-scroll flex items-center justify-start md:justify-center gap-2 overflow-x-auto pb-4 mb-8">
-        @for (dia of dias; track dia.numero) {
+      <div class="reveal-on-scroll is-visible flex items-center justify-start md:justify-center gap-2 overflow-x-auto pb-4 mb-8">
+        @for (dia of dias(); track dia.numero) {
           <button
             class="day-tab px-5 py-3 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs whitespace-nowrap transition-all"
-            [class.active-day]="dia.numero === activeDay"
+            [class.active-day]="dia.numero === activeDay()"
             (click)="selectDay(dia.numero)">
             Día {{ dia.numero }} · {{ dia.fecha }}: {{ dia.resumen }}
           </button>
         }
       </div>
 
-      @for (dia of dias; track dia.numero) {
-        <div class="day-content space-y-4" id="day-{{ dia.numero }}" [class.hidden]="dia.numero !== activeDay">
+      @for (dia of dias(); track dia.numero) {
+        <div class="day-content space-y-4" id="day-{{ dia.numero }}" [class.hidden]="dia.numero !== activeDay()">
           @for (ev of dia.eventos; track ev.id; let i = $index) {
-            <div class="reveal-on-scroll p-6 rounded-2xl bg-white border border-primary/10 shadow-xs hover:shadow-md transition-all" [style.transition-delay]="(i % 3) * 100 + 'ms'">
+            <div class="reveal-on-scroll is-visible p-6 rounded-2xl bg-white border border-primary/10 shadow-xs hover:shadow-md transition-all" [style.transition-delay]="(i % 3) * 100 + 'ms'">
               <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-start gap-4">
                   <div class="px-4 py-2 rounded-xl bg-brand-lavender-surface text-primary font-display text-sm font-bold">
