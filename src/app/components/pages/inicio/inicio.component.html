@@ -3,11 +3,11 @@
   <div #splashNode id="splash-intro" class="fixed top-0 left-0 w-full h-screen z-[9999] flex flex-col items-center justify-center bg-[#0B0813] overflow-hidden pointer-events-auto">
     <div class="absolute w-[500px] h-[500px] bg-brand-cyan-electric/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <div class="relative z-10 flex flex-col items-center gap-6">
+    <div class="relative z-10 flex flex-col items-center gap-4">
       <img
         src="./img/expojuy26_isologotipo.png"
         alt="ExpoJuy 2026"
-        class="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-[0_0_35px_rgba(0,194,209,0.6)] transform scale-75 opacity-0"
+        class="w-20 h-20 sm:w-28 sm:h-28 object-contain drop-shadow-[0_0_25px_rgba(0,194,209,0.5)] transform scale-75 opacity-0"
         #splashLogo
         id="splash-logo"
       >
@@ -36,38 +36,6 @@
     <!-- Animated ambient glows -->
     <div class="absolute top-1/4 left-10 w-96 h-96 bg-brand-cyan-electric/20 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
     <div class="absolute bottom-10 right-10 w-[480px] h-[480px] bg-primary/25 rounded-full blur-3xl pointer-events-none"></div>
-
-    <!-- Parallax Interactive Floating Nodes Container -->
-    <div class="absolute inset-0 z-10 pointer-events-none overflow-hidden" id="hero-parallax-container">
-
-      <!-- Elevation & Coordinate Badge -->
-      <div class="parallax-elem absolute top-20 left-8 sm:left-16 hidden xl:flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/15 shadow-xl text-xs font-semibold text-white/95 transition-transform duration-100 ease-out" data-depth="0.04">
-        <span class="material-symbols-outlined text-brand-cyan-electric text-sm">terrain</span>
-        <span>23° 44' S, 65° 30' O · 1,259 msnm</span>
-      </div>
-
-      <!-- Live Node Badge -->
-      <a href="https://www.youtube.com/watch?v=Im3ggQgfRcY" target="_blank" rel="noopener noreferrer" class="parallax-elem pointer-events-auto z-50 absolute top-20 right-10 lg:right-24 hidden 2xl:flex items-center gap-2 px-4 py-2 rounded-full bg-primary/60 backdrop-blur-md border border-brand-cyan-electric/30 shadow-2xl text-xs font-bold text-white tracking-wide hover:opacity-90 transition-opacity cursor-pointer" data-depth="0.06">
-        <span class="w-2.5 h-2.5 rounded-full bg-brand-cyan-electric animate-ping"></span>
-        <span>MIRÁ LA EXPOJUY EN VIVO</span>
-      </a>
-
-      <!-- Micro stats badge (Hub Trinacional) -->
-      <div class="parallax-elem absolute bottom-8 left-8 hidden 2xl:flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 shadow-2xl transition-transform duration-100 ease-out" data-depth="0.03">
-        <span class="material-symbols-outlined text-brand-cyan-electric text-2xl">hub</span>
-        <div>
-          <div class="text-xs font-bold uppercase tracking-wider text-brand-cyan-electric">Hub Trinacional</div>
-          <div class="text-[11px] text-white/80">Argentina · Chile · Bolivia · Brasil</div>
-        </div>
-      </div>
-
-      <!-- SVG Topographic Contour Overlay -->
-      <svg class="parallax-elem absolute bottom-8 right-6 w-80 h-48 opacity-20 text-brand-cyan-electric hidden 2xl:block transition-transform duration-100 ease-out" data-depth="0.02" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 400 250">
-        <path d="M10,240 C90,180 180,220 250,160 C320,100 370,130 390,90"></path>
-        <path d="M10,210 C100,150 170,190 260,130 C330,80 370,110 390,60"></path>
-        <path d="M10,180 C80,120 190,160 270,100 C340,50 360,80 390,30"></path>
-      </svg>
-    </div>
 
     <!-- Hero Main Content -->
     <div class="relative z-20 max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -103,20 +71,20 @@
           </div>
 
           <!-- Key Indicators Ticker -->
-          <div class="hero-layer grid grid-cols-3 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 border-t border-white/15 count-up-trigger">
-            <div>
+          <div class="hero-layer grid grid-cols-2 sm:grid-cols-4 gap-y-6 gap-x-4 sm:gap-6 pt-6 border-t border-white/15 count-up-trigger">
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
               <div class="font-display text-2xl sm:text-3xl font-extrabold text-white"><span class="count-up" data-count="50" data-suffix="+">0</span></div>
               <div class="text-xs text-slate-300 font-medium">Expositores Globales</div>
             </div>
-            <div>
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
               <div class="font-display text-2xl sm:text-3xl font-extrabold text-brand-cyan-electric"><span class="count-up" data-count="15">0</span></div>
               <div class="text-xs text-slate-300 font-medium">conferencias centrales</div>
             </div>
-            <div>
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
               <div class="font-display text-2xl sm:text-3xl font-extrabold text-white"><span class="count-up" data-count="25" data-suffix="k m²">0</span></div>
               <div class="text-xs text-slate-300 font-medium">Superficie Ferial</div>
             </div>
-            <div class="hidden sm:block">
+            <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
               <div class="font-display text-2xl sm:text-3xl font-extrabold text-brand-lavender-soft">U$D <span class="count-up" data-count="120" data-suffix="M">0</span></div>
               <div class="text-xs text-slate-300 font-medium">Rondas de Negocios</div>
             </div>

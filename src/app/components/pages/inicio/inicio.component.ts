@@ -126,7 +126,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.initLenisSmoothScroll();
     this.initHeroParallax();
     this.revealHeroLayers();
-    this.initHeroCursorParallax();
     this.initScrollReveal();
     this.initCountdown();
     this.initTextEffects();
@@ -234,15 +233,15 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     timeline
       .to(logo, {
-        scale: 14,
+        scale: 6,
         opacity: 0,
-        filter: 'blur(20px)',
-        duration: 0.7,
+        filter: 'blur(16px)',
+        duration: 0.6,
         ease: 'expo.in'
       }, 'zoom')
       .to(splash, {
         opacity: 0,
-        duration: 0.5,
+        duration: 0.45,
         ease: 'power2.out'
       }, 'zoom+=0.1');
   }
@@ -403,50 +402,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.tweens.push(tween);
     if (tween.scrollTrigger) this.scrollTriggers.push(tween.scrollTrigger);
-  }
-
-  private initHeroCursorParallax(): void {
-    const hero = this.heroSection()?.nativeElement;
-    if (!hero) return;
-
-    const pNodes = Array.from(hero.querySelectorAll<HTMLElement>('.parallax-elem'));
-    if (!pNodes.length) return;
-
-    const onMouseMove = (e: MouseEvent) => {
-      const bounds = hero.getBoundingClientRect();
-      const mouseX = (e.clientX - bounds.left) / bounds.width - 0.5;
-      const mouseY = (e.clientY - bounds.top) / bounds.height - 0.5;
-
-      pNodes.forEach(node => {
-        const depth = parseFloat(node.dataset['depth'] || '0.04');
-        const transX = mouseX * depth * 240;
-        const transY = mouseY * depth * 240;
-        node.style.transform = `translate3d(${transX}px, ${transY}px, 0)`;
-      });
-    };
-
-    const onMouseLeave = () => {
-      pNodes.forEach(node => {
-        node.style.transform = 'translate3d(0, 0, 0)';
-        node.style.transition = 'transform 0.4s ease-out';
-      });
-    };
-
-    const onMouseEnter = () => {
-      pNodes.forEach(node => {
-        node.style.transition = 'none';
-      });
-    };
-
-    hero.addEventListener('mousemove', onMouseMove);
-    hero.addEventListener('mouseleave', onMouseLeave);
-    hero.addEventListener('mouseenter', onMouseEnter);
-
-    this.listenerCleanups.push(() => {
-      hero.removeEventListener('mousemove', onMouseMove);
-      hero.removeEventListener('mouseleave', onMouseLeave);
-      hero.removeEventListener('mouseenter', onMouseEnter);
-    });
   }
 
   // =========================================================================
