@@ -61,11 +61,8 @@ export class MediaService {
     if (cleanUrl.startsWith('uploads/')) {
       return `${ASSETS_BASE}/${cleanUrl}`;
     }
-    if (cleanUrl.startsWith('./img/')) {
-      return cleanUrl.replace(/^\.\//, '/');
-    }
-    if (cleanUrl.startsWith('img/')) {
-      return `/${cleanUrl}`;
+    if (/^\.?\/?[iI][mM][gG]\//.test(cleanUrl)) {
+      return cleanUrl.replace(/^\.?\/?[iI][mM][gG]\//, '/img/');
     }
     if (cleanUrl.startsWith('./')) {
       return cleanUrl.replace(/^\.\//, '/');
