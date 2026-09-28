@@ -1,11 +1,11 @@
-<section class="sponsors-marquee-section py-16 bg-[#0B0813] text-white overflow-hidden" id="sponsors-section">
+<section class="sponsors-marquee-section py-16 text-on-surface overflow-hidden" id="sponsors-section">
   
   <!-- Encabezado de la Sección -->
   <div class="text-center mb-10 px-4">
-    <p class="text-xs font-mono font-bold tracking-[0.35em] text-[#00C2D1] uppercase mb-2">
+    <p class="sponsors-eyebrow text-xs font-mono font-bold tracking-[0.35em] text-brand-cyan-accessible dark:text-[#00C2D1] uppercase mb-2">
       AUSPICIANTES & ALIANZAS ESTRATÉGICAS
     </p>
-    <h2 class="text-3xl md:text-5xl font-display font-extrabold uppercase tracking-tight text-white">
+    <h2 class="sponsors-title text-3xl md:text-5xl font-display font-extrabold uppercase tracking-tight text-brand-slate-dark dark:text-white">
       Empresas que conectan el mundo
     </h2>
   </div>
@@ -13,8 +13,8 @@
   <!-- Carrusel Infinito - Fila 1 (Se desplaza hacia la izquierda) -->
   <div class="marquee-wrapper relative flex overflow-hidden my-6">
     <!-- Degradados para suavizar los bordes lateralmente -->
-    <div class="pointer-events-none absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0B0813] to-transparent z-10"></div>
-    <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0B0813] to-transparent z-10"></div>
+    <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
+    <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
 
     <div class="marquee-track flex gap-8 items-center animate-marquee">
       <!-- Grupo 1 de Sponsors -->
@@ -37,8 +37,8 @@
 
   <!-- Carrusel Infinito - Fila 2 (Se desplaza en sentido inverso / derecha) -->
   <div class="marquee-wrapper relative flex overflow-hidden my-6">
-    <div class="pointer-events-none absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-[#0B0813] to-transparent z-10"></div>
-    <div class="pointer-events-none absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-[#0B0813] to-transparent z-10"></div>
+    <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
+    <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
 
     <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
       <!-- Grupo 2 de Sponsors -->
@@ -63,24 +63,24 @@
 
 <!-- MODAL INTERACTIVO DE SPONSOR -->
 <div *ngIf="isModalOpen" class="fixed inset-0 z-[9000] flex items-center justify-center p-4">
-  <div (click)="closeModal()" class="absolute inset-0 bg-black/80 backdrop-blur-md transition-opacity"></div>
+  <div (click)="closeModal()" class="sponsor-modal-backdrop absolute inset-0 transition-opacity"></div>
   
-  <div class="sponsor-modal-panel relative flex flex-col z-10 mx-auto max-w-lg w-full bg-[#0d0a1a] border border-zinc-800 rounded-2xl shadow-2xl p-6 sm:p-7 text-white">
+  <div class="sponsor-modal-panel relative flex flex-col z-10 mx-auto max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7">
     <button (click)="closeModal()" class="sponsor-modal-close" aria-label="Cerrar modal">
       <span class="material-symbols-outlined" style="font-size:1.1rem;">close</span>
     </button>
     
-    <div class="aspect-video w-full overflow-hidden rounded-xl bg-zinc-950 border border-white/10 mb-4 flex items-center justify-center p-2">
+    <div class="sponsor-modal-img-container aspect-video w-full overflow-hidden rounded-xl mb-4 flex items-center justify-center p-4">
       <img [src]="activeSponsor.img" [alt]="activeSponsor.name" class="w-full h-full object-contain" />
     </div>
 
     <div class="flex flex-col gap-2">
-      <p class="text-xs font-mono text-[#00C2D1] uppercase tracking-widest font-semibold">{{ activeSponsor.role }}</p>
-      <h2 class="text-2xl sm:text-3xl font-display font-extrabold text-white">{{ activeSponsor.name }}</h2>
-      <div class="mt-1 h-px w-14" style="background: linear-gradient(90deg, #00C2D1, #8b5cf6);"></div>
-      <p class="text-sm text-zinc-300 leading-relaxed mt-2.5">{{ activeSponsor.desc }}</p>
+      <p class="sponsor-modal-role text-xs font-mono uppercase tracking-widest font-semibold">{{ activeSponsor.role }}</p>
+      <h2 class="sponsor-modal-title text-2xl sm:text-3xl font-display font-extrabold">{{ activeSponsor.name }}</h2>
+      <div class="sponsor-modal-divider mt-1 h-px w-14"></div>
+      <p class="sponsor-modal-desc text-sm leading-relaxed mt-2.5">{{ activeSponsor.desc }}</p>
       <div class="pt-4 mt-2">
-        <a [href]="activeSponsor.website" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-white text-black font-display font-bold text-sm hover:bg-zinc-200 transition-colors shadow-lg">
+        <a [href]="activeSponsor.website" target="_blank" rel="noopener noreferrer" class="sponsor-modal-btn w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-display font-bold text-sm transition-colors shadow-md">
           <span>Visitar sitio web oficial</span>
           <span class="material-symbols-outlined text-base">arrow_outward</span>
         </a>

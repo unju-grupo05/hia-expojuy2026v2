@@ -3,7 +3,29 @@
 .sponsors-marquee-section {
   position: relative;
   width: 100%;
+  background: var(--ej-bg);
+  color: var(--ej-text);
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+html.dark .sponsors-marquee-section {
   background: #0B0813;
+}
+
+.sponsors-eyebrow {
+  color: var(--color-brand-cyan-accessible, #00838F);
+}
+
+html.dark .sponsors-eyebrow {
+  color: var(--ej-cyan);
+}
+
+.sponsors-title {
+  color: var(--ej-slate-dark);
+}
+
+html.dark .sponsors-title {
+  color: #ffffff;
 }
 
 .marquee-wrapper {
@@ -15,6 +37,23 @@
   display: flex;
   width: max-content;
   will-change: transform;
+}
+
+/* Degradados laterales para suavizar bordes */
+.sponsors-fade-left {
+  background: linear-gradient(to right, var(--ej-bg), transparent);
+}
+
+html.dark .sponsors-fade-left {
+  background: linear-gradient(to right, #0B0813, transparent);
+}
+
+.sponsors-fade-right {
+  background: linear-gradient(to left, var(--ej-bg), transparent);
+}
+
+html.dark .sponsors-fade-right {
+  background: linear-gradient(to left, #0B0813, transparent);
 }
 
 /* Animaciones CSS puras e infinitas */
@@ -58,27 +97,44 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--ej-surface);
+  border: 1px solid var(--ej-border);
   border-radius: 1rem;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(94, 58, 140, 0.04);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+html.dark .sponsor-logo-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
 .sponsor-logo-card:hover {
+  background: var(--ej-surface-low);
+  border-color: var(--ej-primary);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 10px 24px rgba(94, 58, 140, 0.12);
+}
+
+html.dark .sponsor-logo-card:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(0, 194, 209, 0.5);
-  transform: translateY(-4px) scale(1.03);
   box-shadow: 0 10px 25px rgba(0, 194, 209, 0.2);
 }
 
-/* Logos en blanco y negro por defecto -> color al hacer hover */
+/* Logos en escala de grises por defecto -> color e iluminación al hacer hover */
 .sponsor-logo-img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: grayscale(100%) opacity(0.6);
+  filter: grayscale(100%) opacity(0.7);
   transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+html.dark .sponsor-logo-img {
+  filter: grayscale(100%) opacity(0.6);
 }
 
 .sponsor-logo-card:hover .sponsor-logo-img {
@@ -86,13 +142,31 @@
   transform: scale(1.05);
 }
 
-/* Estilos del Modal */
+/* ============ ESTILOS DEL MODAL ============ */
+.sponsor-modal-backdrop {
+  background: rgba(15, 12, 25, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+html.dark .sponsor-modal-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+}
+
 .sponsor-modal-panel {
-  background: #0d0a1a;
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: var(--ej-surface);
+  border: 1px solid var(--ej-border);
   border-radius: 1.5rem;
-  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(0, 194, 209, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(94, 58, 140, 0.18), 0 0 0 1px rgba(94, 58, 140, 0.06);
+  color: var(--ej-text);
   animation: modalSpring 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+html.dark .sponsor-modal-panel {
+  background: #0d0a1a;
+  border-color: rgba(139, 92, 246, 0.35);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(0, 194, 209, 0.12);
+  color: #ffffff;
 }
 
 @keyframes modalSpring {
@@ -107,18 +181,88 @@
   width: 2.2rem;
   height: 2.2rem;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
+  background: var(--ej-surface-container);
+  border: 1px solid var(--ej-border);
+  color: var(--ej-text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.2s ease, color 0.2s ease;
   z-index: 10;
 }
 
 .sponsor-modal-close:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--ej-surface-high);
+  color: var(--ej-text);
   transform: scale(1.08);
+}
+
+html.dark .sponsor-modal-close {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+html.dark .sponsor-modal-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.sponsor-modal-img-container {
+  background: #ffffff;
+  border: 1px solid var(--ej-border);
+}
+
+html.dark .sponsor-modal-img-container {
+  background: #06050b;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.sponsor-modal-role {
+  color: var(--color-brand-cyan-accessible, #00838F);
+}
+
+html.dark .sponsor-modal-role {
+  color: var(--ej-cyan);
+}
+
+.sponsor-modal-title {
+  color: var(--ej-slate-dark);
+}
+
+html.dark .sponsor-modal-title {
+  color: #ffffff;
+}
+
+.sponsor-modal-divider {
+  background: linear-gradient(90deg, var(--ej-cyan), var(--ej-primary));
+}
+
+.sponsor-modal-desc {
+  color: var(--ej-text-muted);
+}
+
+html.dark .sponsor-modal-desc {
+  color: #d4d0e2;
+}
+
+.sponsor-modal-btn {
+  background: var(--ej-primary);
+  color: #ffffff;
+}
+
+.sponsor-modal-btn:hover {
+  background: var(--ej-primary-deep);
+  color: #ffffff;
+}
+
+html.dark .sponsor-modal-btn {
+  background: #ffffff;
+  color: #0b0813;
+}
+
+html.dark .sponsor-modal-btn:hover {
+  background: #e5e5ea;
+  color: #0b0813;
 }
