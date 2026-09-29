@@ -67,7 +67,7 @@
   
   <div class="sponsor-modal-panel relative flex flex-col z-10 mx-auto max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7">
     <button (click)="closeModal()" class="sponsor-modal-close" aria-label="Cerrar modal">
-      <span class="material-symbols-outlined" style="font-size:1.1rem;">close</span>
+      <svg class="ms-icon" style="font-size:1.1rem;" aria-hidden="true"><use href="#ms-close"/></svg>
     </button>
     
     <div class="sponsor-modal-img-container aspect-video w-full overflow-hidden rounded-xl mb-4 flex items-center justify-center p-4">
@@ -82,7 +82,7 @@
       <div class="pt-4 mt-2">
         <a [href]="activeSponsor.website" target="_blank" rel="noopener noreferrer" class="sponsor-modal-btn w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-display font-bold text-sm transition-colors shadow-md">
           <span>Visitar sitio web oficial</span>
-          <span class="material-symbols-outlined text-base">arrow_outward</span>
+          <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-arrow_outward"/></svg>
         </a>
       </div>
     </div>

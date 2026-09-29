@@ -1,6 +1,7 @@
 import { Component, effect, inject, input, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { IconHrefPipe } from '../../../shared/icon-href.pipe';
 
 export interface Pillar {
   id: number;
@@ -15,7 +16,7 @@ export type PillarFormData = Omit<Pillar, 'id'> & { id?: number };
 @Component({
   selector: 'app-pillar-form-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, IconHrefPipe],
   templateUrl: './pillar-form-modal.component.html'
 })
 export class PillarFormModalComponent {

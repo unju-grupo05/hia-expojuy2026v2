@@ -43,24 +43,22 @@
   <!-- Controles de Zoom y Pantalla Completa -->
   <div class="map-zoom-controls">
     <button class="map-zoom-control" (click)="zoomIn()" aria-label="Acercar" type="button">
-      <span class="material-symbols-outlined">add</span>
+      <svg class="ms-icon" aria-hidden="true"><use href="#ms-add"/></svg>
     </button>
     <button class="map-zoom-control" (click)="zoomOut()" aria-label="Alejar" type="button">
-      <span class="material-symbols-outlined">remove</span>
+      <svg class="ms-icon" aria-hidden="true"><use href="#ms-remove"/></svg>
     </button>
     <button 
       class="map-zoom-control btn-fs" 
       (click)="toggleFullscreen()" 
       [attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'" 
       type="button">
-      <span class="material-symbols-outlined">
-        {{ isFullscreen() ? 'fullscreen_exit' : 'fullscreen' }}
-      </span>
+      <svg class="ms-icon" aria-hidden="true"><use [attr.href]="'#ms-' + (isFullscreen() ? 'fullscreen_exit' : 'fullscreen')"/></svg>
     </button>
   </div>
 
   <div class="map-3d-tip">
-    <span class="material-symbols-outlined tip-icon">touch_app</span>
+    <svg class="ms-icon tip-icon" aria-hidden="true"><use href="#ms-touch_app"/></svg>
     <span>Toca un stand para inspeccionar · Arrastra para girar</span>
   </div>
 </div>

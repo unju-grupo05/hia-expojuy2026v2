@@ -22,8 +22,11 @@
   --color-on-surface-variant: #4a4550;
   --color-outline: #7b7481;
 
-  --font-display: "Plus Jakarta Sans", sans-serif;
-  --font-sans: "Inter", sans-serif;
+  /* System font stack: elimina 2 peticiones a Google Fonts y el FOUT/CLS por
+     intercambio de tipografia. `system-ui` resuelve a Segoe UI en Windows,
+     San Francisco en iOS/macOS y Roboto en Android. */
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --animate-marquee: marquee 35s linear infinite;
   --animate-kenburns: kenburns 22s ease-in-out infinite alternate;
@@ -103,6 +106,63 @@
         background-color: var(--ej-bg);
         color: var(--ej-text);
         transition: background-color 0.35s ease, color 0.35s ease;
+      }
+    }
+
+    /* =====================================================
+       ICONOS SVG
+       Los <i class="bx ..."> y los <span class="material-symbols-outlined">
+       se sustituyeron por <svg class="ms-icon"><use href="#ms-..."/></svg>.
+       El tamano se hereda de la fuente (1em) para que las utilidades
+       text-[18px] / text-2xl sigan mandando, igual que antes.
+       ===================================================== */
+    .ms-icon {
+      display: inline-block;
+      width: 1em;
+      height: 1em;
+      /* Alineacion optica: centra la caja del glifo sobre la linea base. */
+      vertical-align: -0.125em;
+      /* Evita que el icono estire un contenedor flex mas alla de su ancho. */
+      flex: none;
+      fill: currentColor;
+      /* Los <use> no son interactivos: no deben capturar el puntero. */
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Foco visible en todo control navegable por teclado. */
+    :where(a, button, [role="button"], input, select, textarea, [tabindex]):focus-visible {
+      outline: 2px solid var(--ej-cyan, #00c2d1);
+      outline-offset: 2px;
+      border-radius: 0.25rem;
+    }
+
+    /* =====================================================
+       OBJETIVOS TACTILES
+       Solo en punteros gruesos (movil/tablet): en raton, ampliar
+       los botones pequenos estorba y no aporta nada.
+       ===================================================== */
+    @media (pointer: coarse) {
+      /* Evita el doble toque para zoom y el halo azul de iOS: el sitio ya
+         controla su propio desplazamiento suave con Lenis. */
+      button,
+      a[href] {
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* area pulsable minima en los controles iconograficos de la barra lateral
+         flotante, que en movil miden 2.35rem (37.6px). El area visible no
+         cambia: solo se ensancha la zona que responde al toque. */
+      .social-sidebar__item::after,
+      .social-sidebar__fab::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 44px;
+        height: 44px;
+        transform: translate(-50%, -50%);
       }
     }
     ::-webkit-scrollbar { width: 6px; }

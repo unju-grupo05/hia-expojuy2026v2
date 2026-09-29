@@ -1,13 +1,22 @@
-<aside class="social-sidebar" [class.is-open]="isOpen" aria-label="Menú flotante de redes y efectos">
+<aside class="social-sidebar" [class.is-open]="isOpen()" aria-label="Menú flotante de redes y efectos">
   <button
     type="button"
     class="social-sidebar__fab"
-    [attr.aria-expanded]="isOpen"
-    [attr.aria-label]="isOpen ? 'Cerrar menú' : 'Abrir menú de redes y efectos'"
+    [attr.aria-expanded]="isOpen()"
+    [attr.aria-label]="isOpen() ? 'Cerrar menú' : 'Abrir menú de redes y efectos'"
     (click)="toggleMenu()"
+    (pointerdown)="onFabPressStart($event)"
+    (pointerup)="onFabPressEnd()"
+    (pointerleave)="onFabPressEnd()"
+    (pointercancel)="onFabPressEnd()"
   >
-    <span class="material-symbols-outlined">add</span>
+    <svg class="ms-icon" aria-hidden="true"><use href="#ms-add"/></svg>
   </button>
+
+  <!-- Ayuda: aparece sola una vez, y tras una pulsación larga en táctil. -->
+  <span class="social-sidebar__hint" role="tooltip" [class.is-visible]="showHint()">
+    Redes sociales y ajuste visual
+  </span>
 
   <button
     type="button"
@@ -34,6 +43,29 @@
     [attr.aria-label]="net.label"
     [title]="net.label"
   >
-    <i class="bx {{ net.icon }}"></i>
+    <svg class="ms-icon" aria-hidden="true"><use [attr.href]="'#bx-' + net.icon"/></svg>
   </a>
+
+  <!-- Invitación: aparece sola tras ~4,5 s y una única vez por sesión.
+       Va al final del <aside> a propósito: los :nth-child() que anima el
+       despliegue del menú cuentan la posición de los hijos. -->
+  <div
+    class="social-sidebar__bubble"
+    [class.is-visible]="showBubble()"
+    [attr.aria-hidden]="showBubble() ? null : 'true'"
+    role="status"
+  >
+    <p class="social-sidebar__bubble-text">
+      <span aria-hidden="true">✨</span>
+      ¡Personaliza tu vista y conéctate en nuestras redes sociales aquí!
+    </p>
+    <button
+      type="button"
+      class="social-sidebar__bubble-close"
+      aria-label="Cerrar mensaje"
+      (click)="dismissBubble()"
+    >
+      <svg class="ms-icon" aria-hidden="true"><use href="#ms-close"/></svg>
+    </button>
+  </div>
 </aside>

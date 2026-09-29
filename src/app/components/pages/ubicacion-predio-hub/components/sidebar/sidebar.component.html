@@ -7,7 +7,7 @@
         class="badge-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/25">
         <span>Sector Seleccionado</span>
       </div>
-      <span class="material-symbols-outlined text-sm">sensors</span>
+      <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-sensors"/></svg>
     </div>
 
 
@@ -19,8 +19,7 @@
         {{ item.rubro }} · {{ item.sectorName }}
       </p>
       <p class="sidebar-desc text-sm leading-relaxed pt-1">
-        {{ item.desc || 'Stand oficial de ' + item.area + ' ubicado en ' + item.sectorName + '. Equipado con suministro
-        eléctrico 220V/380V, iluminación LED y conexión Wi-Fi 6.' }}
+        {{ item.desc || 'Stand oficial de ' + item.area + ' ubicado en ' + item.sectorName + '. Equipado con suministro eléctrico 220V/380V, iluminación LED y conexión Wi-Fi 6.' }}
       </p>
     </div>
 
@@ -41,7 +40,7 @@
 
     <div class="pt-3 border-t border-slate-100 dark:border-[#2c2541]">
       <h4 class="section-title text-xs font-bold uppercase tracking-widest mb-2.5 flex items-center gap-1.5">
-        <span class="material-symbols-outlined text-sm">storefront</span>
+        <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-storefront"/></svg>
         <span>Expositores Destacados</span>
       </h4>
       <div *ngIf="featuredCompanies().length > 0; else sinExpositores" class="flex flex-wrap gap-1.5 expositores-list">

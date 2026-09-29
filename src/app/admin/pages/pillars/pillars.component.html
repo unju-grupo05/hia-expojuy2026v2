@@ -1,16 +1,14 @@
-<div class="space-y-6">
+﻿<div class="space-y-6">
 
   <!-- Toast de notificación -->
   @if (toastMessage()) {
     <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
-      <span class="material-symbols-outlined text-lg" [ngClass]="toastType() === 'error' ? 'text-rose-400' : 'text-emerald-400'">
-        {{ toastType() === 'error' ? 'error' : 'check_circle' }}
-      </span>
+      <svg class="ms-icon text-lg" [ngClass]="toastType() === 'error' ? 'text-rose-400' : 'text-emerald-400'" aria-hidden="true"><use [attr.href]="'#ms-' + (toastType() === 'error' ? 'error' : 'check_circle')"/></svg>
       <span>{{ toastMessage() }}</span>
     </div>
   }
 
-  <!-- Header & Botón Crear -->
+  <!-- Header & Boton Crear -->
   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
     <div>
       <h2 class="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
@@ -25,7 +23,7 @@
       type="button"
       (click)="openCreateModal()"
       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
-      <span class="material-symbols-outlined text-[18px]">add_circle</span>
+      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-add_circle"/></svg>
       <span>Nuevo Pilar</span>
     </button>
   </div>
@@ -33,16 +31,16 @@
   <!-- Barra de Filtros y Conmutador de Vista (Grid / Tabla) -->
   <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
     
-    <!-- Input de Búsqueda -->
+    <!-- Input de BÃºsqueda -->
     <div class="relative w-full sm:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <span class="material-symbols-outlined text-[18px]">search</span>
+        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-search"/></svg>
       </span>
       <input
         type="text"
         [ngModel]="searchTerm()"
         (ngModelChange)="searchTerm.set($event)"
-        placeholder="Buscar pilar por título o descripción..."
+        placeholder="Buscar pilar por titulo o descripción..."
         class="w-full pl-9 pr-4 py-2 text-xs sm:text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
       />
     </div>
@@ -58,7 +56,7 @@
           [ngClass]="viewMode() === 'grid'
             ? 'bg-white dark:bg-slate-700 text-primary dark:text-brand-cyan-electric shadow-xs'
             : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'">
-          <span class="material-symbols-outlined text-[18px]">grid_view</span>
+          <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-grid_view"/></svg>
           <span class="hidden md:inline">Cuadrícula</span>
         </button>
 
@@ -69,7 +67,7 @@
           [ngClass]="viewMode() === 'table'
             ? 'bg-white dark:bg-slate-700 text-primary dark:text-brand-cyan-electric shadow-xs'
             : 'text-slate-500 hover:text-slate-800 dark:hover:text-white'">
-          <span class="material-symbols-outlined text-[18px]">view_list</span>
+          <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-view_list"/></svg>
           <span class="hidden md:inline">Tabla</span>
         </button>
       </div>
@@ -99,7 +97,7 @@
             <div>
               <div class="flex items-center justify-between mb-5">
                 <div class="w-14 h-14 rounded-2xl bg-brand-lavender-surface dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-colors duration-300 shadow-xs">
-                  <span class="material-symbols-outlined text-3xl">{{ pillar.iconSvgName }}</span>
+                  <svg class="ms-icon text-3xl" aria-hidden="true"><use [attr.href]="(pillar.iconSvgName) | iconHref"/></svg>
                 </div>
 
                 <span class="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
@@ -126,7 +124,7 @@
                   (click)="openEditModal(pillar)"
                   class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                   title="Editar pilar">
-                  <span class="material-symbols-outlined text-[18px]">edit</span>
+                  <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-edit"/></svg>
                 </button>
 
                 <button
@@ -134,7 +132,7 @@
                   (click)="deletePillar(pillar.id)"
                   class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                   title="Eliminar pilar">
-                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                  <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-delete"/></svg>
                 </button>
               </div>
             </div>
@@ -142,7 +140,7 @@
           </div>
         } @empty {
           <div class="col-span-1 md:col-span-3 py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800">
-            <span class="material-symbols-outlined text-4xl text-slate-400 mb-2">interests</span>
+            <svg class="ms-icon text-4xl text-slate-400 mb-2" aria-hidden="true"><use href="#ms-interests"/></svg>
             <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se encontraron pilares estratégicos</p>
           </div>
         }
@@ -168,7 +166,7 @@
               <tr>
                 <td colspan="4" class="py-10 text-center text-slate-400">
                   <div class="flex items-center justify-center gap-2 animate-pulse">
-                    <span class="material-symbols-outlined animate-spin">progress_activity</span>
+                    <svg class="ms-icon animate-spin" aria-hidden="true"><use href="#ms-progress_activity"/></svg>
                     <span class="font-semibold">Cargando ejes...</span>
                   </div>
                 </td>
@@ -182,7 +180,7 @@
                   <td class="py-3.5 px-4 whitespace-nowrap">
                     <div class="flex items-center gap-2.5">
                       <span class="p-1.5 rounded-lg bg-brand-lavender-surface dark:bg-purple-950/60 text-primary dark:text-brand-cyan-electric">
-                        <span class="material-symbols-outlined text-[20px]">{{ pillar.iconSvgName }}</span>
+                        <svg class="ms-icon text-[20px]" aria-hidden="true"><use [attr.href]="(pillar.iconSvgName) | iconHref"/></svg>
                       </span>
                       <span class="font-bold text-slate-900 dark:text-white">{{ pillar.title }}</span>
                     </div>
@@ -196,13 +194,13 @@
                         type="button"
                         (click)="openEditModal(pillar)"
                         class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">edit</span>
+                        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-edit"/></svg>
                       </button>
                       <button
                         type="button"
                         (click)="deletePillar(pillar.id)"
                         class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
-                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-delete"/></svg>
                       </button>
                     </div>
                   </td>

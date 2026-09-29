@@ -4,7 +4,7 @@
         <div class="reveal-on-scroll flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div class="space-y-2">
             <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
-              <span class="material-symbols-outlined text-sm">storefront</span>
+              <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-storefront"/></svg>
               Catálogo de Empresas Confirmadas
             </div>
             <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Directorio de Expositores 2026</h2>
@@ -14,7 +14,7 @@
           <div class="w-full md:w-80">
             <div class="relative">
               <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="exhibitor-search" (input)="filterExhibitors($any($event.target).value)" placeholder="Buscar por empresa o rubro..." type="text">
-              <span class="material-symbols-outlined absolute left-3 top-2.5 text-outline text-lg">search</span>
+              <svg class="ms-icon absolute left-3 top-2.5 text-outline text-lg" aria-hidden="true"><use href="#ms-search"/></svg>
             </div>
           </div>
         </div>
@@ -63,7 +63,7 @@
                         [class.text-brand-slate-dark]="ex.category === 'agro' || ex.category === 'logistica'">
                     {{ ex.stand }}
                   </span>
-                  <span class="material-symbols-outlined text-outline">verified</span>
+                  <svg class="ms-icon text-outline" aria-hidden="true"><use href="#ms-verified"/></svg>
                 </div>
                 <h3 class="font-display text-lg font-bold text-brand-slate-dark">{{ ex.name }}</h3>
                 <p class="text-xs text-outline mt-1 font-semibold uppercase tracking-wider">{{ ex.subtitle }}</p>
@@ -75,13 +75,13 @@
                 <span class="font-semibold text-primary">Origen: {{ ex.origin }}</span>
                 <button type="button" class="b2b-link font-bold text-brand-cyan-accessible flex items-center gap-1 cursor-pointer" (click)="openB2BModal(ex)" [attr.aria-label]="'Agendar reunión B2B con ' + ex.name">
                   <span>Agendar B2B</span>
-                  <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                  <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
                 </button>
               </div>
             </div>
           } @empty {
             <div class="col-span-1 md:col-span-2 lg:col-span-3 py-16 flex flex-col items-center justify-center text-center">
-              <span class="material-symbols-outlined text-5xl text-outline/50 mb-3">storefront</span>
+              <svg class="ms-icon text-5xl text-outline/50 mb-3" aria-hidden="true"><use href="#ms-storefront"/></svg>
               <p class="text-sm sm:text-base font-semibold text-brand-slate-dark">
                 @if (loadingExhibitors()) {
                   Cargando expositores...
@@ -142,14 +142,14 @@
 
           @if (b2bModalState() === 'success') {
             <div class="flex flex-col items-center px-6 py-12 text-center" role="status">
-              <span class="material-symbols-outlined mb-4 text-5xl text-emerald-600">check_circle</span>
+              <svg class="ms-icon mb-4 text-5xl text-emerald-600" aria-hidden="true"><use href="#ms-check_circle"/></svg>
               <h3 class="font-display text-xl font-bold text-brand-slate-dark">Solicitud registrada</h3>
               <p class="mt-2 max-w-md text-sm text-on-surface-variant">{{ b2bSuccessMessage() }}</p>
               <button type="button" class="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-dark" (click)="closeB2BModal()">Cerrar</button>
             </div>
           } @else if (b2bModalState() === 'server-error') {
             <div class="flex flex-col items-center px-6 py-12 text-center" role="alert">
-              <span class="material-symbols-outlined mb-4 text-5xl text-red-600">error</span>
+              <svg class="ms-icon mb-4 text-5xl text-red-600" aria-hidden="true"><use href="#ms-error"/></svg>
               <h3 class="font-display text-xl font-bold text-brand-slate-dark">No pudimos registrar la solicitud</h3>
               <p class="mt-2 max-w-md text-sm text-on-surface-variant">{{ b2bErrorMessage() }}</p>
               <button type="button" class="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-bold text-white hover:bg-primary-dark" (click)="b2bModalState.set('open')">Volver al formulario</button>
@@ -157,7 +157,7 @@
           } @else {
             <form class="b2b-modal-form" [formGroup]="b2bForm" (ngSubmit)="submitB2BMeeting()" (wheel)="$event.stopPropagation()" (touchmove)="$event.stopPropagation()" novalidate>
               @if (b2bModalState() === 'validation-error') {
-                <div class="b2b-form-alert" role="alert"><span class="material-symbols-outlined text-base">warning</span>Revisa los campos marcados antes de enviar.</div>
+                <div class="b2b-form-alert" role="alert"><svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-warning"/></svg>Revisa los campos marcados antes de enviar.</div>
               }
               <div class="b2b-form-grid">
                 <label>Nombre completo *<input type="text" formControlName="nombreCliente" autocomplete="name" placeholder="Tu nombre" [class.b2b-invalid]="isFieldInvalid('nombreCliente')"></label>
@@ -193,7 +193,7 @@
               <div class="flex flex-col-reverse justify-end gap-3 border-t border-slate-100 pt-4 sm:flex-row">
                 <button type="button" class="b2b-secondary-button" (click)="closeB2BModal()" [disabled]="b2bModalState() === 'submitting'">Cancelar</button>
                 <button type="submit" class="b2b-primary-button" [disabled]="b2bModalState() === 'submitting'">
-                  @if (b2bModalState() === 'submitting') { <span class="b2b-spinner"></span> Enviando... } @else { <span class="material-symbols-outlined text-base">send</span> Enviar solicitud }
+                  @if (b2bModalState() === 'submitting') { <span class="b2b-spinner"></span> Enviando... } @else { <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-send"/></svg> Enviar solicitud }
                 </button>
               </div>
             </form>

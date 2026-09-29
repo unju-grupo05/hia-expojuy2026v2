@@ -5,11 +5,12 @@ import { filter } from 'rxjs/operators';
 import { PortalLayoutComponent } from './components/layout/portal-layout/portal-layout.component';
 import { StardustComponent } from './components/shared/stardust/stardust.component';
 import { SocialSidebarComponent, STARDUST_STORAGE_KEY } from './components/shared/social-sidebar/social-sidebar.component';
+import { SvgSpriteComponent } from './shared/components/svg-sprite/svg-sprite.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, PortalLayoutComponent, StardustComponent, SocialSidebarComponent],
+  imports: [RouterOutlet, PortalLayoutComponent, StardustComponent, SocialSidebarComponent, SvgSpriteComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

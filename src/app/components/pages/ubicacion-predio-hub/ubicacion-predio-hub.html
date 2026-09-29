@@ -5,7 +5,7 @@
     <header class="reveal-on-scroll is-visible flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div class="space-y-2">
         <div class="badge-pill-header inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
-          <span class="material-symbols-outlined text-sm">explore</span>
+          <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-explore"/></svg>
           NAVEGACIÓN Y ACCESOS EXPOJUY 2026
         </div>
         <h1 class="hub-h1 font-display text-3xl sm:text-4xl font-extrabold">
@@ -21,12 +21,12 @@
       <!-- TABS SWITCHER -->
       <div class="hub-tabs-box self-start md:self-auto">
         <button type="button" class="hub-tab-btn" [class.active]="activeTab() === '3d'" (click)="setTab('3d')">
-          <span class="material-symbols-outlined text-base">apartment</span>
+          <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-apartment"/></svg>
           <span>Predio Ferial (3D)</span>
         </button>
         <button type="button" class="hub-tab-btn" [class.active]="activeTab() === 'location'"
           (click)="setTab('location')">
-          <span class="material-symbols-outlined text-base">location_on</span>
+          <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-location_on"/></svg>
           <span>Mapa de Ubicación</span>
         </button>
       </div>
@@ -181,21 +181,21 @@
 
             <ul class="location-features-list features-list space-y-3 pt-2">
               <li class="feature-item flex items-start gap-3">
-                <span class="material-symbols-outlined feat-icon text-brand-cyan-accessible">directions_bus</span>
+                <svg class="ms-icon feat-icon text-brand-cyan-accessible" aria-hidden="true"><use href="#ms-directions_bus"/></svg>
                 <div class="feat-text">
                   <strong class="text-sm font-bold">Transporte Público</strong>
                   <span class="text-xs">Líneas urbanas con parada en Av. De Las Carrozas</span>
                 </div>
               </li>
               <li class="feature-item flex items-start gap-3">
-                <span class="material-symbols-outlined feat-icon text-primary">local_parking</span>
+                <svg class="ms-icon feat-icon text-primary" aria-hidden="true"><use href="#ms-local_parking"/></svg>
                 <div class="feat-text">
                   <strong class="text-sm font-bold">Estacionamiento</strong>
                   <span class="text-xs">Sector habilitado para vehículos</span>
                 </div>
               </li>
               <li class="feature-item flex items-start gap-3">
-                <span class="material-symbols-outlined feat-icon text-outline">calendar_month</span>
+                <svg class="ms-icon feat-icon text-outline" aria-hidden="true"><use href="#ms-calendar_month"/></svg>
                 <div class="feat-text">
                   <strong class="text-sm font-bold">Fechas Oficiales</strong>
                   <span class="text-xs">09 al 12 de octubre de 2026</span>
@@ -209,7 +209,7 @@
             <a [href]="googleMapsUrl" target="_blank" rel="noopener noreferrer"
               class="btn-gps-action btn-gps-hero w-full inline-flex items-center justify-between px-5 py-3 rounded-full text-xs font-bold tracking-wider uppercase transition-all shadow-sm">
               <span>ABRIR EN GOOGLE MAPS GPS</span>
-              <span class="material-symbols-outlined text-base">near_me</span>
+              <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-near_me"/></svg>
             </a>
           </div>
         </div>

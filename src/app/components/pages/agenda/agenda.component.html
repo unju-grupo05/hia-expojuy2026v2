@@ -2,7 +2,7 @@
   <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
     <div class="reveal-on-scroll is-visible max-w-2xl mb-10 space-y-2">
       <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
-        <span class="material-symbols-outlined text-sm">calendar_month</span>
+        <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-calendar_month"/></svg>
         Programa Oficial de Conferencias
       </div>
       <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Cronograma de Actividades</h2>
@@ -34,7 +34,7 @@
       </div>
     } @else if (dias().length === 0) {
       <div class="reveal-on-scroll is-visible p-12 rounded-3xl bg-white border border-primary/10 shadow-xs text-center">
-        <span class="material-symbols-outlined text-5xl text-primary/30 mb-3">calendar_month</span>
+        <svg class="ms-icon text-5xl text-primary/30 mb-3" aria-hidden="true"><use href="#ms-calendar_month"/></svg>
         <h3 class="font-display text-lg font-bold text-brand-slate-dark">Sin actividades programadas</h3>
         <p class="text-sm text-on-surface-variant mt-1">La agenda oficial se publicará próximamente. Consultá más tarde.</p>
       </div>
@@ -78,7 +78,7 @@
                   }
                   <button class="reminder-btn flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible text-xs font-bold border border-brand-cyan-electric/30 hover:bg-brand-cyan-electric/25 transition-all cursor-pointer"
                     (click)="openReminderModal(ev.id, ev.titulo, dia.fecha + ' · ' + ev.horaInicio + ' - ' + ev.horaFin)">
-                    <span class="material-symbols-outlined text-sm">notifications</span> Avisarme
+                    <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-notifications"/></svg> Avisarme
                   </button>
                 </div>
               </div>
@@ -98,12 +98,12 @@
   <div class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 bg-brand-slate-dark/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="reminder-modal-title" (click)="closeReminderModal()">
     <div class="modal-panel relative w-full max-w-md rounded-3xl bg-white dark:bg-[#17131f] border border-brand-cyan-electric/30 shadow-[0_20px_60px_rgba(0,194,209,0.25)] p-7 space-y-5" (click)="$event.stopPropagation()">
       <button class="absolute top-4 right-4 w-9 h-9 inline-flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant dark:text-[#c6bfd8] transition-colors cursor-pointer" (click)="closeReminderModal()" aria-label="Cerrar" type="button">
-        <span class="material-symbols-outlined text-lg">close</span>
+        <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
       </button>
 
       <div class="flex items-center gap-3">
         <div class="w-12 h-12 rounded-2xl bg-brand-cyan-electric/15 text-brand-cyan-accessible flex items-center justify-center shrink-0">
-          <span class="material-symbols-outlined text-2xl">notifications_active</span>
+          <svg class="ms-icon text-2xl" aria-hidden="true"><use href="#ms-notifications_active"/></svg>
         </div>
         <div>
           <span class="text-[10px] font-bold uppercase tracking-widest text-brand-cyan-accessible">Recordatorio de Agenda</span>
@@ -112,11 +112,11 @@
       </div>
       <div class="p-4 rounded-2xl bg-surface-container-low dark:bg-[#221c33] border border-primary/10 space-y-2">
         <div class="flex items-center gap-2 text-sm font-bold text-brand-slate-dark dark:text-[#ece7f7]">
-          <span class="material-symbols-outlined text-base text-primary">event</span>
+          <svg class="ms-icon text-base text-primary" aria-hidden="true"><use href="#ms-event"/></svg>
           <span>{{ selectedActivityTitle }}</span>
         </div>
         <div class="flex items-center gap-2 text-xs text-on-surface-variant dark:text-[#c6bfd8]">
-          <span class="material-symbols-outlined text-sm text-brand-cyan-accessible">schedule</span>
+          <svg class="ms-icon text-sm text-brand-cyan-accessible" aria-hidden="true"><use href="#ms-schedule"/></svg>
           <span>{{ selectedActivityTime }}</span>
         </div>
       </div>
@@ -124,7 +124,7 @@
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-outline mb-1" for="reminder-email">Tu Correo Electrónico</label>
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-3.5 top-3 text-outline text-lg">mail</span>
+            <svg class="ms-icon absolute left-3.5 top-3 text-outline text-lg" aria-hidden="true"><use href="#ms-mail"/></svg>
             <input #reminderEmailInput class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-[#221c33] border border-slate-200 dark:bg-[#2c2541] text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="reminder-email" name="email" [value]="reminderEmail()" (input)="updateReminderEmail($any($event.target).value)" placeholder="tucorreo@ejemplo.com" required type="email">
           </div>
         </div>
@@ -140,7 +140,7 @@
             <span>Enviando…</span>
           } @else {
             <span>Registrar Recordatorio</span>
-            <span class="material-symbols-outlined text-base">notifications</span>
+            <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-notifications"/></svg>
           }
         </button>
       </form>
@@ -148,7 +148,7 @@
       @if (modalStatus() === 'exito') {
         <div class="p-4 rounded-2xl bg-emerald-50 dark:bg-[#0c1f17] border border-emerald-200 dark:border-[#1c4233] text-emerald-800 dark:text-emerald-700 text-xs sm:text-sm font-medium">
           <div class="flex items-center gap-2 font-bold mb-1">
-            <span class="material-symbols-outlined text-base">check_circle</span>
+            <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-check_circle"/></svg>
             <span>¡Recordatorio Registrado!</span>
           </div>
           <p>{{ modalSuccessMessage() }}</p>

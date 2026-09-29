@@ -1,3 +1,6 @@
+<!-- Sprite de iconos: debe existir siempre en el DOM para que los <use> resuelvan. -->
+<app-svg-sprite />
+
 @if (!isAdminRoute()) {
   <app-stardust [active]="stardustEnabled" />
   <app-social-sidebar [stardustEnabled]="stardustEnabled" (stardustToggle)="onStardustToggle($event)" />

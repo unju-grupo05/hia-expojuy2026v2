@@ -33,7 +33,7 @@
           Publicaciones Totales
         </span>
         <div class="p-2.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 text-primary dark:text-brand-cyan-electric">
-          <span class="material-symbols-outlined text-[22px]">feed</span>
+          <svg class="ms-icon text-[22px]" aria-hidden="true"><use href="#ms-rss_feed"/></svg>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
       <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs">
         <a routerLink="/admin/posts" class="text-primary dark:text-brand-cyan-electric font-semibold hover:underline flex items-center gap-1">
           <span>Gestionar noticias</span>
-          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          <svg class="ms-icon text-[14px]" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
         </a>
       </div>
     </div>
@@ -66,7 +66,7 @@
           Imágenes en Servidor
         </span>
         <div class="p-2.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-brand-cyan-electric">
-          <span class="material-symbols-outlined text-[22px]">photo_library</span>
+          <svg class="ms-icon text-[22px]" aria-hidden="true"><use href="#ms-photo_library"/></svg>
         </div>
       </div>
 
@@ -87,7 +87,7 @@
       <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between text-xs">
         <a routerLink="/admin/media" class="text-primary dark:text-brand-cyan-electric font-semibold hover:underline flex items-center gap-1">
           <span>Ver biblioteca</span>
-          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+          <svg class="ms-icon text-[14px]" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
         </a>
       </div>
     </div>
@@ -99,7 +99,7 @@
           Consultas IA (Hoy)
         </span>
         <div class="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
-          <span class="material-symbols-outlined text-[22px]">smart_toy</span>
+          <svg class="ms-icon text-[22px]" aria-hidden="true"><use href="#ms-smart_toy"/></svg>
         </div>
       </div>
 
@@ -129,7 +129,7 @@
           Tokens IA Consumidos
         </span>
         <div class="p-2.5 rounded-xl bg-fuchsia-50 dark:bg-fuchsia-950/50 text-fuchsia-600 dark:text-fuchsia-400">
-          <span class="material-symbols-outlined text-[22px]">memory</span>
+          <svg class="ms-icon text-[22px]" aria-hidden="true"><use href="#ms-memory"/></svg>
         </div>
       </div>
 
@@ -182,7 +182,7 @@
           <div class="p-4 flex items-start gap-3.5 hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors">
             
             <div class="p-2 rounded-xl shrink-0 mt-0.5" [ngClass]="item.badgeClass">
-              <span class="material-symbols-outlined text-[20px]">{{ item.icon }}</span>
+              <svg class="ms-icon text-[20px]" aria-hidden="true"><use [attr.href]="(item.icon) | iconHref"/></svg>
             </div>
 
             <div class="flex-1 min-w-0">
@@ -246,20 +246,20 @@
             routerLink="/admin/posts"
             class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-primary/10 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
             <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-[18px] text-primary dark:text-brand-cyan-electric">post_add</span>
+              <svg class="ms-icon text-[18px] text-primary dark:text-brand-cyan-electric" aria-hidden="true"><use href="#ms-post_add"/></svg>
               <span>Redactar nueva noticia</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
+            <svg class="ms-icon text-[16px] text-slate-400" aria-hidden="true"><use href="#ms-chevron_right"/></svg>
           </a>
 
           <a
             routerLink="/admin/media"
             class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-primary/10 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
             <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-[18px] text-cyan-600 dark:text-brand-cyan-electric">cloud_upload</span>
+              <svg class="ms-icon text-[18px] text-cyan-600 dark:text-brand-cyan-electric" aria-hidden="true"><use href="#ms-cloud_upload"/></svg>
               <span>Subir fotografía al servidor</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-400">chevron_right</span>
+            <svg class="ms-icon text-[16px] text-slate-400" aria-hidden="true"><use href="#ms-chevron_right"/></svg>
           </a>
 
           <a
@@ -267,10 +267,10 @@
             target="_blank"
             class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-primary/10 dark:hover:bg-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:text-primary transition-colors">
             <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-[18px] text-emerald-600">visibility</span>
+              <svg class="ms-icon text-[18px] text-emerald-600" aria-hidden="true"><use href="#ms-visibility"/></svg>
               <span>Previsualizar landing pública</span>
             </div>
-            <span class="material-symbols-outlined text-[16px] text-slate-400">open_in_new</span>
+            <svg class="ms-icon text-[16px] text-slate-400" aria-hidden="true"><use href="#ms-open_in_new"/></svg>
           </a>
         </div>
       </div>

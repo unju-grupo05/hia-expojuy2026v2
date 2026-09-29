@@ -5,7 +5,7 @@
     <div class="reveal-on-scroll flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-8">
       <div class="max-w-2xl space-y-2">
         <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-cyan-electric">
-          <span class="material-symbols-outlined text-sm">newspaper</span>
+          <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-newspaper"/></svg>
           Prensa & Actualidad
         </div>
         <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Últimas Noticias & Comunicados</h2>
@@ -20,7 +20,7 @@
           aria-label="Página anterior"
           [disabled]="loadingNews() || slides().length <= 1"
           class="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-brand-cyan-electric dark:hover:bg-brand-cyan-electric hover:text-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center transition-all duration-300 shadow-xs active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
-          <span class="material-symbols-outlined text-xl">arrow_back</span>
+          <svg class="ms-icon text-xl" aria-hidden="true"><use href="#ms-arrow_back"/></svg>
         </button>
         <button
           type="button"
@@ -28,7 +28,7 @@
           aria-label="Página siguiente"
           [disabled]="loadingNews() || slides().length <= 1"
           class="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-800/80 hover:bg-brand-cyan-electric dark:hover:bg-brand-cyan-electric hover:text-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center transition-all duration-300 shadow-xs active:scale-95 disabled:opacity-40 disabled:pointer-events-none">
-          <span class="material-symbols-outlined text-xl">arrow_forward</span>
+          <svg class="ms-icon text-xl" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
         </button>
       </div>
     </div>
@@ -42,7 +42,7 @@
             @for (item of slide; track item.id; let idx = $index) {
               @if (idx === 0 && slide.length === pageSize) {
                 <!-- Hero: tarjeta grande con imagen de fondo (solo en páginas completas) -->
-                <article (click)="openNewsModal(item)" class="news-card bento-card cursor-pointer md:col-span-2 relative overflow-hidden min-h-[320px] bg-slate-900 rounded-3xl transition-all duration-300 hover:-translate-y-1" role="button">
+                <article (click)="openNewsModal(item)" (keydown)="onCardKeydown($event, item)" tabindex="0" class="news-card bento-card cursor-pointer md:col-span-2 relative overflow-hidden min-h-[320px] bg-slate-900 rounded-3xl transition-all duration-300 hover:-translate-y-1" role="button">
                   @if (item.img) {
                     <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
                   }
@@ -54,7 +54,7 @@
 
                   <div class="absolute bottom-0 inset-x-0 p-6 sm:p-8 z-10 space-y-2">
                     <div class="text-xs text-slate-300 flex items-center gap-1">
-                      <span class="material-symbols-outlined text-sm">calendar_today</span>
+                      <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-calendar_today"/></svg>
                       <span>{{ item.date }}</span>
                     </div>
                     <h3 class="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight line-clamp-3">{{ item.title }}</h3>
@@ -62,7 +62,7 @@
                 </article>
               } @else {
                 <!-- Tarjeta compacta con imagen superior -->
-                <article (click)="openNewsModal(item)" [class]="'news-card bento-card cursor-pointer bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-cyan-electric ' + layoutClass(slide, idx)" role="button">
+                <article (click)="openNewsModal(item)" (keydown)="onCardKeydown($event, item)" tabindex="0" [class]="'news-card bento-card cursor-pointer bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-cyan-electric ' + layoutClass(slide, idx)" role="button">
                   <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
                     @if (item.img) {
                       <img class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
@@ -71,7 +71,7 @@
                   </div>
                   <div class="p-5 space-y-2">
                     <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <span class="material-symbols-outlined text-sm">calendar_today</span>
+                      <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-calendar_today"/></svg>
                       <span>{{ item.date }}</span>
                     </div>
                     <h3 class="text-sm font-bold text-slate-900 dark:text-white line-clamp-2">{{ item.title }}</h3>
@@ -94,7 +94,7 @@
           </div>
         } @else if (slides().length === 0 && !newsError()) {
           <div class="w-full py-16 flex flex-col items-center justify-center text-center rounded-3xl bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10">
-            <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-3">newspaper</span>
+            <svg class="ms-icon text-5xl text-slate-300 dark:text-slate-600 mb-3" aria-hidden="true"><use href="#ms-newspaper"/></svg>
             <p class="text-sm sm:text-base font-semibold text-slate-700 dark:text-slate-300">Aún no se publicaron noticias.</p>
           </div>
         }
@@ -152,12 +152,12 @@
         <!-- Contenido -->
         <div class="relative p-6 sm:p-8 overflow-y-auto flex flex-col justify-between">
           <button (click)="closeNewsModal()" type="button" class="absolute top-4 right-4 w-9 h-9 inline-flex items-center justify-center rounded-full text-slate-500 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-            <span class="material-symbols-outlined text-lg">close</span>
+            <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
           </button>
 
           <div class="space-y-4">
             <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-cyan-electric">
-              <span class="material-symbols-outlined text-sm">calendar_today</span>
+              <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-calendar_today"/></svg>
               <span>{{ activeNews.date }}</span>
             </div>
 
@@ -175,12 +175,12 @@
           <!-- Botones de Acción -->
           <div class="flex flex-wrap gap-3 pt-6 mt-6 border-t border-slate-100 dark:border-white/10">
             <button (click)="shareNews()" type="button" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-brand-cyan-electric hover:bg-[#32e2f0] text-slate-900 font-display text-xs font-bold uppercase tracking-wider transition-all shadow-md active:scale-95 cursor-pointer">
-              <span class="material-symbols-outlined text-sm">share</span>
+              <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-share"/></svg>
               <span>Compartir publicación</span>
             </button>
 
             <button (click)="copyLink()" type="button" class="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-transparent border-2 border-slate-300 dark:border-white/20 text-slate-700 dark:text-slate-200 hover:border-brand-cyan-electric font-display text-xs font-bold uppercase tracking-wider transition-all active:scale-95 cursor-pointer">
-              <span class="material-symbols-outlined text-sm">{{ copySuccess ? 'check' : 'link' }}</span>
+              <svg class="ms-icon text-sm" aria-hidden="true"><use [attr.href]="'#ms-' + (copySuccess ? 'check' : 'link')"/></svg>
               <span>{{ copySuccess ? '¡Vínculo copiado!' : 'Copiar vínculo' }}</span>
             </button>
           </div>
