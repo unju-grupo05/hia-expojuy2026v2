@@ -5,9 +5,7 @@
     <div
       class="fixed bottom-6 right-6 z-[60] px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce"
       [ngClass]="toastError() ? 'bg-rose-600 text-white dark:bg-rose-600' : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'">
-      <span class="material-symbols-outlined text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'">
-        {{ toastError() ? 'error' : 'check_circle' }}
-      </span>
+      <svg class="ms-icon text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'" aria-hidden="true"><use [attr.href]="'#ms-' + (toastError() ? 'error' : 'check_circle')"/></svg>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -38,9 +36,7 @@
         (click)="fileInput.click()"
         [disabled]="uploading()"
         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 group disabled:opacity-60 disabled:cursor-not-allowed">
-        <span class="material-symbols-outlined text-[18px] transition-transform group-hover:-translate-y-0.5">
-          {{ uploading() ? 'hourglass_top' : 'cloud_upload' }}
-        </span>
+        <svg class="ms-icon text-[18px] transition-transform group-hover:-translate-y-0.5" aria-hidden="true"><use [attr.href]="'#ms-' + (uploading() ? 'hourglass_top' : 'cloud_upload')"/></svg>
         <span>{{ uploading() ? 'Subiendo...' : 'Subir Imagen' }}</span>
       </button>
     </div>
@@ -52,7 +48,7 @@
     <!-- Input de Búsqueda -->
     <div class="relative w-full sm:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <span class="material-symbols-outlined text-[18px]">search</span>
+        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-search"/></svg>
       </span>
       <input
         type="text"
@@ -64,7 +60,7 @@
     </div>
 
     <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 w-full sm:w-auto justify-end">
-      <span class="material-symbols-outlined text-[18px] text-primary dark:text-brand-cyan-electric">photo_library</span>
+      <svg class="ms-icon text-[18px] text-primary dark:text-brand-cyan-electric" aria-hidden="true"><use href="#ms-photo_library"/></svg>
       <span>{{ filteredImages().length }} imágenes disponibles</span>
     </div>
 
@@ -86,7 +82,7 @@
   } @else if (loadError()) {
     <!-- Estado: Error -->
     <div class="col-span-full py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-rose-200/80 dark:border-rose-900/50 flex flex-col items-center gap-3">
-      <span class="material-symbols-outlined text-5xl text-rose-400">cloud_off</span>
+      <svg class="ms-icon text-5xl text-rose-400" aria-hidden="true"><use href="#ms-cloud_off"/></svg>
       <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
         No se pudieron cargar las imágenes.
       </p>
@@ -141,9 +137,7 @@
                 [ngClass]="copiedId() === image.id
                   ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary dark:hover:bg-slate-700'">
-                <span class="material-symbols-outlined text-[15px]">
-                  {{ copiedId() === image.id ? 'check' : 'content_copy' }}
-                </span>
+                <svg class="ms-icon text-[15px]" aria-hidden="true"><use [attr.href]="'#ms-' + (copiedId() === image.id ? 'check' : 'content_copy')"/></svg>
                 <span>{{ copiedId() === image.id ? '¡Copiado!' : 'Copiar URL' }}</span>
               </button>
 
@@ -153,7 +147,7 @@
                 (click)="openEdit(image)"
                 class="p-1.5 rounded-lg text-slate-400 hover:text-primary hover:bg-primary/10 transition-colors"
                 title="Editar imagen">
-                <span class="material-symbols-outlined text-[17px]">edit</span>
+                <svg class="ms-icon text-[17px]" aria-hidden="true"><use href="#ms-edit"/></svg>
               </button>
 
               <!-- Eliminar -->
@@ -162,7 +156,7 @@
                 (click)="deleteImage(image.id)"
                 class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                 title="Eliminar imagen">
-                <span class="material-symbols-outlined text-[17px]">delete</span>
+                <svg class="ms-icon text-[17px]" aria-hidden="true"><use href="#ms-delete"/></svg>
               </button>
 
             </div>
@@ -171,9 +165,7 @@
         </div>
       } @empty {
         <div class="col-span-2 md:col-span-4 py-16 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
-          <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-2">
-            image_not_supported
-          </span>
+          <svg class="ms-icon text-5xl text-slate-300 dark:text-slate-600 mb-2" aria-hidden="true"><use href="#ms-hide_image"/></svg>
           <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
             No se encontraron imágenes
           </p>
@@ -198,7 +190,7 @@
             type="button"
             (click)="cancelEdit()"
             class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-            <span class="material-symbols-outlined text-lg">close</span>
+            <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
           </button>
         </div>
 
@@ -265,7 +257,7 @@
             (click)="saveEdit()"
             [disabled]="saving()"
             class="px-5 py-2 rounded-lg text-xs font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25 disabled:opacity-60 disabled:cursor-not-allowed inline-flex items-center gap-2">
-            <span class="material-symbols-outlined text-[16px]">{{ saving() ? 'hourglass_top' : 'save' }}</span>
+            <svg class="ms-icon text-[16px]" aria-hidden="true"><use [attr.href]="'#ms-' + (saving() ? 'hourglass_top' : 'save')"/></svg>
             <span>{{ saving() ? 'Guardando...' : 'Guardar cambios' }}</span>
           </button>
         </div>

@@ -4,11 +4,6 @@ import { NoticiasService } from '../../../services/noticias.service';
 import { MediaService } from '../../../services/media.service';
 import { NoticiaDTO } from '../../../models/noticia.model';
 
-/**
- * View model de la grilla publica. Se deriva de `NoticiaDTO` (contrato de la
- * API): la imagen pasa por `MediaService`, la fecha se formatea y el cuerpo
- * se parte en parrafos para el modal.
- */
 interface NewsItem {
   id: string;
   img: string;
@@ -26,10 +21,6 @@ interface NewsItem {
   styleUrls: ['./publicaciones.component.css']
 })
 export class NovedadesComponent implements OnInit {
-  // La noticia destacada ocupa 2 columnas (2 celdas) y cada tarjeta secundaria 1.
-  // En una grilla de 3 columnas, una página "perfecta" = 2 celdas (héroe) + 4 celdas (secundarias)
-  // = 6 celdas = 2 filas completas. Por lo tanto 1 destacada + 4 secundarias = 5 tarjetas por página
-  // (1 + 5 = 6 tarjetas dejaría 5 secundarias = 7 celdas → fila final incompleta).
   public readonly pageSize = 5;
 
   readonly news = signal<NewsItem[]>([]);
@@ -96,15 +87,11 @@ export class NovedadesComponent implements OnInit {
     this.slides.set(chunks.length > 0 ? chunks : []);
   }
 
-  // Distribuye los espaciados de la grilla (md: 2 columnas, lg: 3 columnas) para que
-  // ninguna fila quede incompleta, incluida la última página parcial.
+  // Distribuye los espaciados de la grilla (md: 2 columnas, lg: 3 columnas) para que ninguna fila quede incompleta, incluida la última página parcial.
   public layoutClass(slide: NewsItem[], idx: number): string {
     if (slide.length === this.pageSize) {
-      // Página completa: el primer elemento es la tarjeta destacada (héroe).
       return idx === 0 ? 'md:col-span-2' : '';
     }
-    // Última página parcial: todas las tarjetas van compactas y la última
-    // estira sus columnas hasta completar la fila restante.
     const last = idx === slide.length - 1;
     if (slide.length === 1) return 'md:col-span-2 lg:col-span-3';
     if (slide.length === 2) return last ? 'lg:col-span-2' : '';
@@ -139,6 +126,14 @@ export class NovedadesComponent implements OnInit {
     this.activeNews = item;
     this.isModalOpen = true;
     document.body.style.overflow = 'hidden';
+  }
+
+  // La tarjeta es un <article role="button">: necesita equivalencia de teclado. 
+  onCardKeydown(event: KeyboardEvent, item: NewsItem): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    // Space desplaza la pagina; en un control activable debe PreventDefault.
+    event.preventDefault();
+    this.openNewsModal(item);
   }
 
   closeNewsModal(): void {

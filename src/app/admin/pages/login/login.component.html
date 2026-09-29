@@ -10,7 +10,7 @@
     <!-- Top Brand Header -->
     <div class="flex flex-col items-center text-center mb-8">
       <div class="p-3 bg-purple-50 dark:bg-purple-950/40 rounded-2xl border border-primary/10 dark:border-primary/20 mb-4 shadow-xs">
-        <img
+        <img width="1510" height="1509"
           src="./img/expojuy26_isologotipo.png"
           alt="ExpoJuy 2026 Logo"
           class="h-14 w-auto drop-shadow-md"
@@ -31,7 +31,7 @@
     <!-- Error Alert Banner -->
     @if (errorMessage()) {
       <div class="mb-5 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 flex items-start gap-2.5 text-rose-700 dark:text-rose-300 text-xs">
-        <span class="material-symbols-outlined text-lg shrink-0 mt-0.5">error</span>
+        <svg class="ms-icon text-lg shrink-0 mt-0.5" aria-hidden="true"><use href="#ms-error"/></svg>
         <div class="flex-1">
           <p class="font-semibold">{{ errorMessage() }}</p>
         </div>
@@ -48,7 +48,7 @@
         </label>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <span class="material-symbols-outlined text-[20px]">mail</span>
+            <svg class="ms-icon text-[20px]" aria-hidden="true"><use href="#ms-mail"/></svg>
           </span>
           <input
             id="admin-email"
@@ -76,7 +76,7 @@
         </div>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-            <span class="material-symbols-outlined text-[20px]">lock</span>
+            <svg class="ms-icon text-[20px]" aria-hidden="true"><use href="#ms-lock"/></svg>
           </span>
           <input
             id="admin-password"
@@ -91,9 +91,7 @@
             type="button"
             (click)="togglePasswordVisibility()"
             class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-            <span class="material-symbols-outlined text-[20px]">
-              {{ showPassword() ? 'visibility_off' : 'visibility' }}
-            </span>
+            <svg class="ms-icon text-[20px]" aria-hidden="true"><use [attr.href]="'#ms-' + (showPassword() ? 'visibility_off' : 'visibility')"/></svg>
           </button>
         </div>
         @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
@@ -118,7 +116,7 @@
             <span>Verificando acceso...</span>
           } @else {
             <span>Ingresar al Sistema</span>
-            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
           }
         </button>
       </div>
@@ -129,7 +127,7 @@
       <a
         routerLink="/"
         class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-brand-cyan-electric transition-colors">
-        <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+        <svg class="ms-icon text-[16px]" aria-hidden="true"><use href="#ms-arrow_back"/></svg>
         <span>Volver a la landing pública de ExpoJuy</span>
       </a>
     </div>

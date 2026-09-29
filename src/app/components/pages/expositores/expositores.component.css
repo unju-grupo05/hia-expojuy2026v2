@@ -21,10 +21,10 @@
     .b2b-link:hover > span:first-child::after {
       transform: scaleX(1);
     }
-    .b2b-link .material-symbols-outlined {
+    .b2b-link .ms-icon {
       transition: transform 0.25s ease;
     }
-    .b2b-link:hover .material-symbols-outlined {
+    .b2b-link:hover .ms-icon {
       transform: translateX(4px);
     }
 

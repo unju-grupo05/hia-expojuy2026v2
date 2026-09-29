@@ -1,9 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { UiChromeService } from '../../../core/ui-chrome.service';
+import { IconHrefPipe } from '../../../shared/icon-href.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
+  imports: [IconHrefPipe],
   templateUrl: './header.component.html',
 })
 export class HeaderComponent {

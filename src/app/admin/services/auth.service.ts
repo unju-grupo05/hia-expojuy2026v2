@@ -103,7 +103,7 @@ export class AuthService {
     return this.http.post<AuthLoginResponse>(this.loginUrl, body, httpOptions).pipe(
       map((res) => {
         if (!res?.token) {
-          throw new Error('Respuesta invǭlida del servidor.');
+          throw new Error('Respuesta inválida del servidor.');
         }
 
         const claims: AuthUsuarioClaims = res.usuario;
@@ -113,7 +113,6 @@ export class AuthService {
           email: emailTrimmed || '',
           name: [claims?.nombre, claims?.apellido].filter(Boolean).join(' ') || 'Administrador ExpoJuy',
           role: claims?.rol || 'admin',
-          // Sin avatar por defecto: s��lo se usa si el backend lo env��a.
           avatar: claims?.avatar ?? undefined
         };
 
@@ -154,11 +153,6 @@ export class AuthService {
     return readAuthToken();
   }
 
-  /**
-   * Indica si hay una sesión vigente: el token existe y su claim `exp` no venció.
-   * Si está vencido, limpia los restos de sesión para no dejar credenciales muertas.
-   * Es la comprobación que deben usar los guards de ruta.
-   */
   public hasValidSession(): boolean {
     if (!this.isBrowser) return false;
 

@@ -6,9 +6,7 @@
          [ngClass]="toastError()
            ? 'bg-rose-600 text-white'
            : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'">
-      <span class="material-symbols-outlined text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'">
-        {{ toastError() ? 'error' : 'check_circle' }}
-      </span>
+      <svg class="ms-icon text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'" aria-hidden="true"><use [attr.href]="'#ms-' + (toastError() ? 'error' : 'check_circle')"/></svg>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -29,7 +27,7 @@
       type="button"
       (click)="openCreateModal()"
       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
-      <span class="material-symbols-outlined text-[18px]">add</span>
+      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-add"/></svg>
       <span>Nueva Publicación</span>
     </button>
   </div>
@@ -40,7 +38,7 @@
     <!-- Input de Búsqueda -->
     <div class="relative w-full md:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <span class="material-symbols-outlined text-[18px]">search</span>
+        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-search"/></svg>
       </span>
       <input
         type="text"
@@ -94,7 +92,7 @@
     </div>
   } @else if (loadError()) {
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900 shadow-xs p-16 flex flex-col items-center justify-center gap-3">
-      <span class="material-symbols-outlined text-4xl text-rose-400">cloud_off</span>
+      <svg class="ms-icon text-4xl text-rose-400" aria-hidden="true"><use href="#ms-cloud_off"/></svg>
       <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se pudieron cargar las publicaciones.</p>
       <button
         type="button"
@@ -155,12 +153,12 @@
               <td class="py-3.5 px-4 whitespace-nowrap">
                 @if (post.displaySize === 'large') {
                   <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-primary dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
-                    <span class="material-symbols-outlined text-[14px]">featured_play_list</span>
+                    <svg class="ms-icon text-[14px]" aria-hidden="true"><use href="#ms-featured_play_list"/></svg>
                     <span>Destacada (Large)</span>
                   </span>
                 } @else {
                   <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                    <span class="material-symbols-outlined text-[14px]">view_agenda</span>
+                    <svg class="ms-icon text-[14px]" aria-hidden="true"><use href="#ms-view_agenda"/></svg>
                     <span>Estándar (Small)</span>
                   </span>
                 }
@@ -196,7 +194,7 @@
                     (click)="openPreview(post)"
                     class="p-1.5 rounded-lg text-slate-500 hover:text-brand-cyan-accessible dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     title="Previsualizar en modo landing">
-                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-visibility"/></svg>
                   </button>
 
                   <!-- Editar -->
@@ -205,7 +203,7 @@
                     (click)="openEditModal(post)"
                     class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     title="Editar publicación">
-                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                    <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-edit"/></svg>
                   </button>
 
                   <!-- Eliminar -->
@@ -214,7 +212,7 @@
                     (click)="deletePost(post.id)"
                     class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                     title="Eliminar publicación">
-                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                    <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-delete"/></svg>
                   </button>
                 </div>
               </td>
@@ -224,9 +222,7 @@
             <tr>
               <td colspan="5" class="py-12 px-4 text-center">
                 <div class="max-w-sm mx-auto flex flex-col items-center">
-                  <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">
-                    article
-                  </span>
+                  <svg class="ms-icon text-4xl text-slate-300 dark:text-slate-600 mb-2" aria-hidden="true"><use href="#ms-article"/></svg>
                   <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
                     No se encontraron publicaciones
                   </p>
@@ -267,13 +263,13 @@
           
           <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-brand-cyan-electric">visibility</span>
+              <svg class="ms-icon text-brand-cyan-electric" aria-hidden="true"><use href="#ms-visibility"/></svg>
               <h3 class="text-base font-bold text-slate-900 dark:text-white">
                 Previsualización en la Landing Pública
               </h3>
             </div>
             <button type="button" (click)="closePreview()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-              <span class="material-symbols-outlined text-lg">close</span>
+              <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
             </button>
           </div>
 

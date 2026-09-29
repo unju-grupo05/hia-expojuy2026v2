@@ -4,11 +4,12 @@ import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { EjesService } from '../../../services/ejes.service';
 import { Eje } from '../../../models/eje.model';
+import { IconHrefPipe } from '../../../shared/icon-href.pipe';
 
 @Component({
   selector: 'app-ejes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconHrefPipe],
   templateUrl: './ejes.component.html',
   styleUrl: './ejes.component.css'
 })

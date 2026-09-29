@@ -87,7 +87,7 @@
   color: #0f172a;
 }
 
-.section-title .material-symbols-outlined {
+.section-title .ms-icon {
   color: var(--ej-primary, #5E3A8C);
 }
 
@@ -97,9 +97,9 @@
   color: #ffffff;
 }
 
-:host-context(.dark) .section-title .material-symbols-outlined,
-:host-context(html.dark) .section-title .material-symbols-outlined,
-.dark .section-title .material-symbols-outlined {
+:host-context(.dark) .section-title .ms-icon,
+:host-context(html.dark) .section-title .ms-icon,
+.dark .section-title .ms-icon {
   color: #bda3e2;
 }
 
@@ -181,9 +181,9 @@
 .b2b-link:hover > span:first-child::after {
   transform: scaleX(1);
 }
-.b2b-link .material-symbols-outlined {
+.b2b-link .ms-icon {
   transition: transform 0.25s ease;
 }
-.b2b-link:hover .material-symbols-outlined {
+.b2b-link:hover .ms-icon {
   transform: translateX(4px);
 }

@@ -3,9 +3,7 @@
   <!-- Toast de notificación -->
   @if (toastMessage()) {
     <div class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-xs font-semibold animate-bounce">
-      <span class="material-symbols-outlined text-lg" [ngClass]="toastType() === 'error' ? 'text-rose-400' : 'text-emerald-400'">
-        {{ toastType() === 'error' ? 'error' : 'check_circle' }}
-      </span>
+      <svg class="ms-icon text-lg" [ngClass]="toastType() === 'error' ? 'text-rose-400' : 'text-emerald-400'" aria-hidden="true"><use [attr.href]="'#ms-' + (toastType() === 'error' ? 'error' : 'check_circle')"/></svg>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -25,7 +23,7 @@
       type="button"
       (click)="openCreateModal()"
       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
-      <span class="material-symbols-outlined text-[18px]">add_circle</span>
+      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-add_circle"/></svg>
       <span>Nueva Actividad</span>
     </button>
   </div>
@@ -36,7 +34,7 @@
     <!-- Input de Búsqueda -->
     <div class="relative w-full md:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <span class="material-symbols-outlined text-[18px]">search</span>
+        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-search"/></svg>
       </span>
       <input
         type="text"
@@ -122,7 +120,7 @@
             <tr>
               <td colspan="5" class="py-10 text-center text-slate-400">
                 <div class="flex items-center justify-center gap-2 animate-pulse">
-                  <span class="material-symbols-outlined animate-spin">progress_activity</span>
+                  <svg class="ms-icon animate-spin" aria-hidden="true"><use href="#ms-progress_activity"/></svg>
                   <span class="font-semibold">Cargando agenda...</span>
                 </div>
               </td>
@@ -172,7 +170,7 @@
                 <!-- Escenario -->
                 <td class="py-3.5 px-4 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300 font-medium">
                   <span class="inline-flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[16px] text-primary dark:text-brand-cyan-electric">location_on</span>
+                    <svg class="ms-icon text-[16px] text-primary dark:text-brand-cyan-electric" aria-hidden="true"><use href="#ms-location_on"/></svg>
                     <span>{{ event.lugar }}</span>
                   </span>
                 </td>
@@ -194,7 +192,7 @@
                       (click)="openPreview(event)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-brand-cyan-accessible dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       title="Previsualizar formato de agenda">
-                      <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-visibility"/></svg>
                     </button>
 
                     <!-- Editar -->
@@ -203,7 +201,7 @@
                       (click)="openEditModal(event)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       title="Editar actividad">
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-edit"/></svg>
                     </button>
 
                     <!-- Eliminar -->
@@ -212,7 +210,7 @@
                       (click)="deleteEvent(event.id)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                       title="Eliminar actividad">
-                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-delete"/></svg>
                     </button>
                   </div>
                 </td>
@@ -222,9 +220,7 @@
               <tr>
                 <td colspan="5" class="py-12 px-4 text-center">
                   <div class="max-w-sm mx-auto flex flex-col items-center">
-                    <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">
-                      event_busy
-                    </span>
+                    <svg class="ms-icon text-4xl text-slate-300 dark:text-slate-600 mb-2" aria-hidden="true"><use href="#ms-event_busy"/></svg>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       No hay actividades registradas para este filtro
                     </p>
@@ -264,13 +260,13 @@
 
           <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-5">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-brand-cyan-electric">visibility</span>
+              <svg class="ms-icon text-brand-cyan-electric" aria-hidden="true"><use href="#ms-visibility"/></svg>
               <h3 class="text-sm font-bold text-slate-900 dark:text-white">
                 Previsualización en la Agenda Pública
               </h3>
             </div>
             <button type="button" (click)="closePreview()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-              <span class="material-symbols-outlined text-lg">close</span>
+              <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
             </button>
           </div>
 
@@ -310,7 +306,7 @@
                   {{ ev.diaSemana }}
                 </span>
                 <button type="button" class="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric text-xs font-bold border border-brand-cyan-electric/30">
-                  <span class="material-symbols-outlined text-sm">notifications</span> Avisarme
+                  <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-notifications"/></svg> Avisarme
                 </button>
               </div>
             </div>

@@ -6,9 +6,7 @@
          [ngClass]="toastError()
            ? 'bg-rose-600 text-white'
            : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'">
-      <span class="material-symbols-outlined text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'">
-        {{ toastError() ? 'error' : 'check_circle' }}
-      </span>
+      <svg class="ms-icon text-lg" [ngClass]="toastError() ? 'text-white' : 'text-emerald-400'" aria-hidden="true"><use [attr.href]="'#ms-' + (toastError() ? 'error' : 'check_circle')"/></svg>
       <span>{{ toastMessage() }}</span>
     </div>
   }
@@ -28,7 +26,7 @@
       type="button"
       (click)="openCreateModal()"
       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-primary hover:bg-primary-dark transition-all shadow-md shadow-primary/25">
-      <span class="material-symbols-outlined text-[18px]">add_business</span>
+      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-add_business"/></svg>
       <span>Nuevo Expositor</span>
     </button>
   </div>
@@ -39,7 +37,7 @@
     <!-- Input de Búsqueda -->
     <div class="relative w-full md:w-80">
       <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-        <span class="material-symbols-outlined text-[18px]">search</span>
+        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-search"/></svg>
       </span>
       <input
         type="text"
@@ -85,7 +83,7 @@
     </div>
   } @else if (loadError()) {
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-rose-200 dark:border-rose-900 shadow-xs p-16 flex flex-col items-center justify-center gap-3">
-      <span class="material-symbols-outlined text-4xl text-rose-400">cloud_off</span>
+      <svg class="ms-icon text-4xl text-rose-400" aria-hidden="true"><use href="#ms-cloud_off"/></svg>
       <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">No se pudieron cargar los expositores.</p>
       <button
         type="button"
@@ -161,7 +159,7 @@
                       (click)="openPreview(stand)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-brand-cyan-accessible dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       title="Previsualizar tarjeta en catálogo">
-                      <span class="material-symbols-outlined text-[18px]">visibility</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-visibility"/></svg>
                     </button>
 
                     <!-- Editar -->
@@ -170,7 +168,7 @@
                       (click)="openEditModal(stand)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-brand-cyan-electric hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                       title="Editar expositor">
-                      <span class="material-symbols-outlined text-[18px]">edit</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-edit"/></svg>
                     </button>
 
                     <!-- Eliminar -->
@@ -179,7 +177,7 @@
                       (click)="deleteStand(stand.id)"
                       class="p-1.5 rounded-lg text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
                       title="Eliminar expositor">
-                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                      <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-delete"/></svg>
                     </button>
                   </div>
                 </td>
@@ -189,9 +187,7 @@
               <tr>
                 <td colspan="5" class="py-12 px-4 text-center">
                   <div class="max-w-sm mx-auto flex flex-col items-center">
-                    <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">
-                      storefront
-                    </span>
+                    <svg class="ms-icon text-4xl text-slate-300 dark:text-slate-600 mb-2" aria-hidden="true"><use href="#ms-storefront"/></svg>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       No se encontraron expositores registrados
                     </p>
@@ -231,13 +227,13 @@
 
           <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-5">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-brand-cyan-electric">visibility</span>
+              <svg class="ms-icon text-brand-cyan-electric" aria-hidden="true"><use href="#ms-visibility"/></svg>
               <h3 class="text-sm font-bold text-slate-900 dark:text-white">
                 Previsualización en Directorio
               </h3>
             </div>
             <button type="button" (click)="closePreview()" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-              <span class="material-symbols-outlined text-lg">close</span>
+              <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
             </button>
           </div>
 
@@ -248,7 +244,7 @@
                 <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
                   {{ stand.stand }}
                 </span>
-                <span class="material-symbols-outlined text-primary text-base">verified</span>
+                <svg class="ms-icon text-primary text-base" aria-hidden="true"><use href="#ms-verified"/></svg>
               </div>
 
               <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ stand.name }}</h3>
@@ -265,7 +261,7 @@
               <span class="font-semibold text-primary dark:text-brand-cyan-electric">Origen: {{ stand.origin || 'Jujuy' }}</span>
               <span class="font-bold text-brand-cyan-accessible dark:text-brand-cyan-electric flex items-center gap-1">
                 <span>Agendar B2B</span>
-                <span class="material-symbols-outlined text-xs">arrow_forward</span>
+                <svg class="ms-icon text-xs" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
               </span>
             </div>
           </div>

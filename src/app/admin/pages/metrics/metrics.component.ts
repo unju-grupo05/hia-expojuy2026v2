@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { IconHrefPipe } from '../../../shared/icon-href.pipe';
 
 export interface AdminMetrics {
   totalPosts: number;
@@ -23,15 +24,11 @@ export interface RecentActivity {
 @Component({
   selector: 'app-metrics',
   standalone: true,
-  imports: [CommonModule, DecimalPipe, RouterLink],
+  imports: [CommonModule, DecimalPipe, RouterLink, IconHrefPipe],
   templateUrl: './metrics.component.html'
 })
 export class MetricsComponent {
-  /**
-   * Sin endpoint de métricas en el backend: los valores arrancan en cero.
-   * NO reintroducir cifras inventadas, serían datos falsos presentados como reales.
-   * Cada campo debe poblarse desde la API cuando exista el endpoint correspondiente.
-   */
+  //Sin endpoint de métricas en el backend: los valores arrancan en cero.
   public metrics = signal<AdminMetrics>({
     totalPosts: 0,
     published: 0,

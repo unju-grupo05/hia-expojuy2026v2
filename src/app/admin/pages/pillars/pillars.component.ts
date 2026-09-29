@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Pillar, PillarFormData, PillarFormModalComponent } from './pillar-form-modal.component';
 import { EjesService } from '../../../services/ejes.service';
 import { Eje, EjePayload } from '../../../models/eje.model';
+import { IconHrefPipe } from '../../../shared/icon-href.pipe';
 
 @Component({
   selector: 'app-pillars',
   standalone: true,
-  imports: [CommonModule, FormsModule, PillarFormModalComponent],
+  imports: [CommonModule, FormsModule, PillarFormModalComponent, IconHrefPipe],
   templateUrl: './pillars.component.html'
 })
 export class PillarsComponent implements OnInit {

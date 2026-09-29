@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { IconHrefPipe } from '../../shared/icon-href.pipe';
 
 export interface NavItem {
   label: string;
@@ -13,7 +14,7 @@ export interface NavItem {
 @Component({
   selector: 'app-admin-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive, IconHrefPipe],
   templateUrl: './sidebar.component.html'
 })
 export class SidebarComponent {
@@ -31,7 +32,7 @@ export class SidebarComponent {
     {
       label: 'Publicaciones',
       route: '/admin/posts',
-      icon: 'feed',
+      icon: 'rss_feed',
       badge: 'CMS',
       badgeColor: 'bg-purple-100 text-primary dark:bg-purple-900/40 dark:text-purple-300'
     },

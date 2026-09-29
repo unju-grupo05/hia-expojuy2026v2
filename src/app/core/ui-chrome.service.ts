@@ -50,6 +50,8 @@ export class UiChromeService {
   private scrollHandler: ((target: string) => void) | null = null;
 
   private readingScrollListener: (() => void) | null = null;
+  /** Frame pendiente de medicion; se cancela al detener el tracker. */
+  private readingFrame: number | null = null;
 
   /**
    * Sincroniza el signal con la clase `dark` que el script anti-flicker de
@@ -141,7 +143,14 @@ export class UiChromeService {
   startReadingTracker(): void {
     if (typeof window === 'undefined' || this.readingScrollListener) return;
 
-    const onScroll = () => {
+    // El scroll se dispara a una frecuencia mayor que la de pintado. Se escucha
+    // en modo barato (solo marca que hay trabajo pendiente) y se mide una vez
+    // por frame: asi no se fuerzan varios layouts por segundo.
+    let ticking = false;
+
+    const measure = () => {
+      ticking = false;
+
       const doc = document.documentElement;
       const winScroll = doc.scrollTop || document.body.scrollTop;
       const height = doc.scrollHeight - doc.clientHeight;
@@ -163,12 +172,22 @@ export class UiChromeService {
       this._activeSection.set(current);
     };
 
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      this.readingFrame = requestAnimationFrame(measure);
+    };
+
     window.addEventListener('scroll', onScroll, { passive: true });
     this.readingScrollListener = onScroll;
-    onScroll();
+    measure();
   }
 
   stopReadingTracker(): void {
+    if (this.readingFrame !== null) {
+      cancelAnimationFrame(this.readingFrame);
+      this.readingFrame = null;
+    }
     if (!this.readingScrollListener) return;
     window.removeEventListener('scroll', this.readingScrollListener);
     this.readingScrollListener = null;
