@@ -13,6 +13,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { AgendaService } from '../../../services/agenda.service';
+import { scheduleIdle } from '../../../core/idle';
 import { AgendaEvento } from '../../../models/agenda.model';
 
 export interface AgendaEventoPublico {
@@ -83,6 +84,8 @@ export class AgendaComponent implements OnInit, OnDestroy {
   /** Observadores de reveal pendientes, desconectados en ngOnDestroy. */
   private revealObserver: IntersectionObserver | null = null;
   private observedRevealEls: Element[] = [];
+
+  private cancelIdle: (() => void) | null = null;
 
   constructor(
     @Inject(PLATFORM_ID) private readonly platformId: Object,
@@ -256,6 +259,10 @@ export class AgendaComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // 0. Cancelar la carga diferida si todavia no llego a dispararse.
+    this.cancelIdle?.();
+    this.cancelIdle = null;
+
     // 1. Cancelar temporizadores (reveal inicial y cierre automático del modal).
     this.pendingTimers.forEach((id) => clearTimeout(id));
     this.pendingTimers.clear();

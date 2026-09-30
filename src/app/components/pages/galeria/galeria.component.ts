@@ -1,8 +1,9 @@
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GaleriaService } from '../../../services/galeria.service';
 import { GaleriaItem } from '../../../models/galeria.model';
 import { MediaService } from '../../../services/media.service';
+import { scheduleIdle } from '../../../core/idle';
 
 /**
  * View model del carrusel. Se deriva de `GaleriaItem` (contrato de la API)
@@ -24,11 +25,14 @@ export interface GaleriaItemView {
   templateUrl: './galeria.component.html',
   styleUrl: './galeria.component.css'
 })
-export class GaleriaComponent implements OnInit {
+export class GaleriaComponent implements OnInit, OnDestroy {
   // Las primeras 10 imágenes se muestran en el acordeón expandible.
   readonly accordionLimit = 10;
   // El resto se muestran en un carrusel paginado.
   readonly carouselPageSize = 6;
+
+  /** Cancela la carga diferida si el componente se destruye antes de partir. */
+  private cancelIdle: (() => void) | null = null;
 
   readonly items = signal<GaleriaItemView[]>([]);
   readonly accordionItems = computed(() => this.items().slice(0, this.accordionLimit));
@@ -106,5 +110,10 @@ export class GaleriaComponent implements OnInit {
 
   goToPage(index: number): void {
     this.currentPage = index;
+  }
+
+  ngOnDestroy(): void {
+    this.cancelIdle?.();
+    this.cancelIdle = null;
   }
 }

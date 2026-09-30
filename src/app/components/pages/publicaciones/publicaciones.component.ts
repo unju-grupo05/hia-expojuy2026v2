@@ -1,7 +1,8 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NoticiasService } from '../../../services/noticias.service';
 import { MediaService } from '../../../services/media.service';
+import { scheduleIdle } from '../../../core/idle';
 import { NoticiaDTO } from '../../../models/noticia.model';
 
 interface NewsItem {
@@ -20,8 +21,9 @@ interface NewsItem {
   templateUrl: './publicaciones.component.html',
   styleUrls: ['./publicaciones.component.css']
 })
-export class NovedadesComponent implements OnInit {
+export class NovedadesComponent implements OnInit, OnDestroy {
   public readonly pageSize = 5;
+  private cancelIdle: (() => void) | null = null;
 
   readonly news = signal<NewsItem[]>([]);
   readonly slides = signal<NewsItem[][]>([]);
@@ -127,11 +129,9 @@ export class NovedadesComponent implements OnInit {
     this.isModalOpen = true;
     document.body.style.overflow = 'hidden';
   }
-
-  // La tarjeta es un <article role="button">: necesita equivalencia de teclado. 
+  
   onCardKeydown(event: KeyboardEvent, item: NewsItem): void {
     if (event.key !== 'Enter' && event.key !== ' ') return;
-    // Space desplaza la pagina; en un control activable debe PreventDefault.
     event.preventDefault();
     this.openNewsModal(item);
   }
@@ -159,6 +159,11 @@ export class NovedadesComponent implements OnInit {
         setTimeout(() => (this.copySuccess = false), 2500);
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.cancelIdle?.();
+    this.cancelIdle = null;
   }
 
   private formatFecha(fecha: string): string {

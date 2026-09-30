@@ -1,4 +1,4 @@
-<section class="sponsors-marquee-section py-16 text-on-surface overflow-hidden" id="sponsors-section">
+<section class="sponsors-marquee-section py-16 text-on-surface overflow-hidden">
   
   <!-- Encabezado de la Sección -->
   <div class="text-center mb-10 px-4">
@@ -19,18 +19,18 @@
     <div class="marquee-track flex gap-8 items-center animate-marquee">
       <!-- Grupo 1 de Sponsors -->
       <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
       <div *ngFor="let item of col2Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
 
       <!-- Duplicado exacto para lograr el bucle infinito perfecto -->
       <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
       <div *ngFor="let item of col2Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
     </div>
   </div>
@@ -43,18 +43,18 @@
     <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
       <!-- Grupo 2 de Sponsors -->
       <div *ngFor="let item of col3Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
       <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
 
       <!-- Duplicado exacto -->
       <div *ngFor="let item of col3Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
       <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
-        <img [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </div>
     </div>
   </div>
@@ -71,7 +71,7 @@
     </button>
     
     <div class="sponsor-modal-img-container aspect-video w-full overflow-hidden rounded-xl mb-4 flex items-center justify-center p-4">
-      <img [src]="activeSponsor.img" [alt]="activeSponsor.name" class="w-full h-full object-contain" />
+      <img decoding="async" [src]="activeSponsor.img" [alt]="activeSponsor.name" class="w-full h-full object-contain" />
     </div>
 
     <div class="flex flex-col gap-2">

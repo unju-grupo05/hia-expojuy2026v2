@@ -44,7 +44,7 @@
                 <!-- Hero: tarjeta grande con imagen de fondo (solo en páginas completas) -->
                 <article (click)="openNewsModal(item)" (keydown)="onCardKeydown($event, item)" tabindex="0" class="news-card bento-card cursor-pointer md:col-span-2 relative overflow-hidden min-h-[320px] bg-slate-900 rounded-3xl transition-all duration-300 hover:-translate-y-1" role="button">
                   @if (item.img) {
-                    <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
+                    <img decoding="async" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
                   }
                   <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
@@ -65,7 +65,7 @@
                 <article (click)="openNewsModal(item)" (keydown)="onCardKeydown($event, item)" tabindex="0" [class]="'news-card bento-card cursor-pointer bg-slate-50 dark:bg-[#151026] border border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden shadow-sm dark:shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-cyan-electric ' + layoutClass(slide, idx)" role="button">
                   <div class="relative h-44 overflow-hidden bg-slate-100 dark:bg-slate-900">
                     @if (item.img) {
-                      <img class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
+                      <img decoding="async" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" [alt]="item.title" loading="lazy" [src]="item.img">
                     }
                     <span class="absolute top-3 left-3 px-3 py-1 rounded-full bg-black/60 text-brand-cyan-electric text-[10px] font-bold uppercase tracking-wider backdrop-blur-md">{{ item.badge }}</span>
                   </div>
@@ -141,7 +141,7 @@
         <!-- Imagen -->
         <div class="relative h-56 md:h-auto md:min-h-[420px] overflow-hidden bg-slate-900">
           @if (activeNews.img) {
-            <img [src]="activeNews.img" [alt]="activeNews.title" class="absolute inset-0 w-full h-full object-cover">
+            <img decoding="async" [src]="activeNews.img" [alt]="activeNews.title" class="absolute inset-0 w-full h-full object-cover">
           }
           <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
           <span class="absolute top-4 left-4 px-3 py-1 rounded-full bg-black/60 text-brand-cyan-electric text-[10px] font-black uppercase tracking-widest border border-brand-cyan-electric/40 backdrop-blur-md">

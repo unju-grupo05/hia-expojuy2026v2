@@ -36,19 +36,62 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
     setTimeout(() => this.threeService.handleResize(), 200);
     setTimeout(() => this.threeService.handleResize(), 400);
   };
+  private static readonly PRELOAD_MARGIN = '600px 0px';
+  private visibilityObserver: IntersectionObserver | null = null;
+  private sceneRequested = false;
+  private destroyed = false;
 
   constructor(public threeService: Masterplan3dService) {}
 
   ngAfterViewInit(): void {
-    this.threeService.init(
-      this.canvasRef.nativeElement,
-      this.wrapperRef.nativeElement,
-      this.pinRef.nativeElement,
-      this.pinTextRef.nativeElement
-    );
+    this.deferSceneUntilNeeded();
 
     document.addEventListener('fullscreenchange', this.fsChangeHandler);
     document.addEventListener('webkitfullscreenchange', this.fsChangeHandler);
+  }
+  
+  private deferSceneUntilNeeded(): void {
+    const wrapper = this.wrapperRef.nativeElement;
+
+    if (typeof IntersectionObserver === 'undefined') {
+      this.requestScene();
+      return;
+    }
+
+    this.visibilityObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          this.requestScene();
+        }
+      },
+      { rootMargin: CanvasComponent.PRELOAD_MARGIN }
+    );
+    this.visibilityObserver.observe(wrapper);
+
+    wrapper.addEventListener('pointerdown', this.onFirstInteraction, { passive: true });
+    wrapper.addEventListener('focusin', this.onFirstInteraction);
+  }
+
+  private onFirstInteraction = (): void => this.requestScene();
+
+  /** Idempotente: la escena se monta una sola vez, llegue como llegue el primer aviso. */
+  private requestScene(): void {
+    if (this.sceneRequested || this.destroyed) return;
+    this.sceneRequested = true;
+
+    this.visibilityObserver?.disconnect();
+    this.visibilityObserver = null;
+
+    const wrapper = this.wrapperRef.nativeElement;
+    wrapper.removeEventListener('pointerdown', this.onFirstInteraction);
+    wrapper.removeEventListener('focusin', this.onFirstInteraction);
+
+    this.threeService.init(
+      this.canvasRef.nativeElement,
+      wrapper,
+      this.pinRef.nativeElement,
+      this.pinTextRef.nativeElement
+    );
   }
 
   public setCamera(mode: 'iso' | 'top' | 'entrance'): void {
@@ -104,6 +147,9 @@ export class CanvasComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroyed = true;
+    this.visibilityObserver?.disconnect();
+    this.visibilityObserver = null;
     document.removeEventListener('fullscreenchange', this.fsChangeHandler);
     document.removeEventListener('webkitfullscreenchange', this.fsChangeHandler);
     this.threeService.destroy();

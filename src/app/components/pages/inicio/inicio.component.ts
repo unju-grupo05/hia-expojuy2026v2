@@ -20,9 +20,12 @@ import { GaleriaComponent } from '../galeria/galeria.component';
 import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
 import { UiChromeService } from '../../../core/ui-chrome.service';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import Lenis from 'lenis';
+import { GsapBundle, loadGsap } from '../../../core/gsap-loader';
+import { scheduleIdle } from '../../../core/idle';
+import type Lenis from 'lenis';
+import type * as ScrollTriggerTypes from 'gsap/ScrollTrigger';
+
+type GsapTween = ReturnType<GsapBundle['gsap']['to']>;
 
 interface ChatMessage {
   sender: 'user' | 'bot';
@@ -59,16 +62,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── View queries (signal based) ──────────────────────────────────────────
   private readonly bgVideo = viewChild<ElementRef<HTMLVideoElement>>('bgVideo');
   private readonly predioComponent = viewChild(UbicacionPredioHubComponent);
-  private readonly splashNode = viewChild<ElementRef<HTMLElement>>('splashNode');
-  private readonly splashLogo = viewChild<ElementRef<HTMLElement>>('splashLogo');
-  private readonly splashBadge = viewChild<ElementRef<HTMLElement>>('splashBadge');
   private readonly heroSection = viewChild<ElementRef<HTMLElement>>('heroSection');
   private readonly heroBg = viewChild<ElementRef<HTMLElement>>('heroBg');
   private readonly chatMessagesBox = viewChild<ElementRef<HTMLDivElement>>('chatMessagesBox');
   private readonly chatInputField = viewChild<ElementRef<HTMLInputElement>>('chatInputField');
 
   // ── Estado de UI (consumido por la plantilla) ───────────────────────────
-  readonly splashVisible = signal(true);
   readonly countdown = signal({ days: '30', hours: '00', minutes: '00', seconds: '00' });
   readonly chatOpen = signal(false);
   readonly chatTyping = signal(false);
@@ -78,21 +77,27 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   // ── Recursos con teardown ───────────────────────────────────────────────
+  // GSAP y Lenis se resuelven con `import()` diferido para no bloquear el First Paint.
+  private gsap!: GsapBundle['gsap'];
+  private ScrollTrigger!: GsapBundle['ScrollTrigger'];
+  private LenisCtor: typeof Lenis | null = null;
   private lenisInstance: Lenis | null = null;
   private lenisScrollUnsubscribe: (() => void) | null = null;
   private gsapTickerFn: ((time: number) => void) | null = null;
   private chromeScrollHandler: ((target: string) => void) | null = null;
-  private splashTimeline: gsap.core.Timeline | null = null;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
-  private readonly tweens: gsap.core.Tween[] = [];
-  private readonly scrollTriggers: ScrollTrigger[] = [];
+  private readonly tweens: GsapTween[] = [];
+  private readonly scrollTriggers: ScrollTriggerTypes.ScrollTrigger[] = [];
   private readonly observers: IntersectionObserver[] = [];
   private readonly timeouts = new Set<ReturnType<typeof setTimeout>>();
   private readonly typingTimers = new Set<ReturnType<typeof setTimeout>>();
+  private readonly idleCancels = new Set<() => void>();
+  private chatScrollFrame: number | null = null;
+  private videoSourceAttached = false;
   private readonly rafIds = new Set<number>();
   private readonly listenerCleanups: Array<() => void> = [];
   private activeRecognition: SpeechRecognitionLike | null = null;
-  private bodyScrollLocked = false;
+  private viewDestroyed = false;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -102,8 +107,15 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     effect(() => {
       this.chatMessages();
       this.chatTyping();
-      const box = this.chatMessagesBox()?.nativeElement;
-      if (box) box.scrollTop = box.scrollHeight;
+
+      if (typeof requestAnimationFrame !== 'function') return;
+      if (this.chatScrollFrame !== null) cancelAnimationFrame(this.chatScrollFrame);
+
+      this.chatScrollFrame = requestAnimationFrame(() => {
+        this.chatScrollFrame = null;
+        const box = this.chatMessagesBox()?.nativeElement;
+        if (box) box.scrollTop = box.scrollHeight;
+      });
     });
 
     // La clase vive en <body> porque el CSS de la barra lateral tambien la consulta.
@@ -116,29 +128,66 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (typeof window !== 'undefined' && isPlatformBrowser(this.platformId)) {
+      const deferredTasks = () => {
+        void this.initAnimations();
+      };
 
-    window.scrollTo(0, 0);
-    gsap.registerPlugin(ScrollTrigger);
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(deferredTasks, { timeout: 2000 });
+      } else {
+        setTimeout(deferredTasks, 250);
+      }
+    }
+  }
 
-    this.initSplashIntro();
-    this.iniciarVideoFondo();
-    this.initLenisSmoothScroll();
-    this.initHeroParallax();
-    this.revealHeroLayers();
-    this.initScrollReveal();
-    this.initCountdown();
-    this.initTextEffects();
+  private onIdle(fn: () => void, timeoutMs: number): void {
+    const cancel = scheduleIdle(() => {
+      this.idleCancels.delete(cancel);
+      fn();
+    }, timeoutMs);
+    this.idleCancels.add(cancel);
+  }
+
+  private async initAnimations(): Promise<void> {
+    try {
+      const [{ gsap, ScrollTrigger }, lenisModule] = await Promise.all([
+        loadGsap(),
+        import('lenis')
+      ]);
+
+      if (this.viewDestroyed) return;
+
+      this.gsap = gsap;
+      this.ScrollTrigger = ScrollTrigger;
+      this.LenisCtor = (lenisModule.default ?? lenisModule) as typeof Lenis;
+
+      this.revealHeroLayers();
+      this.iniciarVideoFondo();
+      this.initCountdown();
+      this.initTextEffects();
+      this.initLenisSmoothScroll();
+      this.initHeroParallax();
+      this.initScrollReveal();
+    } catch (error) {
+      console.error('[inicio] No se pudieron cargar las animaciones', error);
+      this.revealHeroLayers();
+      this.iniciarVideoFondo();
+      this.initCountdown();
+      this.initTextEffectsStatic();
+    }
   }
 
   ngOnDestroy(): void {
+    this.viewDestroyed = true;
+
     if (this.chromeScrollHandler) {
       this.chrome.unregisterScrollHandler(this.chromeScrollHandler);
       this.chromeScrollHandler = null;
     }
 
-    if (this.gsapTickerFn) {
-      gsap.ticker.remove(this.gsapTickerFn);
+    if (this.gsapTickerFn && this.gsap) {
+      this.gsap.ticker.remove(this.gsapTickerFn);
       this.gsapTickerFn = null;
     }
 
@@ -146,9 +195,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lenisScrollUnsubscribe = null;
     this.lenisInstance?.destroy();
     this.lenisInstance = null;
-
-    this.splashTimeline?.kill();
-    this.splashTimeline = null;
 
     this.clearCountdown();
 
@@ -170,92 +216,24 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const rafId of this.rafIds) cancelAnimationFrame(rafId);
     this.rafIds.clear();
 
+    if (this.chatScrollFrame !== null) cancelAnimationFrame(this.chatScrollFrame);
+    this.chatScrollFrame = null;
+
+    for (const cancel of this.idleCancels) cancel();
+    this.idleCancels.clear();
+
     for (const cleanup of this.listenerCleanups) cleanup();
     this.listenerCleanups.length = 0;
 
     this.activeRecognition?.abort();
     this.activeRecognition = null;
 
-    this.releaseBodyScrollLock();
     document.body.classList.remove('chat-open');
   }
 
   // =========================================================================
-  // SPLASH INTRO & VIDEO DE FONDO
+  // VIDEO DE FONDO
   // =========================================================================
-  private initSplashIntro(): void {
-    const splash = this.splashNode()?.nativeElement;
-    const logo = this.splashLogo()?.nativeElement;
-    const badge = this.splashBadge()?.nativeElement;
-
-    if (!splash || !logo) {
-      this.splashVisible.set(false);
-      this.revealHeroLayers();
-      return;
-    }
-
-    this.lockBodyScroll();
-
-    const timeline = gsap.timeline({
-      onComplete: () => {
-        // El overlay se retira con `@if`, no con `remove()`: asi Angular sigue
-        // siendo dueño del nodo y no queda un hole en el DOM.
-        this.splashVisible.set(false);
-        this.releaseBodyScrollLock();
-
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-
-        this.lenisInstance?.scrollTo(0, { immediate: true });
-
-        ScrollTrigger.refresh();
-        this.revealHeroLayers();
-      }
-    });
-    this.splashTimeline = timeline;
-
-    timeline.to(logo, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.6,
-      ease: 'back.out(1.7)'
-    });
-
-    if (badge) {
-      timeline.to(badge, {
-        opacity: 0,
-        y: 10,
-        duration: 0.3,
-        delay: 0.3
-      });
-    }
-
-    timeline
-      .to(logo, {
-        scale: 6,
-        opacity: 0,
-        filter: 'blur(16px)',
-        duration: 0.6,
-        ease: 'expo.in'
-      }, 'zoom')
-      .to(splash, {
-        opacity: 0,
-        duration: 0.45,
-        ease: 'power2.out'
-      }, 'zoom+=0.1');
-  }
-
-  private lockBodyScroll(): void {
-    this.bodyScrollLocked = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  private releaseBodyScrollLock(): void {
-    if (!this.bodyScrollLocked) return;
-    this.bodyScrollLocked = false;
-    document.body.style.overflow = '';
-  }
 
   private clearCountdown(): void {
     if (this.countdownInterval === null) return;
@@ -265,29 +243,43 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private iniciarVideoFondo(): void {
     const video = this.bgVideo()?.nativeElement;
-    if (!video) return;
+    if (!video || this.videoSourceAttached) return;
+    this.videoSourceAttached = true;
 
     video.muted = true;
     video.defaultMuted = true;
-    video.play().catch(() => {
-      // Autoplay bloqueado: se reintenta en el primer gesto del usuario y el
-      // listener se elimina tanto por `once` como en el teardown.
-      const resumeOnFirstGesture = () => {
-        window.removeEventListener('click', resumeOnFirstGesture);
-        video.play().catch(() => { /* el navegador puede seguir bloqueandolo */ });
-      };
-      window.addEventListener('click', resumeOnFirstGesture, { once: true });
-      this.listenerCleanups.push(() => window.removeEventListener('click', resumeOnFirstGesture));
-    });
+
+    const play = () => {
+      video.play().catch(() => {
+        const resumeOnFirstGesture = () => {
+          window.removeEventListener('click', resumeOnFirstGesture);
+          video.play().catch(() => { /* el navegador puede seguir bloqueandolo */ });
+        };
+        window.addEventListener('click', resumeOnFirstGesture, { once: true });
+        this.listenerCleanups.push(() => window.removeEventListener('click', resumeOnFirstGesture));
+      });
+    };
+
+    const attachSource = () => {
+      if (this.viewDestroyed) return;
+      video.src = './img/video_fondo.mp4';
+      video.load();
+      play();
+    };
+    this.onIdle(attachSource, 2500);
   }
 
   // =========================================================================
   // LENIS SMOOTH SCROLL
   // =========================================================================
+
   private initLenisSmoothScroll(): void {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const lenis = new Lenis({
+    const LenisCtor = this.LenisCtor;
+    if (!LenisCtor) return;
+
+    const lenis = new LenisCtor({
       duration: 0.85,
       smoothWheel: true,
       syncTouch: false,
@@ -301,12 +293,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       if (instance.animatedScroll <= 0) {
         window.scrollTo(0, 0);
       }
-      ScrollTrigger.update();
+      this.ScrollTrigger.update();
     });
 
     this.gsapTickerFn = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(this.gsapTickerFn);
-    gsap.ticker.lagSmoothing(0);
+    this.gsap.ticker.add(this.gsapTickerFn);
+    this.gsap.ticker.lagSmoothing(0);
 
     // El menu movil del header (persistente, fuera de esta ruta) navega
     // mediante el servicio: asi el smooth scroll tiene un unico dueno.
@@ -352,33 +344,38 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   // HERO LAYERS & PARALLAX
   // =========================================================================
+  /**
+   * Garantiza que las capas del hero sean visibles.
+   *
+   * Antes se ocultaban con `gsap.set({ opacity: 0, visibility: 'hidden' })` y se
+   * revelaban con un tween escalonado. Eso costaba el LCP: Chrome descarta del
+   * LCP todo elemento con `opacity: 0` y lo vuelve a registrar como candidato
+   * en el instante en que pasa a visible, con lo que el LCP quedaba atado al
+   * fin de la carga de GSAP y no al primer pintado. Un LCP de 3,4 s con el
+   * `<h1>` del hero como elemento candidato es exactamente esa firma.
+   *
+   * La animacion, ademas, nunca se llegaba a ver: el overlay opaco del splash
+   * la tapaba durante toda su duracion, asi que solo costaba reflow y pintura.
+   */
   private revealHeroLayers(): void {
-    const layers = Array.from(
-      this.heroSection()?.nativeElement.querySelectorAll<HTMLElement>('.hero-layer') ?? []
-    );
-    if (!layers.length) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      layers.forEach(l => {
+    this.heroSection()?.nativeElement
+      .querySelectorAll<HTMLElement>('.hero-layer')
+      .forEach(l => {
         l.style.opacity = '1';
         l.style.visibility = 'visible';
         l.style.transform = '';
       });
-      return;
-    }
+  }
 
-    gsap.set(layers, { opacity: 0, y: 40, visibility: 'hidden' });
-    this.tweens.push(gsap.to(layers, {
-      opacity: 1,
-      y: 0,
-      visibility: 'visible',
-      duration: 0.6,
-      delay: 0.2,
-      stagger: 0.15,
-      ease: 'expo.out',
-      overwrite: true,
-      clearProps: 'opacity,transform,visibility'
-    }));
+
+  private initTextEffectsStatic(): void {
+    document.querySelectorAll<HTMLElement>('.count-up').forEach(el => {
+      el.textContent = (parseFloat(el.dataset['count'] || '0')) + (el.dataset['suffix'] || '');
+    });
+
+    document.querySelectorAll<HTMLElement>('.reveal-on-scroll').forEach(el => {
+      el.classList.add('is-visible');
+    });
   }
 
   private initHeroParallax(): void {
@@ -386,7 +383,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!bg) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const tween = gsap.fromTo(bg,
+    const tween = this.gsap.fromTo(bg,
       { y: 0 },
       {
         y: -80,
@@ -414,7 +411,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const reveals = document.querySelectorAll('.reveal-on-scroll');
       if (!reveals.length) {
-        ScrollTrigger.refresh();
+        this.ScrollTrigger.refresh();
         return;
       }
 
@@ -436,7 +433,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
         reveals.forEach(el => el.classList.add('is-visible'));
       }
 
-      ScrollTrigger.refresh();
+      this.ScrollTrigger.refresh();
     }, 300);
 
     this.timeouts.add(timeout);
@@ -547,7 +544,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       const io = new IntersectionObserver((entries) => {
         entries.forEach(e => {
           if (!e.isIntersecting) return;
-          this.tweens.push(gsap.fromTo(chars,
+          this.tweens.push(this.gsap.fromTo(chars,
             { opacity: 0, y: '0.5em', filter: 'blur(10px)' },
             {
               opacity: 1,

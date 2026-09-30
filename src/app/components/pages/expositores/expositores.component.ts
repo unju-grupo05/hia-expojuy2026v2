@@ -16,6 +16,7 @@ import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Expositor } from '../../../models/expositor.model';
 import { B2BMeetingRequest } from '../../../models/b2b-meeting.model';
 import { ExpositoresService } from '../../../services/expositores.service';
+import { scheduleIdle } from '../../../core/idle';
 import { B2BMeetingService } from '../../../services/b2b-meeting.service';
 
 @Component({
@@ -40,6 +41,9 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   readonly b2bForm: ReturnType<FormBuilder['group']>;
 
   private readonly destroyRef = inject(DestroyRef);
+
+  /** Cancela la carga diferida si el componente se destruye antes de partir. */
+  private cancelIdle: (() => void) | null = null;
 
   private createB2BForm(): ReturnType<FormBuilder['group']> {
     return this.formBuilder.group({
@@ -259,6 +263,9 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
    * `overflow: hidden` y la pagina quedaba sin scroll de forma permanente.
    */
   ngOnDestroy(): void {
+    this.cancelIdle?.();
+    this.cancelIdle = null;
+
     if (isPlatformBrowser(this.platformId) && this.b2bModalState() !== 'closed') {
       document.body.style.overflow = '';
     }
