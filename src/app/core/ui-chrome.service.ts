@@ -27,6 +27,9 @@ export class UiChromeService {
     'acreditaciones-section'
   ] as const;
 
+  /** Elementos de seccion ya resueltos, para no consultar el DOM por frame. */
+  private readonly sectionElements = new Map<string, HTMLElement | null>();
+
   // ── Tema ────────────────────────────────────────────────────────────────
   private readonly _darkMode = signal(false);
   readonly darkMode = this._darkMode.asReadonly();
@@ -123,6 +126,20 @@ export class UiChromeService {
   }
 
   /**
+   * Igual que `resolveSectionElement` pero recuerda el elemento. El tracker de
+   * lectura interroga las ocho secciones en cada frame de scroll; resolverlas de
+   * nuevo cada vez eran ocho `getElementById` por frame. `isConnected` mantiene
+   * la cache al dia cuando Angular destruye y recrea una seccion al navegar.
+   */
+  private resolveCachedSection(id: string): HTMLElement | null {
+    const cached = this.sectionElements.get(id);
+    if (cached && cached.isConnected) return cached;
+    const el = this.resolveSectionElement(id);
+    this.sectionElements.set(id, el);
+    return el;
+  }
+
+  /**
    * Clic en un enlace del menu movil: navega con scroll suave y cierra el menu.
    * El `preventDefault` se aplica siempre para no duplicar el salto del ancla.
    */
@@ -150,17 +167,21 @@ export class UiChromeService {
 
     const measure = () => {
       ticking = false;
+      if (typeof document === 'undefined') return;
 
+      // Todas las lecturas de geometria ocurren aqui, antes de tocar ninguna
+      // senal: si se mezclaran escrituras, cada lectura invalidaria el layout
+      // pendiente y el navegador recalcularia el documento en el mismo frame.
       const doc = document.documentElement;
       const winScroll = doc.scrollTop || document.body.scrollTop;
       const height = doc.scrollHeight - doc.clientHeight;
-      this._readingProgress.set(height > 0 ? (winScroll / height) * 100 : 0);
+      const progress = height > 0 ? (winScroll / height) * 100 : 0;
 
       const probe = window.scrollY + 280;
       let current: string | null = null;
 
       for (const id of UiChromeService.SECTION_IDS) {
-        const el = this.resolveSectionElement(id);
+        const el = this.resolveCachedSection(id);
         if (!el) continue;
         const top = el.offsetTop;
         if (probe >= top && probe < top + el.offsetHeight) {
@@ -169,6 +190,8 @@ export class UiChromeService {
         }
       }
 
+      // Escrituras al final, ya sin lecturas pendientes que invalidar.
+      this._readingProgress.set(progress);
       this._activeSection.set(current);
     };
 
@@ -180,7 +203,11 @@ export class UiChromeService {
 
     window.addEventListener('scroll', onScroll, { passive: true });
     this.readingScrollListener = onScroll;
-    measure();
+
+    // La primera medicion se difiere un frame a proposito: medir de forma
+    // sincrona desde `ngOnInit` obliga al navegador a resolver estilos que aun
+    // no estan asentados, que es exactamente el reflow forzado que penaliza.
+    this.readingFrame = requestAnimationFrame(measure);
   }
 
   stopReadingTracker(): void {

@@ -396,3 +396,55 @@
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       }
     }
+
+/* =========================================================================
+   CONTENIDO DEBAJO DEL PLIEGUE
+   =========================================================================
+   La portada monta ocho secciones en un solo render inicial, con ~34 elementos
+   que usan `backdrop-filter` o `blur` y cientos de nodos. Medir estilo y layout
+   de todo eso antes de que el navegador pueda presentar el hero es el mayor
+   costo del primer pintado (2,25 s en Lighthouse).
+
+   `content-visibility: auto` permite al navegador saltarse el estilo, el layout
+   y el paint de las secciones fuera de pantalla, y renderizarlas al acercarse
+   al viewport. Los `blur()` grandes (`blur-[120px]`, `blur-3xl`) y los
+   `backdrop-filter` son de los mas caros que existen: cada `backdrop-filter`
+   ademas crea una superficie de composicion propia que hay que capturar.
+
+   Se elige esto y no `@defer (on viewport)` a proposito: `@defer` retira el
+   elemento del DOM, y el smooth scroll del header y los CTA del hero resuelven
+   su destino con `UiChromeService.resolveSectionElement()`, que devuelve `null`
+   para un id inexistente y aborta el scroll. Con `content-visibility: auto` los
+   elementos siguen en el DOM y toda la navegacion por anclas sigue funcionando.
+
+   `app-ubicacion-predio-hub` queda deliberadamente fuera: su escena 3D solo
+   reevalua sus dimensiones ante un `resize` de window, asi que si su caja
+   permaneciera en el tamano reservado se dibujaria con la dimension de
+   respaldo de 800x500 sin corregirla.
+
+   `contain-intrinsic-size` reserva el alto de la seccion mientras su contenido
+   esta omitido. El keyword `auto` hace que el navegador recuerde el ultimo alto
+   real que renderizo, de modo que la segunda visita ya no estima y la barra de
+   scroll no salta. Son estimaciones: si una se aparta de la realidad, el
+   navegador la corrige al acercarse la seccion.
+
+   Es una mejora progresiva. Un navegador sin soporte ignora ambas propiedades y
+   pinta todo, igual que antes.
+   ========================================================================= */
+app-ejes,
+app-expositores,
+app-agenda,
+app-novedades,
+app-galeria,
+app-sponsors,
+app-acreditaciones-faq {
+  content-visibility: auto;
+}
+
+app-ejes               { contain-intrinsic-size: auto 1200px; }
+app-expositores        { contain-intrinsic-size: auto 1800px; }
+app-agenda             { contain-intrinsic-size: auto 1600px; }
+app-novedades          { contain-intrinsic-size: auto 1200px; }
+app-galeria            { contain-intrinsic-size: auto 1600px; }
+app-sponsors           { contain-intrinsic-size: auto 900px; }
+app-acreditaciones-faq { contain-intrinsic-size: auto 1100px; }

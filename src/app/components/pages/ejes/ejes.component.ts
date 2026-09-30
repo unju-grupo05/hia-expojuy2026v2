@@ -1,7 +1,8 @@
 import { Component, OnInit, OnDestroy, DestroyRef, ChangeDetectorRef, Inject, PLATFORM_ID, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { loadGsap } from '../../../core/gsap-loader';
+import { scheduleIdle } from '../../../core/idle';
 import { EjesService } from '../../../services/ejes.service';
 import { Eje } from '../../../models/eje.model';
 import { IconHrefPipe } from '../../../shared/icon-href.pipe';
@@ -21,6 +22,8 @@ export class EjesComponent implements OnInit, OnDestroy {
   private revealTimeouts = new Set<ReturnType<typeof setTimeout>>();
   private observers: IntersectionObserver[] = [];
 
+  private cancelIdle: (() => void) | null = null;
+
   constructor(
     private ejesService: EjesService,
     private cdr: ChangeDetectorRef,
@@ -28,7 +31,10 @@ export class EjesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.obtenerEjes();
+    this.cancelIdle = scheduleIdle(() => {
+      this.cancelIdle = null;
+      this.obtenerEjes();
+    }, 2000);
   }
 
   obtenerEjes(): void {
@@ -84,10 +90,17 @@ export class EjesComponent implements OnInit, OnDestroy {
 
     // `refresh()` es idempotente: el observer anterior ya soltó los nodos que
     // entro en viewport, y los nuevos se re-observan en cada recarga de datos.
-    ScrollTrigger.getAll().forEach(trigger => trigger.refresh());
+    // ScrollTrigger llega por `import()` (chunk compartido con `InicioComponent`):
+    // si la promesa aun no se resolvio, no hay triggers que refrescar.
+    void loadGsap()
+      .then(({ ScrollTrigger }) => ScrollTrigger.getAll().forEach(trigger => trigger.refresh()))
+      .catch(() => { /* sin GSAP no hay nada que refrescar */ });
   }
 
   ngOnDestroy(): void {
+    this.cancelIdle?.();
+    this.cancelIdle = null;
+
     for (const timeout of this.revealTimeouts) clearTimeout(timeout);
     this.revealTimeouts.clear();
 

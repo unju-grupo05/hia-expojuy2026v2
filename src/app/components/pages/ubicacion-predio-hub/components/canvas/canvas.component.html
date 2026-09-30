@@ -61,4 +61,16 @@
     <svg class="ms-icon tip-icon" aria-hidden="true"><use href="#ms-touch_app"/></svg>
     <span>Toca un stand para inspeccionar · Arrastra para girar</span>
   </div>
+
+  <!-- Cubre el canvas mientras se descarga el chunk de three.js y se monta la escena -->
+  @if (threeService.loading()) {
+    <div class="map-3d-boot" role="status" aria-live="polite">
+      <span class="map-3d-boot-spinner" aria-hidden="true"></span>
+      <span>Preparando visualizador 3D…</span>
+    </div>
+  } @else if (threeService.loadError()) {
+    <div class="map-3d-boot map-3d-boot--error" role="alert">
+      <span>No se pudo cargar el visualizador 3D. Recargá la página para intentarlo de nuevo.</span>
+    </div>
+  }
 </div>

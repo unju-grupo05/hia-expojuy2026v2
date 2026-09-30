@@ -4,14 +4,18 @@
  * Este archivo reemplaza a `environment.ts` durante `ng build --configuration production`
  * (ver `fileReplacements` en angular.json).
  *
- * IMPORTANTE: `apiUrl` usa una ruta relativa, lo que asume que la API se sirve
- * en el MISMO origen que el frontend (por ejemplo, detrás de un proxy inverso
- * con Nginx). Si el backend vive en otro dominio, reemplazar '/api' por la URL
- * completa, por ejemplo 'https://api.expojuy.com.ar/api'.
+ * IMPORTANTE: `apiUrl` es una URL ABSOLUTA a propósito. Con una ruta relativa
+ * ('/api') el navegador resuelve contra el origen desde el que se sirvió el
+ * frontend; si eso es `http://localhost:4200` (el servidor de `ng serve`), la
+ * petición pega al fallback SPA de Angular, que devuelve `index.html` en lugar
+ * de JSON y rompe el parseo de la respuesta.
+ *
+ * OJO — al ser origen distinto, cada llamada pasa por CORS. El backend debe
+ * permitir el origen del frontend (ver `cors()` en expojuy2026v2-Back/index.js).
  */
 export const environment = {
   production: true,
 
   /** Raíz de la API. Debe incluir el sufijo `/api`. */
-  apiUrl: '/api'
+  apiUrl: 'http://localhost:3000/api'
 };

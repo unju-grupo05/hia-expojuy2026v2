@@ -203,3 +203,50 @@
   border-radius: 50%;
   box-shadow: 0 0 8px var(--ej-cyan);
 }
+
+/* =====================================================
+   OVERLAY DE ARRANQUE
+   Cubre el canvas mientras three.js se descarga y la escena
+   se monta, para que no se vea un rectangulo negro mudo.
+   ===================================================== */
+.map-3d-boot {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: #090d12;
+  color: #c6bfd8;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.map-3d-boot--error {
+  color: #f8fafc;
+}
+
+.map-3d-boot-spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-top-color: var(--ej-cyan);
+  animation: map-3d-boot-spin 0.8s linear infinite;
+}
+
+@keyframes map-3d-boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-3d-boot-spinner {
+    animation-duration: 2.4s;
+  }
+}

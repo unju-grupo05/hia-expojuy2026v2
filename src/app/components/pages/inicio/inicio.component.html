@@ -4,7 +4,7 @@
     <div class="absolute w-[500px] h-[500px] bg-brand-cyan-electric/20 rounded-full blur-[120px] pointer-events-none"></div>
 
     <div class="relative z-10 flex flex-col items-center gap-4">
-      <img width="1510" height="1509"
+      <img decoding="async" width="1510" height="1509"
         src="./img/expojuy26_isologotipo.png"
         alt="ExpoJuy 2026"
         class="w-20 h-20 sm:w-28 sm:h-28 object-contain drop-shadow-[0_0_25px_rgba(0,194,209,0.5)] transform scale-75 opacity-0"
@@ -21,11 +21,10 @@
 
 <!-- Hero pegado al techo -->
 <section #heroSection class="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-brand-slate-dark text-white pt-16 pb-16" id="hero-section">
-    <!-- Parallel Layer de Fondo (video + scrims) — parallax vertical suave, sin distorsión de escala -->
     <div #heroBg class="absolute inset-0 z-0 overflow-hidden pointer-events-none will-change-transform" id="hero-bg">
       <!-- Looping Visual Layer featuring Jujuy Landscape (Ken-burns / Ambient Zoom) -->
       <div class="absolute inset-0 overflow-hidden">
-        <video #bgVideo class="w-full h-full object-cover" autoplay muted loop playsinline src="./img/VideoFondo.mp4"></video>
+        <video #bgVideo class="w-full h-full object-cover" autoplay muted loop playsinline preload="none" poster="./img/Expojuy-5.webp"></video>
       </div>
 
       <!-- High-Contrast Glassmorphic Gradient Scrim -->
@@ -45,7 +44,6 @@
             <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-rocket_launch"/></svg>
             <span class="text-xs font-bold uppercase tracking-wider font-display">Edición Histórica 2026 · Ciudad Cultural Jujuy</span>
           </div>
-          
           <h1 class="hero-layer font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.12]">
             ExpoJuy 2026: <br class="hidden sm:inline">
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-brand-cyan-electric to-brand-lavender-soft">
@@ -53,7 +51,6 @@
             </span> <br>
             <span>Creando Oportunidades</span>
           </h1>
-
           <p class="hero-layer text-base sm:text-lg text-slate-200 max-w-2xl font-normal leading-relaxed">
             El epicentro ferial y multisectorial más gravitante del Cono Sur. Donde la <strong class="text-white font-semibold">Minería Sustentable, el Litio, las Energías Limpias, la Agroindustria 4.0</strong> y la <strong class="text-white font-semibold">Economía del Conocimiento</strong> se articulan con el Corredor Bioceánico hacia el mundo.
           </p>
@@ -81,7 +78,7 @@
               <div class="text-xs text-slate-300 font-medium">conferencias centrales</div>
             </div>
             <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
-              <div class="font-display text-2xl sm:text-3xl font-extrabold text-white"><span class="count-up" data-count="25" data-suffix="k m²">0</span></div>
+              <div class="font-display text-2xl sm:text-3xl font-extrabold text-white"><span class="count-up" data-count="25" data-suffix="k m">0</span></div>
               <div class="text-xs text-slate-300 font-medium">Superficie Ferial</div>
             </div>
             <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
@@ -151,7 +148,6 @@
     </div>
   </section>
 
-  <!-- 6 Ejes / Predio / Ubicación / Expositores / Agenda / Novedades / Galería (componentes de sección) -->
   <app-ejes id="sobre-expojuy"></app-ejes>
   <app-ubicacion-predio-hub id="mapa"></app-ubicacion-predio-hub>
   <app-expositores id="expositores"></app-expositores>
@@ -184,7 +180,7 @@
       }
     </div>
     <form class="chatbot-input-row" id="chatbot-form" (submit)="sendChatMessage($event)">
-      <input #chatInputField type="text" id="chatbot-input" name="chatInput" [value]="chatDraft()" (input)="updateChatDraft($any($event.target).value)" placeholder="Escribí tu consulta..." aria-label="Escribí tu consulta para PachAI" autocomplete="off">
+      <input #chatInputField type="text" id="chatbot-input" name="chatInput" [value]="chatDraft()" (input)="updateChatDraft($any($event.target).value)" placeholder="Escriba­ tu consulta..." aria-label="Escriba­ tu consulta para PachAI" autocomplete="off">
       <button type="button" id="chatbot-mic" class="chatbot-mic" aria-label="Dictar mensaje por voz" (click)="toggleVoiceInput()"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm7 10a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.929V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.071A7 7 0 0 0 19 12z"/></svg></button>
       <button type="submit" aria-label="Enviar mensaje"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20.573v-5.919a.9.9 0 0 1 .45-.77l14.998-7.198a.9.9 0 0 1 1.157 1.204l-5.16 15.32a.9.9 0 0 1-1.565.253l-4.58-5.423-4.395 2.508a.9.9 0 0 1-.896 0zm12.876-9.72-10.54 5.06-.2.115 4.86 5.747 5.88-10.922z"/></svg></button>
     </form>
