@@ -173,7 +173,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     } catch (error) {
       console.error('[inicio] No se pudieron cargar las animaciones', error);
       this.dismissSplash();
-      this.revealHeroLayersStatic();
+      this.revealHeroLayers();
       this.iniciarVideoFondo();
       this.initCountdown();
       this.initTextEffectsStatic();
@@ -438,36 +438,20 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   // HERO LAYERS & PARALLAX
   // =========================================================================
+  /**
+   * Garantiza que las capas del hero sean visibles.
+   *
+   * Antes se ocultaban con `gsap.set({ opacity: 0, visibility: 'hidden' })` y se
+   * revelaban con un tween escalonado. Eso costaba el LCP: Chrome descarta del
+   * LCP todo elemento con `opacity: 0` y lo vuelve a registrar como candidato
+   * en el instante en que pasa a visible, con lo que el LCP quedaba atado al
+   * fin de la carga de GSAP y no al primer pintado. Un LCP de 3,4 s con el
+   * `<h1>` del hero como elemento candidato es exactamente esa firma.
+   *
+   * La animacion, ademas, nunca se llegaba a ver: el overlay opaco del splash
+   * la tapaba durante toda su duracion, asi que solo costaba reflow y pintura.
+   */
   private revealHeroLayers(): void {
-    const layers = Array.from(
-      this.heroSection()?.nativeElement.querySelectorAll<HTMLElement>('.hero-layer') ?? []
-    );
-    if (!layers.length) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      layers.forEach(l => {
-        l.style.opacity = '1';
-        l.style.visibility = 'visible';
-        l.style.transform = '';
-      });
-      return;
-    }
-
-    this.gsap.set(layers, { opacity: 0, y: 40, visibility: 'hidden' });
-    this.tweens.push(this.gsap.to(layers, {
-      opacity: 1,
-      y: 0,
-      visibility: 'visible',
-      duration: 0.6,
-      delay: 0.2,
-      stagger: 0.15,
-      ease: 'expo.out',
-      overwrite: true,
-      clearProps: 'opacity,transform,visibility'
-    }));
-  }
-
-  private revealHeroLayersStatic(): void {
     this.heroSection()?.nativeElement
       .querySelectorAll<HTMLElement>('.hero-layer')
       .forEach(l => {
