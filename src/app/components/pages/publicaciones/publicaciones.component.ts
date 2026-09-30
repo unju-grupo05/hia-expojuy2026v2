@@ -49,10 +49,7 @@ export class NovedadesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cancelIdle = scheduleIdle(() => {
-      this.cancelIdle = null;
-      this.cargarNoticias();
-    }, 2000);
+    this.cargarNoticias();
   }
 
   cargarNoticias(): void {

@@ -204,10 +204,21 @@ export class UiChromeService {
     window.addEventListener('scroll', onScroll, { passive: true });
     this.readingScrollListener = onScroll;
 
-    // La primera medicion se difiere un frame a proposito: medir de forma
-    // sincrona desde `ngOnInit` obliga al navegador a resolver estilos que aun
-    // no estan asentados, que es exactamente el reflow forzado que penaliza.
-    this.readingFrame = requestAnimationFrame(measure);
+    // La primera medicion se difiere a idle para no obligar al navegador a resolver
+    // estilos/geometria de forma sincrona durante el arranque inicial (elimina forced reflow).
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => {
+        if (this.readingScrollListener) {
+          this.readingFrame = requestAnimationFrame(measure);
+        }
+      }, { timeout: 2500 });
+    } else {
+      setTimeout(() => {
+        if (this.readingScrollListener) {
+          this.readingFrame = requestAnimationFrame(measure);
+        }
+      }, 500);
+    }
   }
 
   stopReadingTracker(): void {

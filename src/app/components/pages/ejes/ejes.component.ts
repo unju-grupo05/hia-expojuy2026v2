@@ -31,10 +31,7 @@ export class EjesComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cancelIdle = scheduleIdle(() => {
-      this.cancelIdle = null;
-      this.obtenerEjes();
-    }, 2000);
+    this.obtenerEjes();
   }
 
   obtenerEjes(): void {

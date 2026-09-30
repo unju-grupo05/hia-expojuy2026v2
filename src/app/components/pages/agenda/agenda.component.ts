@@ -93,10 +93,7 @@ export class AgendaComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cancelIdle = scheduleIdle(() => {
-      this.cancelIdle = null;
-      this.obtenerAgenda();
-    }, 2000);
+    this.obtenerAgenda();
   }
 
   /** Registra un setTimeout y garantiza su limpieza al destruir. */

@@ -60,11 +60,21 @@ export class StardustComponent implements AfterViewInit, OnChanges, OnDestroy {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     this.ctx = ctx;
-    this.onResize();
-    window.addEventListener('resize', this.onResize);
-    window.addEventListener('scroll', this.onScroll, { passive: true });
-    if (this.active) {
-      this.start();
+
+    const startStardust = () => {
+      if (!this.stardustCanvas?.nativeElement) return;
+      this.onResize();
+      window.addEventListener('resize', this.onResize);
+      window.addEventListener('scroll', this.onScroll, { passive: true });
+      if (this.active) {
+        this.start();
+      }
+    };
+
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(startStardust, { timeout: 2000 });
+    } else {
+      setTimeout(startStardust, 250);
     }
   }
 

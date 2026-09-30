@@ -25,7 +25,6 @@ import { scheduleIdle } from '../../../core/idle';
 import type Lenis from 'lenis';
 import type * as ScrollTriggerTypes from 'gsap/ScrollTrigger';
 
-type GsapTimeline = ReturnType<GsapBundle['gsap']['timeline']>;
 type GsapTween = ReturnType<GsapBundle['gsap']['to']>;
 
 interface ChatMessage {
@@ -63,16 +62,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // ── View queries (signal based) ──────────────────────────────────────────
   private readonly bgVideo = viewChild<ElementRef<HTMLVideoElement>>('bgVideo');
   private readonly predioComponent = viewChild(UbicacionPredioHubComponent);
-  private readonly splashNode = viewChild<ElementRef<HTMLElement>>('splashNode');
-  private readonly splashLogo = viewChild<ElementRef<HTMLElement>>('splashLogo');
-  private readonly splashBadge = viewChild<ElementRef<HTMLElement>>('splashBadge');
   private readonly heroSection = viewChild<ElementRef<HTMLElement>>('heroSection');
   private readonly heroBg = viewChild<ElementRef<HTMLElement>>('heroBg');
   private readonly chatMessagesBox = viewChild<ElementRef<HTMLDivElement>>('chatMessagesBox');
   private readonly chatInputField = viewChild<ElementRef<HTMLInputElement>>('chatInputField');
 
   // ── Estado de UI (consumido por la plantilla) ───────────────────────────
-  readonly splashVisible = signal(true);
   readonly countdown = signal({ days: '30', hours: '00', minutes: '00', seconds: '00' });
   readonly chatOpen = signal(false);
   readonly chatTyping = signal(false);
@@ -82,9 +77,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   ]);
 
   // ── Recursos con teardown ───────────────────────────────────────────────
-  // GSAP y Lenis se resuelven con `import()` en `ngAfterViewInit`: son ~90 kB
-  // que antes formaban parte del bundle inicial. Los tipos vienen de
-  // `import type`, que el compilador borra por completo.
+  // GSAP y Lenis se resuelven con `import()` diferido para no bloquear el First Paint.
   private gsap!: GsapBundle['gsap'];
   private ScrollTrigger!: GsapBundle['ScrollTrigger'];
   private LenisCtor: typeof Lenis | null = null;
@@ -92,7 +85,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private lenisScrollUnsubscribe: (() => void) | null = null;
   private gsapTickerFn: ((time: number) => void) | null = null;
   private chromeScrollHandler: ((target: string) => void) | null = null;
-  private splashTimeline: GsapTimeline | null = null;
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
   private readonly tweens: GsapTween[] = [];
   private readonly scrollTriggers: ScrollTriggerTypes.ScrollTrigger[] = [];
@@ -105,7 +97,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly rafIds = new Set<number>();
   private readonly listenerCleanups: Array<() => void> = [];
   private activeRecognition: SpeechRecognitionLike | null = null;
-  private bodyScrollLocked = false;
   private viewDestroyed = false;
 
   constructor(
@@ -137,9 +128,17 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (typeof window !== 'undefined' && isPlatformBrowser(this.platformId)) {
+      const deferredTasks = () => {
+        void this.initAnimations();
+      };
 
-    this.onIdle(() => void this.initAnimations(), 600);
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(deferredTasks, { timeout: 2000 });
+      } else {
+        setTimeout(deferredTasks, 250);
+      }
+    }
   }
 
   private onIdle(fn: () => void, timeoutMs: number): void {
@@ -163,38 +162,20 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       this.ScrollTrigger = ScrollTrigger;
       this.LenisCtor = (lenisModule.default ?? lenisModule) as typeof Lenis;
 
-      this.initSplashIntro();
-      this.iniciarVideoFondo();
       this.revealHeroLayers();
+      this.iniciarVideoFondo();
       this.initCountdown();
       this.initTextEffects();
-
-      this.scheduleEnhancements();
+      this.initLenisSmoothScroll();
+      this.initHeroParallax();
+      this.initScrollReveal();
     } catch (error) {
       console.error('[inicio] No se pudieron cargar las animaciones', error);
-      this.dismissSplash();
       this.revealHeroLayers();
       this.iniciarVideoFondo();
       this.initCountdown();
       this.initTextEffectsStatic();
     }
-  }
-
-  private scheduleEnhancements(): void {
-    this.onIdle(() => {
-      if (this.viewDestroyed) return;
-      this.initLenisSmoothScroll();
-      this.initHeroParallax();
-      this.initScrollReveal();
-    }, 1200);
-  }
-
-  private dismissSplash(): void {
-    this.splashVisible.set(false);
-    this.releaseBodyScrollLock();
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
   }
 
   ngOnDestroy(): void {
@@ -214,9 +195,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.lenisScrollUnsubscribe = null;
     this.lenisInstance?.destroy();
     this.lenisInstance = null;
-
-    this.splashTimeline?.kill();
-    this.splashTimeline = null;
 
     this.clearCountdown();
 
@@ -250,84 +228,12 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.activeRecognition?.abort();
     this.activeRecognition = null;
 
-    this.releaseBodyScrollLock();
     document.body.classList.remove('chat-open');
   }
 
   // =========================================================================
-  // SPLASH INTRO & VIDEO DE FONDO
+  // VIDEO DE FONDO
   // =========================================================================
-  private initSplashIntro(): void {
-    const splash = this.splashNode()?.nativeElement;
-    const logo = this.splashLogo()?.nativeElement;
-    const badge = this.splashBadge()?.nativeElement;
-
-    if (!splash || !logo) {
-      this.splashVisible.set(false);
-      this.revealHeroLayers();
-      return;
-    }
-
-    this.lockBodyScroll();
-
-    const timeline = this.gsap.timeline({
-      onComplete: () => {
-        this.splashVisible.set(false);
-        this.releaseBodyScrollLock();
-
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
-
-        this.lenisInstance?.scrollTo(0, { immediate: true });
-
-        this.ScrollTrigger.refresh();
-        this.revealHeroLayers();
-      }
-    });
-    this.splashTimeline = timeline;
-
-    timeline.to(logo, {
-      opacity: 1,
-      scale: 1,
-      duration: 0.6,
-      ease: 'back.out(1.7)'
-    });
-
-    if (badge) {
-      timeline.to(badge, {
-        opacity: 0,
-        y: 10,
-        duration: 0.3,
-        delay: 0.3
-      });
-    }
-
-    timeline
-      .to(logo, {
-        scale: 6,
-        opacity: 0,
-        filter: 'blur(16px)',
-        duration: 0.6,
-        ease: 'expo.in'
-      }, 'zoom')
-      .to(splash, {
-        opacity: 0,
-        duration: 0.45,
-        ease: 'power2.out'
-      }, 'zoom+=0.1');
-  }
-
-  private lockBodyScroll(): void {
-    this.bodyScrollLocked = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  private releaseBodyScrollLock(): void {
-    if (!this.bodyScrollLocked) return;
-    this.bodyScrollLocked = false;
-    document.body.style.overflow = '';
-  }
 
   private clearCountdown(): void {
     if (this.countdownInterval === null) return;

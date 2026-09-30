@@ -78,10 +78,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.cancelIdle = scheduleIdle(() => {
-      this.cancelIdle = null;
-      this.loadExhibitors(true);
-    }, 2000);
+    this.loadExhibitors(true);
   }
 
   loadExhibitors(reset = false): void {

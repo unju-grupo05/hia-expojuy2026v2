@@ -58,10 +58,7 @@ export class GaleriaComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.cancelIdle = scheduleIdle(() => {
-      this.cancelIdle = null;
-      this.cargarGaleria();
-    }, 2000);
+    this.cargarGaleria();
   }
 
   cargarGaleria(): void {
