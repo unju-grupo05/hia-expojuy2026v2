@@ -1,6 +1,59 @@
 export type StandType = 'cubierto' | 'triangular' | 'planta_libre' | 'corporativo' | 'descubierto' | 'artesano';
-export type CommercialStatus = 'disponible' | 'reservado' | 'ocupado';
+export type CommercialStatus = 'disponible' | 'reservado' | 'cedido';
 export type SectorKey = 'cubierto' | 'corporativo' | 'descubierto' | 'artesano' | 'gastronomico' | 'all';
+
+export interface StandExpositor {
+  id: string;
+  name: string;
+  stand?: string;
+  category?: string;
+  subtitle?: string;
+  description?: string;
+  origin?: string;
+  email?: string | null;
+  logo?: string;
+}
+
+export interface UbicacionStandDto {
+  id?: number;
+  standId?: string;
+  x: number;
+  y: number;
+  z: number;
+  rotY: number;
+  w: number;
+  l: number;
+  h?: number;
+  carpetColor?: number;
+  type?: StandType | string;
+}
+
+export interface StandBackendDto {
+  id: string;
+  sector?: string;
+  superficie?: string;
+  estado: CommercialStatus | string;
+  notas?: string | null;
+  expositorId?: string | null;
+  expositor?: StandExpositor | null;
+  ubicacion?: UbicacionStandDto | null;
+  // Campos opcionales planos para retrocompatibilidad
+  x?: number;
+  y?: number;
+  z?: number;
+  rotY?: number;
+  w?: number;
+  l?: number;
+  h?: number;
+  carpetColor?: number;
+  type?: StandType | string;
+}
+
+export interface StandApiResponse {
+  success: boolean;
+  data: StandBackendDto[];
+  message?: string;
+}
 
 export interface StandData {
   id: string;
@@ -18,10 +71,12 @@ export interface StandData {
   type: StandType;
   rubro: string;
   area?: string;
+  superficie?: string;
   status?: CommercialStatus;
   company?: string;
   desc?: string;
   isPOI?: boolean;
+  expositor?: StandExpositor | null;
 }
 
 export interface PropItem {

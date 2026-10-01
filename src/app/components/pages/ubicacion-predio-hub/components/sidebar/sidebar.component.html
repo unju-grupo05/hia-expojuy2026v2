@@ -7,20 +7,44 @@
         class="badge-pill inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/25">
         <span>Sector Seleccionado</span>
       </div>
-      <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-sensors"/></svg>
+      
+      <!-- Badge de Estado Comercial Oficial (#8b5cf6 para Cedido) -->
+      <div *ngIf="stand()" 
+        class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border transition-colors"
+        [style.color]="statusDisplay().color"
+        [style.border-color]="statusDisplay().color + '66'"
+        [style.background-color]="statusDisplay().color + '20'">
+        <span class="w-1.5 h-1.5 rounded-full" [style.background-color]="statusDisplay().color"></span>
+        <span>{{ statusDisplay().text }}</span>
+      </div>
     </div>
-
 
     <div *ngIf="stand() as item; else defaultInfo" class="space-y-1">
       <h3 class="sidebar-title font-display text-xl font-bold leading-tight">
         {{ item.id }} — {{ item.company || 'Punto Oficial' }}
       </h3>
       <p class="sidebar-sub text-xs font-semibold uppercase tracking-wider">
-        {{ item.rubro }} · {{ item.sectorName }}
+        {{ item.rubro }} · {{ item.sectorName }} · {{ item.area || item.superficie || '' }}
       </p>
       <p class="sidebar-desc text-sm leading-relaxed pt-1">
-        {{ item.desc || 'Stand oficial de ' + item.area + ' ubicado en ' + item.sectorName + '. Equipado con suministro eléctrico 220V/380V, iluminación LED y conexión Wi-Fi 6.' }}
+        {{ item.desc || ('Stand oficial de ' + (item.area || item.superficie || 'área estándar') + ' ubicado en ' + item.sectorName + '. Equipado con suministro eléctrico 220V/380V, iluminación LED y conexión Wi-Fi 6.') }}
       </p>
+
+      <!-- Badge de disponibilidad para reserva comercial -->
+      <div *ngIf="item.status === 'disponible'" class="mt-2.5 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <span>Espacio disponible para reserva</span>
+      </div>
+
+      <!-- Detalle del Expositor Oficial asignado -->
+      <div *ngIf="item.expositor as exp" class="mt-2.5 p-2.5 rounded-lg bg-surface-container-high border border-slate-200/40 dark:border-white/10 text-xs space-y-1">
+        <div class="font-bold text-on-surface flex items-center justify-between">
+          <span>{{ exp.name }}</span>
+          <span *ngIf="exp.category" class="text-[10px] px-2 py-0.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible">{{ exp.category }}</span>
+        </div>
+        <p *ngIf="exp.subtitle" class="text-on-surface-variant font-medium">{{ exp.subtitle }}</p>
+        <p *ngIf="exp.origin" class="text-on-surface-variant/80">{{ exp.origin }}</p>
+      </div>
     </div>
 
     <ng-template #defaultInfo>

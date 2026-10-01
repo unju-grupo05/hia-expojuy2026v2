@@ -13,14 +13,11 @@ import { SectorActivity } from '../../../../models/sector-info.model';
 })
 export class SidebarComponent {
   public stand = computed(() => {
-    // `dataVersion` actúa como dependencia: al llegar los expositores de la BD
-    // el stand se muta en el sitio, y esto fuerza a releer sus datos.
     this.dataService.dataVersion();
     return this.dataService.selectedStand();
   });
   public isDismissed = signal<boolean>(false);
 
-  // Determina si la tarjeta debe mostrarse en mobile
   public isSheetVisible = computed(() => {
     return !!this.stand() && !this.isDismissed();
   });
@@ -33,7 +30,8 @@ export class SidebarComponent {
     const st = s.status || 'disponible';
     if (st === 'disponible') return { text: 'DISPONIBLE', color: '#22c55e' };
     if (st === 'reservado') return { text: 'RESERVADO', color: '#facc15' };
-    return { text: 'OCUPADO', color: '#ef4444' };
+    if (st === 'cedido') return { text: 'CEDIDO', color: '#8b5cf6' };
+    return { text: 'DISPONIBLE', color: '#22c55e' };
   });
 
   /** Categorías de la BD que se priorizan para cada sector del predio. */
@@ -49,8 +47,6 @@ export class SidebarComponent {
     const lista: string[] = [];
     if (s?.company) lista.push(s.company);
 
-    // Expositores reales de PostgreSQL. El orden lo fija la respuesta de la API,
-    // por lo que la lista es estable entre recargas.
     const categorias = s ? (SidebarComponent.CATEGORIAS_POR_SECTOR[s.sectorKey] ?? []) : [];
     const todos = this.dataService.expositores();
 

@@ -23,7 +23,7 @@
                 {{ standToEdit() ? 'Editar Expositor' : 'Nuevo Expositor' }}
               </h2>
               <p class="text-xs text-slate-500 dark:text-slate-400">
-                Configura los datos del expositor para el catálogo oficial de empresas
+                Configura los datos del expositor y sus parcelas físicas asignadas
               </p>
             </div>
           </div>
@@ -39,34 +39,119 @@
         <!-- Form Body -->
         <form [formGroup]="standForm" (ngSubmit)="onSubmit()" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
 
-          <!-- Nombre y Stand -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="sm:col-span-2">
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Empresa / Nombre del Expositor *
+          <!-- Nombre de Empresa -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Empresa / Nombre del Expositor *
+            </label>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Ej: Jujuy Litio & Energías del Norte"
+              class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+            />
+            @if (standForm.get('name')?.invalid && standForm.get('name')?.touched) {
+              <p class="text-[11px] text-rose-500 mt-1">El nombre debe tener al menos 3 caracteres.</p>
+            }
+          </div>
+
+          <!-- Selector Múltiple de Stands con Badges -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Parcelas Físicas Asignadas (Stands 3D) *
               </label>
-              <input
-                type="text"
-                formControlName="name"
-                placeholder="Ej: Jujuy Litio & Energías del Norte"
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              />
-              @if (standForm.get('name')?.invalid && standForm.get('name')?.touched) {
-                <p class="text-[11px] text-rose-500 mt-1">El nombre debe tener al menos 3 caracteres.</p>
+              <button
+                type="button"
+                (click)="toggleSelector()"
+                class="text-xs font-semibold text-primary dark:text-brand-cyan-electric hover:underline flex items-center gap-1">
+                <svg class="ms-icon text-sm" aria-hidden="true">
+                  <use [attr.href]="isStandSelectorOpen() ? '#ms-close' : '#ms-add'"/>
+                </svg>
+                <span>{{ isStandSelectorOpen() ? 'Cerrar Catálogo' : '+ Asignar / Cambiar Stands' }}</span>
+              </button>
+            </div>
+
+            <!-- Contenedor de Badges seleccionados -->
+            <div class="min-h-11 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 flex flex-wrap items-center gap-1.5">
+              @for (standId of selectedStandIds(); track standId) {
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-cyan-electric/20 text-brand-cyan-accessible dark:text-brand-cyan-electric border border-brand-cyan-electric/40 shadow-xs">
+                  <span>Stand {{ standId }}</span>
+                  <button
+                    type="button"
+                    (click)="removeStand(standId, $event)"
+                    title="Remover stand"
+                    class="p-0.5 rounded-full hover:bg-rose-500/20 text-rose-500 transition-colors">
+                    <svg class="ms-icon text-[14px]" aria-hidden="true"><use href="#ms-close"/></svg>
+                  </button>
+                </span>
+              } @empty {
+                <span class="text-xs text-slate-400 dark:text-slate-500 italic px-1">
+                  Ningún stand seleccionado. Haz clic en "+ Asignar / Cambiar Stands" para elegir parcelas disponibles.
+                </span>
               }
             </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                Stand *
-              </label>
-              <input
-                type="text"
-                formControlName="stand"
-                placeholder="Stand A-12 · Pab. Minería"
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
-              />
-            </div>
+            @if (selectedStandIds().length === 0 && standForm.get('stand')?.touched) {
+              <p class="text-[11px] text-rose-500 mt-1">Debes seleccionar al menos un stand comercial para el expositor.</p>
+            }
+
+            <!-- Desplegable interactivo para elegir stands disponibles -->
+            @if (isStandSelectorOpen()) {
+              <div class="mt-2 p-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-primary/20 shadow-xl space-y-2.5 animate-fadeIn">
+                <div class="flex items-center justify-between gap-2">
+                  <input
+                    type="text"
+                    [value]="standsSearch()"
+                    (input)="onSearchChange($event)"
+                    placeholder="Filtrar por código o sector (ej: A1, C29, Cubierto)..."
+                    class="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-1 focus:ring-primary"
+                  />
+                  <span class="text-[11px] font-semibold text-slate-400 whitespace-nowrap">
+                    {{ filteredStandsDisponibles().length }} disponibles
+                  </span>
+                </div>
+
+                @if (standsLoading()) {
+                  <div class="py-4 text-center text-xs text-slate-400">
+                    Cargando parcelas disponibles del servidor...
+                  </div>
+                } @else {
+                  <div class="max-h-48 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-1.5 pr-1">
+                    @for (s of filteredStandsDisponibles(); track s.id) {
+                      <button
+                        type="button"
+                        (click)="toggleStandSelection(s.id)"
+                        [class.bg-brand-cyan-electric/25]="isStandSelected(s.id)"
+                        [class.border-brand-cyan-electric]="isStandSelected(s.id)"
+                        [class.text-brand-cyan-accessible]="isStandSelected(s.id)"
+                        [class.dark:text-brand-cyan-electric]="isStandSelected(s.id)"
+                        [class.bg-slate-100]="!isStandSelected(s.id)"
+                        [class.dark:bg-slate-900]="!isStandSelected(s.id)"
+                        [class.border-slate-200]="!isStandSelected(s.id)"
+                        [class.dark:border-slate-700]="!isStandSelected(s.id)"
+                        [class.text-slate-700]="!isStandSelected(s.id)"
+                        [class.dark:text-slate-300]="!isStandSelected(s.id)"
+                        class="p-2 rounded-xl text-start text-xs border transition-all hover:border-primary/50 flex flex-col justify-between">
+                        <div class="flex items-center justify-between w-full">
+                          <span class="font-bold">{{ s.id }}</span>
+                          @if (isStandSelected(s.id)) {
+                            <svg class="ms-icon text-[14px] text-brand-cyan-accessible dark:text-brand-cyan-electric" aria-hidden="true"><use href="#ms-check"/></svg>
+                          }
+                        </div>
+                        <span class="text-[10px] text-slate-400 truncate mt-0.5">
+                          {{ s.sector || 'Sector General' }}
+                        </span>
+                      </button>
+                    } @empty {
+                      <div class="col-span-full py-3 text-center text-xs text-slate-400">
+                        No se encontraron parcelas que coincidan con la búsqueda.
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            }
           </div>
 
           <!-- Categoría y Origen -->
@@ -146,10 +231,19 @@
 
               <div class="w-full max-w-sm p-6 rounded-3xl bg-white dark:bg-[#151026] border border-primary/10 dark:border-white/10 shadow-sm flex flex-col justify-between">
                 <div>
-                  <div class="flex items-center justify-between mb-4">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric">
-                      {{ standForm.get('stand')?.value || 'Stand S/N' }}
-                    </span>
+                  <!-- Badges en Preview -->
+                  <div class="flex flex-wrap items-center justify-between gap-1.5 mb-4">
+                    <div class="flex flex-wrap items-center gap-1">
+                      @for (sId of selectedStandIds(); track sId) {
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-brand-cyan-electric/15 text-brand-cyan-accessible dark:text-brand-cyan-electric border border-brand-cyan-electric/30">
+                          Stand {{ sId }}
+                        </span>
+                      } @empty {
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-400">
+                          Sin stands asignados
+                        </span>
+                      }
+                    </div>
                     <svg class="ms-icon text-primary text-base" aria-hidden="true"><use href="#ms-verified"/></svg>
                   </div>
 

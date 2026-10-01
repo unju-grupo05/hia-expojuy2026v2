@@ -46,11 +46,12 @@ export class StandsListComponent {
         this.stands.set((res.data?.items ?? []).map((expositor) => ({
           id: expositor.id,
           name: expositor.name,
-          stand: expositor.stand,
+          stand: expositor.stand || '',
           category: expositor.category,
           subtitle: expositor.subtitle ?? '',
           description: expositor.description ?? '',
-          origin: expositor.origin ?? ''
+          origin: expositor.origin ?? '',
+          standIds: (expositor.stands || []).map(s => s.id)
         })));
         this.loading.set(false);
       },
@@ -111,6 +112,7 @@ export class StandsListComponent {
       this.expositoresService.putModificarExpositor(formData.id, {
         name: formData.name,
         stand: formData.stand,
+        standIds: formData.standIds,
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
@@ -122,13 +124,15 @@ export class StandsListComponent {
         },
         error: (err) => {
           console.error('Error al actualizar expositor:', err);
-          this.showToast('No se pudo actualizar el expositor.', true);
+          const msg = err.error?.message || 'No se pudo actualizar el expositor.';
+          this.showToast(msg, true);
         }
       });
     } else {
       this.expositoresService.postExpositor({
         name: formData.name,
         stand: formData.stand,
+        standIds: formData.standIds,
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
@@ -140,7 +144,8 @@ export class StandsListComponent {
         },
         error: (err) => {
           console.error('Error al crear expositor:', err);
-          this.showToast('No se pudo registrar el expositor.', true);
+          const msg = err.error?.message || 'No se pudo registrar el expositor.';
+          this.showToast(msg, true);
         }
       });
     }

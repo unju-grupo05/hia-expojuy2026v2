@@ -6,15 +6,23 @@
  * que se tipa como `string`; las pestanas de filtro de la seccion publica
  * comparan contra literales, no contra el tipo.
  */
+export interface ExpositorStandSummary {
+  id: string;
+  sector: string;
+  superficie?: string;
+  estado: string;
+}
+
 export interface Expositor {
   id: string;
   name: string;
-  stand: string;
+  stand: string | null;
   category: string;
   subtitle: string | null;
   description: string | null;
   origin: string | null;
   email: string | null;
+  stands?: ExpositorStandSummary[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -31,7 +39,8 @@ export interface ExpositorQuery {
 export interface ExpositorPayload {
   id?: string;
   name: string;
-  stand: string;
+  stand?: string | null;
+  standIds?: string[];
   category: string;
   subtitle?: string | null;
   description?: string | null;

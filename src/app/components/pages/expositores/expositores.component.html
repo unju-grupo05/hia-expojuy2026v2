@@ -1,42 +1,52 @@
     <!-- Directorio de Expositores (Categorized & Searchable) -->
-    <section class="w-full py-20 lg:py-28 bg-neutral-surface-light text-on-surface">
+    <section id="expositores" class="w-full pt-28 pb-20 lg:pt-32 lg:pb-28 bg-neutral-surface-light text-on-surface">
       <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="reveal-on-scroll flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+        <div class="reveal-on-scroll is-visible flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
           <div class="space-y-2">
-            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary">
+            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary dark:text-[#E879F9]">
               <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-storefront"/></svg>
-              Catálogo de Empresas Confirmadas
+              <span>CATÁLOGO DE EMPRESAS CONFIRMADAS</span>
             </div>
-            <h2 class="blur-split font-display text-3xl sm:text-4xl font-extrabold text-brand-slate-dark">Directorio de Expositores 2026</h2>
+            <h1 class="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold text-brand-slate-dark dark:text-white tracking-tight">Directorio de Expositores 2026</h1>
           </div>
 
           <!-- Search Bar -->
           <div class="w-full md:w-80">
             <div class="relative">
-              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric" id="exhibitor-search" (input)="filterExhibitors($any($event.target).value)" placeholder="Buscar por empresa o rubro..." type="text">
-              <svg class="ms-icon absolute left-3 top-2.5 text-outline text-lg" aria-hidden="true"><use href="#ms-search"/></svg>
+              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-[#1a1628] border border-slate-200 dark:border-[#2c2541] text-sm text-brand-slate-dark dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric shadow-xs"
+                     id="exhibitor-search"
+                     (input)="filterExhibitors($any($event.target).value)"
+                     placeholder="Buscar por empresa o rubro..."
+                     type="text">
+              <svg class="ms-icon absolute left-3 top-2.5 text-outline dark:text-slate-400 text-lg" aria-hidden="true"><use href="#ms-search"/></svg>
             </div>
           </div>
         </div>
 
         <!-- Filter Category Tabs -->
-        <div class="reveal-on-scroll flex flex-wrap items-center gap-2 mb-8" id="category-tabs">
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs transition-all"
+        <div class="reveal-on-scroll is-visible flex flex-wrap items-center gap-2 mb-8" id="category-tabs">
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'all'"
                   (click)="setCategoryFilter('all')">Todos</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'mineria'"
                   (click)="setCategoryFilter('mineria')">Minería & Litio</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'agro'"
                   (click)="setCategoryFilter('agro')">Agroindustria</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'energia'"
                   (click)="setCategoryFilter('energia')">Energías Renovables</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'tecnologia'"
                   (click)="setCategoryFilter('tecnologia')">Tecnología & IA</button>
-          <button class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all"
+          <button type="button"
+                  class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'logistica'"
                   (click)="setCategoryFilter('logistica')">Logística & Puertos</button>
         </div>
@@ -54,16 +64,12 @@
                  [attr.data-name]="ex.name.toLowerCase()">
               <div>
                 <div class="flex items-center justify-between mb-4">
-                  <span class="px-3 py-1 rounded-full text-xs font-bold"
-                        [class.bg-brand-cyan-electric/15]="ex.category === 'mineria' || ex.category === 'tecnologia'"
-                        [class.text-brand-cyan-accessible]="ex.category === 'mineria' || ex.category === 'tecnologia'"
-                        [class.bg-brand-lavender-surface]="ex.category === 'energia'"
-                        [class.text-primary]="ex.category === 'energia'"
-                        [class.bg-surface-container-high]="ex.category === 'agro' || ex.category === 'logistica'"
-                        [class.text-brand-slate-dark]="ex.category === 'agro' || ex.category === 'logistica'">
-                    {{ ex.stand }}
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border backdrop-blur-xs shadow-xs"
+                        [ngClass]="getStandBadgeClasses(ex)">
+                    <span class="w-1.5 h-1.5 rounded-full shrink-0" [ngClass]="getStandBadgeDotClasses(ex)"></span>
+                    <span>{{ getStandBadgeText(ex) }}</span>
                   </span>
-                  <svg class="ms-icon text-outline" aria-hidden="true"><use href="#ms-verified"/></svg>
+                  <svg class="ms-icon text-outline shrink-0 ml-2" aria-hidden="true"><use href="#ms-verified"/></svg>
                 </div>
                 <h3 class="font-display text-lg font-bold text-brand-slate-dark">{{ ex.name }}</h3>
                 <p class="text-xs text-outline mt-1 font-semibold uppercase tracking-wider">{{ ex.subtitle }}</p>

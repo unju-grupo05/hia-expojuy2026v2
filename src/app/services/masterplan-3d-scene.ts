@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import gsap from 'gsap';
 import { MasterplanDataService } from './masterplan-data.service';
-import { StandData, PropItem } from '../components/models/stand.model';
+import { StandData, PropItem, CommercialStatus } from '../components/models/stand.model';
 
 /**
  * Implementacion concreta de la escena 3D del predio.
@@ -29,11 +29,12 @@ export class Masterplan3dScene {
   private pinElement!: HTMLElement;
   private pinTextElement!: HTMLElement;
 
-  private pickableStands: THREE.Mesh[] = [];
+  public pickableStands: THREE.Mesh[] = [];
+  public standMeshes: THREE.Group[] = [];
   private standMeshesMap: Record<string, { group: THREE.Group; hitBox: THREE.Mesh; data: StandData }> = {};
   private animatedBanners: { mesh: THREE.Mesh; baseHeight: number; speed: number }[] = [];
   private highlightBox!: THREE.LineSegments;
-  
+
   // Techo y vigas
   public roofGroup!: THREE.Group;
   public roofMat!: THREE.MeshStandardMaterial;
@@ -57,6 +58,9 @@ export class Masterplan3dScene {
   private raycaster = new THREE.Raycaster();
   private pointer = new THREE.Vector2();
   private currentSelectedStand: StandData | null = null;
+  private standsGroup: THREE.Group = new THREE.Group();
+  private activeStatusFilter: CommercialStatus | 'all' = 'all';
+  private activeRubroFilter: string = 'all';
 
   private wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
@@ -68,7 +72,7 @@ export class Masterplan3dScene {
   constructor(
     private dataService: MasterplanDataService,
     private ngZone: NgZone
-  ) {}
+  ) { }
 
   public init(canvas: HTMLCanvasElement, wrapper: HTMLElement, pinEl: HTMLElement, pinTextEl: HTMLElement): void {
     this.isDestroyed = false;
@@ -114,8 +118,12 @@ export class Masterplan3dScene {
     this.buildProps();
     this.buildAuxiliaryBuildings();
     this.buildPOIFlags();
-    this.buildProceduralStands();
     this.buildHighlightBox();
+
+    this.standsGroup = new THREE.Group();
+    this.scene.add(this.standsGroup);
+
+    this.buildProceduralStands();
 
     this.setupEvents();
 
@@ -697,19 +705,59 @@ export class Masterplan3dScene {
     });
   }
 
-  private buildProceduralStands(): void {
-    const stands = this.dataService.getStandsProcessed();
+  /**
+   * Renderiza y actualiza los stands en Three.js de manera reactiva e independiente
+   * de la infraestructura base (suelo, galpon, vigas, luces).
+   * Itera exclusivamente sobre los stands devueltos por el backend.
+   */
+  public updateStands(stands: StandData[]): void {
+    if (this.isDestroyed || !stands) return;
+
+    if (!this.standsGroup) {
+      this.standsGroup = new THREE.Group();
+    }
+    if (this.scene && !this.scene.children.includes(this.standsGroup)) {
+      this.scene.add(this.standsGroup);
+    }
+
+    // 1. Limpiar mallas previas de standsGroup
+    while (this.standsGroup.children.length > 0) {
+      const child = this.standsGroup.children[0];
+      this.standsGroup.remove(child);
+      child.traverse(obj => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.geometry) {
+          mesh.geometry.dispose();
+        }
+      });
+    }
+
+    this.pickableStands = [];
+    this.standMeshes = [];
+    this.standMeshesMap = {};
+
+    if (stands.length === 0) {
+      if (this.highlightBox) this.highlightBox.visible = false;
+      return;
+    }
+
     const metalMat = this.sharedMaterials.get('trussMetal')!;
     const wallWhite = this.sharedMaterials.get('wallWhite')!;
     const counterDark = this.sharedMaterials.get('counterDark')!;
 
+    // 2. Renderizar mallas iterando sobre los stands provistos
     stands.forEach(data => {
       const standGroup = new THREE.Group();
       standGroup.position.set(data.x, 0.04, data.z);
       standGroup.rotation.y = data.rotY || 0;
 
-      // 1. STAND A6: Triángulo Isósceles con ápice apuntando al Norte
-      if (data.id === "CUB-TRI-A6" || data.type === 'triangular') {
+      const isCedido = data.status === 'cedido';
+      const isReservado = data.status === 'reservado';
+      const cleanId = (data.id || '').toUpperCase().replace(/^(CUB-POL-|CUB-PL-|CUB-TRI-|CUB-|CORP-|EXT-P-|MAQ-)/, '');
+      const standNum = parseInt(cleanId.replace(/\D/g, '')) || 0;
+
+      // 1. STAND TRIANGULAR: A6, C35-C42 o type triangular
+      if (data.type === 'triangular' || cleanId === 'A6' || data.id === 'CUB-TRI-A6' || cleanId.startsWith('TRI') || (cleanId.startsWith('C') && parseInt(cleanId.slice(1)) >= 35 && parseInt(cleanId.slice(1)) <= 42)) {
         const hw = data.w / 2;
         const hl = data.l / 2;
         const shape = new THREE.Shape();
@@ -719,7 +767,8 @@ export class Masterplan3dScene {
         shape.closePath();
 
         const triGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: false });
-        const triMat = new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.35 });
+        const carpetColor = isCedido ? 0x8b5cf6 : (isReservado ? 0xfacc15 : 0x1d4ed8);
+        const triMat = new THREE.MeshStandardMaterial({ color: carpetColor, roughness: 0.35 });
         const triMesh = new THREE.Mesh(triGeo, triMat);
         triMesh.rotation.x = -Math.PI / 2;
         triMesh.position.y = 0.05;
@@ -737,7 +786,7 @@ export class Masterplan3dScene {
         });
       }
       // 2. STAND A1: Trapecio con ochava orientada al pasillo Sureste
-      else if (data.id === "CUB-POL-A1") {
+      else if (cleanId === 'A1' || data.id === 'CUB-POL-A1') {
         const hw = data.w / 2;
         const hl = data.l / 2;
         const shape = new THREE.Shape();
@@ -749,7 +798,8 @@ export class Masterplan3dScene {
         shape.closePath();
 
         const a1Geo = new THREE.ExtrudeGeometry(shape, { depth: 0.1, bevelEnabled: false });
-        const a1Mat = new THREE.MeshStandardMaterial({ color: 0x1e40af, roughness: 0.35 });
+        const carpetColor = isCedido ? 0x8b5cf6 : (isReservado ? 0xfacc15 : 0x1e40af);
+        const a1Mat = new THREE.MeshStandardMaterial({ color: carpetColor, roughness: 0.35 });
         const a1Mesh = new THREE.Mesh(a1Geo, a1Mat);
         a1Mesh.rotation.x = -Math.PI / 2;
         a1Mesh.position.y = 0.05;
@@ -766,11 +816,12 @@ export class Masterplan3dScene {
           standGroup.add(col);
         });
       }
-      // 3. PLANTA LIBRE RECTANGULAR: CUB-PL-A5
-      else if (data.id === "CUB-PL-A5") {
+      // 3. PLANTA LIBRE RECTANGULAR: A2, A5 o type planta_libre
+      else if (data.type === 'planta_libre' || cleanId === 'A5' || cleanId === 'A2' || data.id === 'CUB-PL-A5') {
+        const carpetColor = isCedido ? 0x8b5cf6 : (isReservado ? 0xfacc15 : 0x1e40af);
         const carpet = new THREE.Mesh(
           new THREE.BoxGeometry(data.w - 0.2, 0.08, data.l - 0.2),
-          new THREE.MeshStandardMaterial({ color: 0x1e40af, roughness: 0.4 })
+          new THREE.MeshStandardMaterial({ color: carpetColor, roughness: 0.4 })
         );
         carpet.position.y = 0.04;
         standGroup.add(carpet);
@@ -787,8 +838,8 @@ export class Masterplan3dScene {
           }
         }
       }
-      // 4. LOTES CORPORATIVOS
-      else if (data.type === 'corporativo' || data.id.startsWith('CORP-')) {
+      // 4. LOTES CORPORATIVOS: F1, F2, G1-G3, CORP- o type corporativo
+      else if (data.type === 'corporativo' || data.id.startsWith('CORP-') || cleanId.startsWith('F') || (cleanId.startsWith('G') && standNum >= 1 && standNum <= 3)) {
         const deck = new THREE.Mesh(
           new THREE.BoxGeometry(data.w, 0.18, data.l),
           new THREE.MeshStandardMaterial({ color: 0x18202c, roughness: 0.45, metalness: 0.25 })
@@ -797,13 +848,14 @@ export class Masterplan3dScene {
         deck.receiveShadow = true;
         standGroup.add(deck);
 
+        const accentColor = isCedido ? 0x8b5cf6 : 0xff7b00;
         const borderGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(data.w, data.l));
-        const border = new THREE.LineSegments(borderGeo, new THREE.LineBasicMaterial({ color: 0xff7b00, linewidth: 3 }));
+        const border = new THREE.LineSegments(borderGeo, new THREE.LineBasicMaterial({ color: accentColor, linewidth: 3 }));
         border.rotation.x = -Math.PI / 2;
         border.position.y = 0.185;
         standGroup.add(border);
 
-        const beaconMat = new THREE.MeshBasicMaterial({ color: 0xff7b00 });
+        const beaconMat = new THREE.MeshBasicMaterial({ color: accentColor });
         for (const cx of [-data.w / 2 + 0.4, data.w / 2 - 0.4]) {
           for (const cz of [-data.l / 2 + 0.4, data.l / 2 - 0.4]) {
             const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 3.2), metalMat);
@@ -815,35 +867,8 @@ export class Masterplan3dScene {
           }
         }
       }
-      // 5. STANDS MODULARES
-      else if (data.type === 'cubierto' || data.type === 'artesano') {
-        const carpet = new THREE.Mesh(
-          new THREE.BoxGeometry(Math.max(0.2, data.w - 0.08), 0.05, Math.max(0.2, data.l - 0.08)),
-          this.getCarpetMaterial(data.carpetColor)
-        );
-        carpet.position.y = 0.025;
-        carpet.receiveShadow = true;
-        standGroup.add(carpet);
-
-        const wallH = data.h || (data.type === 'cubierto' ? 2.4 : 2.0);
-        const backWall = new THREE.Mesh(new THREE.BoxGeometry(data.w, wallH, 0.06), wallWhite);
-        backWall.position.set(0, wallH / 2, -data.l / 2 + 0.03);
-        standGroup.add(backWall);
-
-        const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.06, wallH, data.l * 0.8), wallWhite);
-        sideWall.position.set(-data.w / 2 + 0.03, wallH / 2, -data.l * 0.1);
-        standGroup.add(sideWall);
-
-        const fascia = new THREE.Mesh(new THREE.BoxGeometry(data.w, 0.35, 0.08), wallWhite);
-        fascia.position.set(0, wallH - 0.18, data.l / 2 - 0.04);
-        standGroup.add(fascia);
-
-        const counter = new THREE.Mesh(new THREE.BoxGeometry(data.w * 0.45, 0.95, 0.5), counterDark);
-        counter.position.set(data.w * 0.2, 0.48, data.l * 0.15);
-        standGroup.add(counter);
-      }
-      // 6. MAQUINARIAS Y VEHÍCULOS
-      else if (data.type === 'descubierto') {
+      // 5. MAQUINARIAS Y VEHÍCULOS (descubierto)
+      else if (data.type === 'descubierto' || data.id.startsWith('MAQ-') || cleanId.startsWith('H') || (cleanId.startsWith('G') && standNum >= 4)) {
         const parcelBase = new THREE.Mesh(
           new THREE.BoxGeometry(data.w, 0.06, data.l),
           this.sharedMaterials.get('parcelWhite')!
@@ -851,13 +876,14 @@ export class Masterplan3dScene {
         parcelBase.position.y = 0.03;
         standGroup.add(parcelBase);
 
+        const accentColor = isCedido ? 0x8b5cf6 : 0x00f0ff;
         const borderGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(data.w, data.l));
-        const border = new THREE.LineSegments(borderGeo, this.sharedMaterials.get('cyanLine')!);
+        const border = new THREE.LineSegments(borderGeo, new THREE.LineBasicMaterial({ color: accentColor, linewidth: 2 }));
         border.rotation.x = -Math.PI / 2;
         border.position.y = 0.065;
         standGroup.add(border);
 
-        const cornerMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+        const cornerMat = new THREE.MeshBasicMaterial({ color: accentColor });
         for (const cx of [-data.w / 2, data.w / 2]) {
           for (const cz of [-data.l / 2, data.l / 2]) {
             const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.4), cornerMat);
@@ -866,7 +892,6 @@ export class Masterplan3dScene {
           }
         }
 
-        const standNum = parseInt(data.id.replace(/\D/g, '')) || 0;
         if (standNum % 2 === 0) {
           const carGroup = new THREE.Group();
           const carBody = new THREE.Mesh(
@@ -892,7 +917,36 @@ export class Masterplan3dScene {
           standGroup.add(machine);
         }
       }
+      // 6. STANDS MODULARES (cubierto / artesano / fallback general)
+      else {
+        const carpetColor = isCedido ? 0x8b5cf6 : (data.carpetColor || 0x334155);
+        const carpet = new THREE.Mesh(
+          new THREE.BoxGeometry(Math.max(0.2, data.w - 0.08), 0.05, Math.max(0.2, data.l - 0.08)),
+          this.getCarpetMaterial(carpetColor)
+        );
+        carpet.position.y = 0.025;
+        carpet.receiveShadow = true;
+        standGroup.add(carpet);
 
+        const wallH = data.h || (data.type === 'artesano' ? 2.0 : 2.4);
+        const backWall = new THREE.Mesh(new THREE.BoxGeometry(data.w, wallH, 0.06), wallWhite);
+        backWall.position.set(0, wallH / 2, -data.l / 2 + 0.03);
+        standGroup.add(backWall);
+
+        const sideWall = new THREE.Mesh(new THREE.BoxGeometry(0.06, wallH, data.l * 0.8), wallWhite);
+        sideWall.position.set(-data.w / 2 + 0.03, wallH / 2, -data.l * 0.1);
+        standGroup.add(sideWall);
+
+        const fascia = new THREE.Mesh(new THREE.BoxGeometry(data.w, 0.35, 0.08), wallWhite);
+        fascia.position.set(0, wallH - 0.18, data.l / 2 - 0.04);
+        standGroup.add(fascia);
+
+        const counter = new THREE.Mesh(new THREE.BoxGeometry(data.w * 0.45, 0.95, 0.5), counterDark);
+        counter.position.set(data.w * 0.2, 0.48, data.l * 0.15);
+        standGroup.add(counter);
+      }
+
+      // HitBox interactivo para Raycaster
       const hitBox = new THREE.Mesh(
         new THREE.BoxGeometry(data.w, data.h || 3.0, data.l),
         new THREE.MeshBasicMaterial({ visible: false })
@@ -902,11 +956,50 @@ export class Masterplan3dScene {
       standGroup.add(hitBox);
       this.pickableStands.push(hitBox);
 
-      this.scene.add(standGroup);
+      this.standsGroup.add(standGroup);
       this.standMeshesMap[data.id] = { group: standGroup, hitBox, data };
+      this.standMeshes.push(standGroup);
     });
+
+    // 3. Selección y filtros
+    if (this.currentSelectedStand) {
+      const match = stands.find(s => s.id === this.currentSelectedStand!.id);
+      if (match) {
+        this.selectStand(match, false);
+      } else if (stands.length > 0) {
+        this.selectStand(stands[0], false);
+      }
+    } else if (stands.length > 0) {
+      this.selectStand(stands[0], false);
+    }
+
+    if (this.activeStatusFilter && this.activeStatusFilter !== 'all') {
+      this.applyStatusFilter(this.activeStatusFilter);
+    } else if (this.activeRubroFilter && this.activeRubroFilter !== 'all') {
+      this.applyFilter(this.activeRubroFilter);
+    }
   }
 
+  /**
+   * Genera o refresca los stands procedimentales en la escena 3D.
+   * Método de compatibilidad e inicialización sincrónica.
+   */
+  public buildProceduralStands(): void {
+    const stands = this.dataService.stands().length > 0
+      ? this.dataService.stands()
+      : this.dataService.getStandsProcessed();
+    if (stands.length > 0) {
+      this.rebuildStands(stands);
+    }
+  }
+
+  public createStands(stands: StandData[]): void {
+    this.updateStands(stands);
+  }
+
+  public rebuildStands(stands: StandData[]): void {
+    this.updateStands(stands);
+  }
   private buildHighlightBox(): void {
     const boxGeo = new THREE.BoxGeometry(1, 1, 1);
     const edges = new THREE.EdgesGeometry(boxGeo);
@@ -1022,7 +1115,34 @@ export class Masterplan3dScene {
     }
   }
 
+  /**
+   * Filtra los stands en la escena 3D segun su estado comercial:
+   * 'all' | 'disponible' | 'reservado' | 'cedido'.
+   * Atenua stands que no coinciden y resalta los coincidentes a opacidad 1.0.
+   */
+  public applyStatusFilter(status: CommercialStatus | 'all'): void {
+    this.activeStatusFilter = status;
+    const filter = (status || 'all').toLowerCase();
+    let firstMatch: StandData | null = null;
+
+    Object.values(this.standMeshesMap).forEach(m => {
+      const stand = m.data;
+      const standStatus = (stand.status || 'disponible').toLowerCase();
+      const match = (filter === 'all' || standStatus === filter);
+
+      m.group.visible = match;
+      m.hitBox.visible = match;
+
+      if (match && !firstMatch) firstMatch = stand;
+    });
+
+    if (firstMatch && filter !== 'all') {
+      this.selectStand(firstMatch, true);
+    }
+  }
+
   public applyFilter(rubro: string): void {
+    this.activeRubroFilter = rubro;
     const rubroKey = (rubro || 'all').toLowerCase();
     let firstMatch: StandData | null = null;
 
@@ -1033,17 +1153,8 @@ export class Masterplan3dScene {
         stand.sectorName.toLowerCase().includes(rubroKey) ||
         (stand.company && stand.company.toLowerCase().includes(rubroKey)));
 
-      m.group.visible = true;
+      m.group.visible = match;
       m.hitBox.visible = match;
-      m.group.traverse(child => {
-        if ((child as THREE.Mesh).isMesh && child !== m.hitBox) {
-          const mesh = child as THREE.Mesh;
-          if (mesh.material) {
-            (mesh.material as THREE.Material).transparent = true;
-            (mesh.material as THREE.Material).opacity = match ? 1.0 : 0.15;
-          }
-        }
-      });
 
       if (match && !firstMatch) firstMatch = stand;
     });
@@ -1065,16 +1176,8 @@ export class Masterplan3dScene {
         stand.rubro.toLowerCase().includes(q) ||
         stand.sectorName.toLowerCase().includes(q));
 
+      m.group.visible = match;
       m.hitBox.visible = match;
-      m.group.traverse(child => {
-        if ((child as THREE.Mesh).isMesh && child !== m.hitBox) {
-          const mesh = child as THREE.Mesh;
-          if (mesh.material) {
-            (mesh.material as THREE.Material).transparent = true;
-            (mesh.material as THREE.Material).opacity = match ? 1.0 : 0.12;
-          }
-        }
-      });
 
       if (match && !firstMatch) firstMatch = stand;
     });
@@ -1263,6 +1366,16 @@ export class Masterplan3dScene {
       this.sunLight.dispose();
     }
 
+    // 8. Vaciar standsGroup y colecciones internas
+    if (this.standsGroup) {
+      while (this.standsGroup.children.length > 0) {
+        const child = this.standsGroup.children[0];
+        this.standsGroup.remove(child);
+      }
+      if (this.scene) {
+        this.scene.remove(this.standsGroup);
+      }
+    }
     // 8. Vaciar las colecciones internas: retenian mallas ya liberadas.
     this.pickableStands = [];
     this.animatedBanners = [];

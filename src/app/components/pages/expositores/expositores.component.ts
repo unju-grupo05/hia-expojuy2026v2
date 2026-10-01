@@ -10,7 +10,7 @@ import {
   signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Expositor } from '../../../models/expositor.model';
@@ -22,7 +22,7 @@ import { B2BMeetingService } from '../../../services/b2b-meeting.service';
 @Component({
   selector: 'app-expositores',
   standalone: true,
-  imports: [InfiniteScrollDirective, ReactiveFormsModule],
+  imports: [CommonModule, InfiniteScrollDirective, ReactiveFormsModule],
   templateUrl: './expositores.component.html',
   styleUrl: './expositores.component.css'
 })
@@ -247,13 +247,117 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.loadExhibitors(true);
   }
 
+  /**
+   * Deduce el nombre amigable del pabellón o sector a partir del ID del stand
+   */
+  deriveSector(standId: string): string {
+    const clean = (standId || '').toUpperCase().trim();
+    if (clean.startsWith('A')) return 'Pab. Minería';
+    if (clean.startsWith('B')) return 'Pab. Agro';
+    if (clean.startsWith('C')) return 'Pab. Cubierto';
+    if (clean.startsWith('D')) return 'Pab. Tecnología';
+    if (clean.startsWith('E')) return 'Pab. Energías';
+    if (clean.startsWith('F') || clean.startsWith('G') || clean.startsWith('CORP')) return 'Pab. Corporativo';
+    if (clean.startsWith('H') || clean.startsWith('MAQ')) return 'Sector Maquinarias';
+    if (clean.startsWith('I') || clean.startsWith('EXT-P')) return 'Sector Externo';
+    return 'Pab. General';
+  }
+
+  /**
+   * Normaliza el nombre del sector para el badge pastilla (ej. "Pab. Cubierto", "Sector Externo")
+   */
+  formatSector(sector?: string, fallbackStandId: string = ''): string {
+    if (!sector || sector === 'Por Asignar') {
+      return this.deriveSector(fallbackStandId);
+    }
+    const s = sector.trim();
+    if (s.toLowerCase().startsWith('pabellon ') || s.toLowerCase().startsWith('pabellón ')) {
+      return 'Pab. ' + s.substring(8).trim();
+    }
+    return s;
+  }
+
+  /**
+   * Retorna el texto formateado del badge para el expositor:
+   * - Un solo stand: "Stand {{ stand }} · {{ sector }}" (ej: "Stand A-12 · Pab. Minería" o "Stand E6 · Pab. Cubierto")
+   * - Múltiples stands: "Stands {{ stands }} · {{ sector }}" (ej: "Stands i1, i2, i3, i4 · Sector Externo")
+   */
+  getStandBadgeText(ex: Expositor): string {
+    if (ex.stands && ex.stands.length > 0) {
+      if (ex.stands.length === 1) {
+        const s = ex.stands[0];
+        const sector = this.formatSector(s.sector, s.id);
+        const id = s.id.startsWith('Stand') ? s.id : `Stand ${s.id}`;
+        return `${id} · ${sector}`;
+      } else {
+        const ids = ex.stands.map(s => s.id).join(', ');
+        const sector = this.formatSector(ex.stands[0].sector, ex.stands[0].id);
+        return `Stands ${ids} · ${sector}`;
+      }
+    }
+
+    const rawStand = ex.stand ? ex.stand.trim() : '';
+    if (!rawStand) {
+      return 'Stand Asignado · Pab. General';
+    }
+
+    const parts = rawStand.split(',').map(p => p.trim()).filter(Boolean);
+    if (parts.length > 1) {
+      const sector = this.deriveSector(parts[0]);
+      return `Stands ${parts.join(', ')} · ${sector}`;
+    } else {
+      const id = parts[0].startsWith('Stand') ? parts[0] : `Stand ${parts[0]}`;
+      const sector = this.deriveSector(parts[0]);
+      return `${id} · ${sector}`;
+    }
+  }
+
+  /**
+   * Clases CSS para el pastilla (pill badge) con fondo semitransparente, borde sutil y texto coloreado
+   */
+  getStandBadgeClasses(ex: Expositor): string {
+    switch (ex.category) {
+      case 'mineria':
+      case 'tecnologia':
+        return 'bg-cyan-500/10 text-cyan-700 border-cyan-500/25 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30';
+      case 'energia':
+        return 'bg-purple-500/10 text-purple-700 border-purple-500/25 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30';
+      case 'agro':
+        return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30';
+      case 'logistica':
+        return 'bg-amber-500/10 text-amber-700 border-amber-500/25 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30';
+      default:
+        return 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/25 dark:bg-fuchsia-500/15 dark:text-fuchsia-300 dark:border-fuchsia-500/30';
+    }
+  }
+
+  /**
+   * Clases para el punto brillante interior de la pastilla
+   */
+  getStandBadgeDotClasses(ex: Expositor): string {
+    switch (ex.category) {
+      case 'mineria':
+      case 'tecnologia':
+        return 'bg-cyan-500';
+      case 'energia':
+        return 'bg-purple-500';
+      case 'agro':
+        return 'bg-emerald-500';
+      case 'logistica':
+        return 'bg-amber-500';
+      default:
+        return 'bg-fuchsia-500';
+    }
+  }
+
   private activarScrollRevealLocal(): void {
     if (!isPlatformBrowser(this.platformId)) return;
 
-    const reveals = document.querySelectorAll('#expositores .reveal-on-scroll');
+    const reveals = document.querySelectorAll('#expositores .reveal-on-scroll, app-expositores .reveal-on-scroll');
     reveals.forEach((el) => {
       if (el instanceof Element) {
         el.classList.add('visible');
+        el.classList.add('is-visible');
       }
     });
   }
