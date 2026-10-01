@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MasterplanDataService } from '../../../../../services/masterplan-data.service';
 import { Masterplan3dService } from '../../../../../services/masterplan-3d.service';
+import { CommercialStatus } from '../../../../models/stand.model';
 
 @Component({
   selector: 'app-controls',
@@ -13,14 +14,15 @@ import { Masterplan3dService } from '../../../../../services/masterplan-3d.servi
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ControlsComponent {
-  public filters = [
+  /**
+   * Filtros de estado comercial soportados:
+   * Todos, Disponibles, Reservados, Cedidos
+   */
+  public statusFilters: { key: CommercialStatus | 'all'; label: string }[] = [
     { key: 'all', label: 'Todos' },
-    { key: 'mineria', label: 'Minería' },
-    { key: 'energia', label: 'Energía' },
-    { key: 'tecnologia', label: 'Tecnología' },
-    { key: 'agro', label: 'Agroindustria' },
-    { key: 'artesano', label: 'Artesanos' },
-    { key: 'gastronomico', label: 'Gastronomía' }
+    { key: 'disponible', label: 'Disponibles' },
+    { key: 'reservado', label: 'Reservados' },
+    { key: 'cedido', label: 'Cedidos' }
   ];
 
   constructor(
@@ -33,6 +35,11 @@ export class ControlsComponent {
     const query = input.value;
     this.dataService.setSearchQuery(query);
     this.threeService.applySearch(query);
+  }
+
+  public setStatusFilter(status: CommercialStatus | 'all'): void {
+    this.dataService.setStatusFilter(status);
+    this.threeService.applyStatusFilter(status);
   }
 
   public setFilter(key: string): void {

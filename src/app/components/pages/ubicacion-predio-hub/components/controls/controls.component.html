@@ -1,5 +1,5 @@
 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
-  <!-- Search Bar: Idéntico al buscador del directorio de Expositores -->
+  <!-- Search Bar -->
   <div class="w-full md:w-80">
     <div class="relative">
       <input 
@@ -13,13 +13,13 @@
     </div>
   </div>
 
-  <!-- Píldoras de Filtro de Categorías: Idéntico a los tabs de Expositores -->
-  <div class="flex flex-wrap items-center gap-2" id="masterplan-category-tabs">
+  <!-- Botones de Filtro por Estado Comercial: Todos, Disponibles, Reservados, Cedidos -->
+  <div class="flex flex-wrap items-center gap-2" id="masterplan-status-tabs">
     <button 
-      *ngFor="let f of filters" 
+      *ngFor="let f of statusFilters" 
       class="filter-btn"
-      [class.active-filter]="dataService.activeFilter() === f.key" 
-      (click)="setFilter(f.key)"
+      [class.active-filter]="dataService.filterStatus() === f.key" 
+      (click)="setStatusFilter(f.key)"
       type="button">
       {{ f.label }}
     </button>
