@@ -18,6 +18,13 @@ export const routes: Routes = [
       )
   },
   {
+    path: 'expositores',
+    loadComponent: () =>
+      import('./components/pages/expositores/expositores.component').then(
+        (m) => m.ExpositoresComponent
+      )
+  },
+  {
     path: 'admin',
     loadChildren: () => import('./admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
