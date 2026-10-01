@@ -1,6 +1,7 @@
-import { Injectable, NgZone, OnDestroy, inject, signal } from '@angular/core';
+import { Injectable, NgZone, OnDestroy, inject, signal, effect } from '@angular/core';
 import type { Masterplan3dScene } from './masterplan-3d-scene';
 import { MasterplanDataService } from './masterplan-data.service';
+import { CommercialStatus } from '../components/models/stand.model';
 
 export type MasterplanCameraMode = 'iso' | 'top' | 'entrance';
 
@@ -23,6 +24,7 @@ export class Masterplan3dService implements OnDestroy {
   private readonly ngZone = inject(NgZone);
 
   private scene: Masterplan3dScene | null = null;
+  private readonly sceneSignal = signal<Masterplan3dScene | null>(null);
   private pending: Promise<void> | null = null;
   private destroyed = false;
   private paused = false;
@@ -31,12 +33,37 @@ export class Masterplan3dService implements OnDestroy {
   private generation = 0;
 
   private pendingFilter: string | null = null;
+  private pendingStatusFilter: (CommercialStatus | 'all') | null = null;
   private pendingSearch: string | null = null;
 
   /** `true` mientras se descarga y monta la escena 3D. */
   readonly loading = signal(true);
   /** `true` si la carga fallo (WebGL no disponible, chunk bloqueado, etc.). */
   readonly loadError = signal(false);
+
+  constructor() {
+    // Sincronización reactiva del catálogo de stands con Three.js fuera de Zone.js
+    effect(() => {
+      const scene = this.sceneSignal();
+      const stands = this.dataService.stands();
+      if (scene && stands.length > 0) {
+        this.ngZone.runOutsideAngular(() => {
+          scene.rebuildStands(stands);
+        });
+      }
+    });
+
+    // Sincronización reactiva del filtro de estado comercial
+    effect(() => {
+      const scene = this.sceneSignal();
+      const status = this.dataService.filterStatus();
+      if (scene) {
+        this.ngZone.runOutsideAngular(() => {
+          scene.applyStatusFilter(status);
+        });
+      }
+    });
+  }
 
   public get isReady(): boolean {
     return this.scene !== null;
@@ -67,8 +94,19 @@ export class Masterplan3dService implements OnDestroy {
         const scene = new Masterplan3dScene(this.dataService, this.ngZone);
         scene.init(canvas, wrapper, pinEl, pinTextEl);
         this.scene = scene;
+        this.sceneSignal.set(scene);
 
         this.replayPendingState(scene);
+
+        // Si los stands ya fueron resueltos por el backend o el cache, renderizarlos de inmediato
+        const currentStands = this.dataService.stands().length > 0
+          ? this.dataService.stands()
+          : this.dataService.getStandsProcessed();
+        if (currentStands.length > 0) {
+          this.ngZone.runOutsideAngular(() => {
+            scene.rebuildStands(currentStands);
+          });
+        }
       } catch (error) {
         console.error('[masterplan-3d] No se pudo inicializar la escena 3D', error);
         this.loadError.set(true);
@@ -80,6 +118,7 @@ export class Masterplan3dService implements OnDestroy {
 
   private replayPendingState(scene: Masterplan3dScene): void {
     if (this.pendingFilter !== null) scene.applyFilter(this.pendingFilter);
+    if (this.pendingStatusFilter !== null) scene.applyStatusFilter(this.pendingStatusFilter);
     if (this.pendingSearch !== null) scene.applySearch(this.pendingSearch);
     if (this.resizePending) scene.handleResize();
     if (this.paused) scene.pauseLoop();
@@ -88,6 +127,11 @@ export class Masterplan3dService implements OnDestroy {
   public applyFilter(rubro: string): void {
     this.pendingFilter = rubro;
     this.scene?.applyFilter(rubro);
+  }
+
+  public applyStatusFilter(status: CommercialStatus | 'all'): void {
+    this.pendingStatusFilter = status;
+    this.scene?.applyStatusFilter(status);
   }
 
   public applySearch(query: string): void {
@@ -139,6 +183,7 @@ export class Masterplan3dService implements OnDestroy {
     this.generation++;
     this.scene?.destroy();
     this.scene = null;
+    this.sceneSignal.set(null);
     this.loading.set(false);
   }
 
