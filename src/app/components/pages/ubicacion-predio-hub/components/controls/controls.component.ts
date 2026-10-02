@@ -25,6 +25,19 @@ export class ControlsComponent {
     { key: 'cedido', label: 'Cedidos' }
   ];
 
+  /**
+   * Filtros de categorías oficiales (idéntico al Directorio de Expositores):
+   * Todos, Minería & Litio, Agroindustria, Energías Renovables, Tecnología & IA, Logística & Puertos
+   */
+  public categoryFilters = [
+    { key: 'all', label: 'Todos' },
+    { key: 'mineria', label: 'Minería & Litio' },
+    { key: 'agro', label: 'Agroindustria' },
+    { key: 'energia', label: 'Energías Renovables' },
+    { key: 'tecnologia', label: 'Tecnología & IA' },
+    { key: 'logistica', label: 'Logística & Puertos' }
+  ];
+
   constructor(
     public dataService: MasterplanDataService,
     private threeService: Masterplan3dService
@@ -42,7 +55,7 @@ export class ControlsComponent {
     this.threeService.applyStatusFilter(status);
   }
 
-  public setFilter(key: string): void {
+  public setCategoryFilter(key: string): void {
     this.dataService.setFilter(key);
     this.threeService.applyFilter(key);
   }
