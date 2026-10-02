@@ -1,3 +1,89 @@
+    /* ===== DIRECTORIO: GRILLA 3 x 4 (12 POR PAGINA) ===== */
+    .expositores-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      scroll-margin-top: 6rem;
+    }
+    .expositores-grid > .grid-span-full { grid-column: 1 / -1; }
+    @media (max-width: 992px) {
+      .expositores-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .expositores-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ===== CONTROLES DE PAGINACION (mismo lenguaje visual que Noticias) ===== */
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .pagination-controls .nav-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 242, 255, 0.15);
+      border: 1px solid #00f2ff;
+      color: #00f2ff;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+    .pagination-controls .nav-arrow:hover:not(:disabled) {
+      background: #00f2ff;
+      color: #090614;
+      box-shadow: 0 0 16px rgba(0, 242, 255, 0.55);
+      transform: scale(1.06);
+    }
+    .pagination-controls .nav-arrow:active:not(:disabled) { transform: scale(0.96); }
+    .pagination-controls .nav-arrow:disabled {
+      opacity: 0.25;
+      cursor: not-allowed;
+      pointer-events: none;
+      border-color: rgba(0, 242, 255, 0.2);
+      color: rgba(0, 242, 255, 0.2);
+    }
+
+    .pagination-controls .dots-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pagination-controls .page-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: rgba(0, 242, 255, 0.3);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pagination-controls .page-dot:hover:not(.active) {
+      background-color: rgba(0, 242, 255, 0.6);
+      transform: scale(1.2);
+    }
+    .pagination-controls .page-dot.active {
+      background-color: #00f2ff;
+      width: 28px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 242, 255, 0.6);
+    }
+
     /* Enlace "Agendar B2B" — subrayado estilizado sin text-decoration del navegador */
     .b2b-link {
       text-decoration: none;

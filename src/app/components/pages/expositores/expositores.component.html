@@ -51,13 +51,8 @@
                   (click)="setCategoryFilter('logistica')">Logística & Puertos</button>
         </div>
 
-        <!-- Exhibitor Grid -->
-        <!-- Exhibitor Grid with ngx-infinite-scroll -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="exhibitor-grid"
-             infiniteScroll
-             [infiniteScrollDistance]="2"
-             [infiniteScrollThrottle]="150"
-             (scrolled)="onScrollExhibitors()">
+<!-- Exhibitor Grid (3 x 4 = 12 por pagina, paginacion server-side) -->
+        <div #exhibitorGrid class="expositores-grid" id="exhibitor-grid">
           @for (ex of exhibitors(); track ex.id; let i = $index) {
             <div class="reveal-on-scroll is-visible exhibitor-card card-tilt p-6 rounded-3xl bg-white border border-primary/10 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between"
                  [attr.data-category]="ex.category"
@@ -86,7 +81,7 @@
               </div>
             </div>
           } @empty {
-            <div class="col-span-1 md:col-span-2 lg:col-span-3 py-16 flex flex-col items-center justify-center text-center">
+            <div class="grid-span-full py-16 flex flex-col items-center justify-center text-center">
               <svg class="ms-icon text-5xl text-outline/50 mb-3" aria-hidden="true"><use href="#ms-storefront"/></svg>
               <p class="text-sm sm:text-base font-semibold text-brand-slate-dark">
                 @if (loadingExhibitors()) {
@@ -107,22 +102,60 @@
           }
         </div>
 
-        <!-- Infinite Scroll Loading & Status Indicators -->
+        <!-- Paginación (Dots + Flechas) -->
+        @if (totalPages() > 1) {
+          <div class="pagination-controls">
+            <button
+              type="button"
+              class="nav-arrow"
+              (click)="prevPage()"
+              [disabled]="loadingExhibitors() || currentPage() === 1"
+              aria-label="Página anterior de expositores"
+              title="Anterior">
+              <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-arrow_back"/></svg>
+            </button>
+
+            <div class="dots-container">
+              @for (pageNumber of totalPagesArray(); track pageNumber) {
+                <button
+                  type="button"
+                  class="page-dot"
+                  [class.active]="currentPage() === pageNumber"
+                  (click)="goToPage(pageNumber)"
+                  [attr.aria-label]="'Ir a la página ' + pageNumber"
+                  [attr.aria-current]="currentPage() === pageNumber ? 'page' : null">
+                </button>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="nav-arrow"
+              (click)="nextPage()"
+              [disabled]="loadingExhibitors() || currentPage() === totalPages()"
+              aria-label="Página siguiente de expositores"
+              title="Siguiente">
+              <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-arrow_forward"/></svg>
+            </button>
+          </div>
+        }
+
+        <!-- Estado de carga y resumen del directorio -->
         <div class="mt-8 flex flex-col items-center justify-center gap-3">
           @if (loadingExhibitors()) {
             <div class="flex items-center gap-3 py-4 px-6 rounded-full bg-white dark:bg-[#1f1a30] shadow-md border border-primary/20 animate-pulse">
               <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-              <span class="text-xs sm:text-sm font-semibold text-brand-slate-dark dark:text-white">Cargando más expositores desde la API...</span>
+              <span class="text-xs sm:text-sm font-semibold text-brand-slate-dark dark:text-white">Cargando expositores...</span>
             </div>
           }
-          @if (!hasMoreExhibitors() && exhibitors().length > 0) {
+          @if (!loadingExhibitors() && totalExhibitors() > 0) {
             <div class="text-xs sm:text-sm font-semibold text-outline text-center py-4">
-              ✨ Has explorado todos los expositores disponibles ({{ exhibitors().length }} registrados)
+              {{ totalExhibitors() }} expositores en total · página {{ currentPage() }} de {{ totalPages() }}
             </div>
           }
           @if (exhibitorsError()) {
             <div class="flex items-center gap-3 py-3 px-6 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 text-xs sm:text-sm">
-              <span>No se pudieron cargar más expositores.</span>
+              <span>No se pudieron cargar los expositores.</span>
               <button type="button" (click)="retryLoadExhibitors()" class="underline font-bold hover:text-red-900 dark:hover:text-red-100">Reintentar</button>
             </div>
           }

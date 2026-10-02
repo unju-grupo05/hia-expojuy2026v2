@@ -1,18 +1,20 @@
 import {
   Component,
   DestroyRef,
+  ElementRef,
   HostListener,
   Inject,
   OnDestroy,
   OnInit,
   PLATFORM_ID,
+  computed,
   inject,
-  signal
+  signal,
+  viewChild
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
-import { InfiniteScrollDirective } from 'ngx-infinite-scroll';
 import { Expositor } from '../../../models/expositor.model';
 import { B2BMeetingRequest } from '../../../models/b2b-meeting.model';
 import { ExpositoresService } from '../../../services/expositores.service';
@@ -22,15 +24,20 @@ import { B2BMeetingService } from '../../../services/b2b-meeting.service';
 @Component({
   selector: 'app-expositores',
   standalone: true,
-  imports: [CommonModule, InfiniteScrollDirective, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './expositores.component.html',
   styleUrl: './expositores.component.css'
 })
 export class ExpositoresComponent implements OnInit, OnDestroy {
+  /** 3 columnas x 4 filas. */
+  readonly pageSize = 12;
+
   readonly exhibitors = signal<Expositor[]>([]);
   readonly loadingExhibitors = signal<boolean>(false);
-  readonly hasMoreExhibitors = signal<boolean>(true);
   readonly exhibitorsError = signal<boolean>(false);
+  readonly currentPage = signal<number>(1);
+  readonly totalExhibitors = signal<number>(0);
+  readonly totalPages = signal<number>(0);
   readonly activeCategory = signal<string>('all');
   readonly selectedExhibitor = signal<Expositor | null>(null);
   readonly b2bModalState = signal<'closed' | 'open' | 'submitting' | 'success' | 'validation-error' | 'server-error'>('closed');
@@ -38,12 +45,21 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   readonly b2bSuccessMessage = signal('');
   readonly today = this.getToday();
 
+  /** Numeros de pagina (1..totalPages) que se pintan como puntos. */
+  readonly totalPagesArray = computed<number[]>(() =>
+    Array.from({ length: this.totalPages() }, (_, i) => i + 1)
+  );
+
   readonly b2bForm: ReturnType<FormBuilder['group']>;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly exhibitorGrid = viewChild<ElementRef<HTMLElement>>('exhibitorGrid');
 
   /** Cancela la carga diferida si el componente se destruye antes de partir. */
   private cancelIdle: (() => void) | null = null;
+
+  /** El scroll al inicio de la grilla se hace recien con la pagina nueva pintada. */
+  private pendingScrollToGrid = false;
 
   private createB2BForm(): ReturnType<FormBuilder['group']> {
     return this.formBuilder.group({
@@ -63,8 +79,6 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     }, { validators: this.timeRangeValidator });
   }
 
-  private currentExhibitorPage = 1;
-  private readonly pageSize = 6;
   private currentCategory = 'all';
   private currentSearchQuery = '';
 
@@ -78,26 +92,19 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadExhibitors(true);
+    this.loadExhibitors(1);
   }
 
-  loadExhibitors(reset = false): void {
+  /** Carga una pagina concreta del directorio (12 expositores por pagina). */
+  loadExhibitors(page = 1): void {
     if (this.loadingExhibitors()) return;
-
-    if (reset) {
-      this.currentExhibitorPage = 1;
-      this.hasMoreExhibitors.set(true);
-      this.exhibitors.set([]);
-    }
-
-    if (!this.hasMoreExhibitors()) return;
 
     this.loadingExhibitors.set(true);
     this.exhibitorsError.set(false);
 
     this.expositoresService
       .getExpositores({
-        page: this.currentExhibitorPage,
+        page,
         pageSize: this.pageSize,
         category: this.currentCategory,
         search: this.currentSearchQuery
@@ -105,41 +112,65 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          // Contrato de `/expositores`: la pagina viene en `data` y trae `hasMore`.
+          // Contrato de `/expositores`: la pagina viene en `data` con `items` y `total`.
           const pagina = res.data;
           const items: Expositor[] = pagina?.items ?? [];
+          const total = pagina?.total ?? 0;
 
-          if (reset) {
-            this.exhibitors.set(items);
-          } else {
-            this.exhibitors.update(current => [...current, ...items]);
-          }
-
-          this.hasMoreExhibitors.set(pagina?.hasMore === true);
-          this.currentExhibitorPage++;
+          this.exhibitors.set(items);
+          this.currentPage.set(page);
+          this.totalExhibitors.set(total);
+          this.totalPages.set(total > 0 ? Math.ceil(total / this.pageSize) : 0);
           this.loadingExhibitors.set(false);
 
           if (isPlatformBrowser(this.platformId)) {
             this.activarScrollRevealLocal();
           }
+
+          if (this.pendingScrollToGrid) {
+            this.pendingScrollToGrid = false;
+            this.scrollToGridTop();
+          }
         },
         error: (err) => {
           this.loadingExhibitors.set(false);
           this.exhibitorsError.set(true);
-          this.hasMoreExhibitors.set(false);
+          this.exhibitors.set([]);
           console.error('Error al obtener expositores:', err);
         }
       });
   }
 
-  onScrollExhibitors(): void {
-    if (this.hasMoreExhibitors()) {
-      this.loadExhibitors(false);
-    }
+  nextPage(): void {
+    if (this.loadingExhibitors() || this.currentPage() >= this.totalPages()) return;
+    this.pendingScrollToGrid = true;
+    this.loadExhibitors(this.currentPage() + 1);
+  }
+
+  prevPage(): void {
+    if (this.loadingExhibitors() || this.currentPage() <= 1) return;
+    this.pendingScrollToGrid = true;
+    this.loadExhibitors(this.currentPage() - 1);
+  }
+
+  goToPage(page: number): void {
+    if (this.loadingExhibitors() || page === this.currentPage()) return;
+    if (page < 1 || page > this.totalPages()) return;
+    this.pendingScrollToGrid = true;
+    this.loadExhibitors(page);
+  }
+
+  /** Sube suavemente hasta el inicio de la grilla al cambiar de pagina. */
+  private scrollToGridTop(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    const grid = this.exhibitorGrid()?.nativeElement;
+    if (!grid) return;
+    grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   retryLoadExhibitors(): void {
-    this.loadExhibitors(true);
+    this.pendingScrollToGrid = false;
+    this.loadExhibitors(this.currentPage());
   }
 
   openB2BModal(exhibitor: Expositor): void {
@@ -234,7 +265,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   setCategoryFilter(category: string): void {
     this.currentCategory = category;
     this.activeCategory.set(category);
-    this.loadExhibitors(true);
+    this.loadExhibitors(1);
   }
 
   /**
@@ -244,7 +275,7 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
    */
   filterExhibitors(query: string): void {
     this.currentSearchQuery = (query ?? '').trim();
-    this.loadExhibitors(true);
+    this.loadExhibitors(1);
   }
 
   /**
