@@ -61,6 +61,7 @@ export class Masterplan3dScene {
   private standsGroup: THREE.Group = new THREE.Group();
   private activeStatusFilter: CommercialStatus | 'all' = 'all';
   private activeRubroFilter: string = 'all';
+  private activeSearchQuery: string = '';
 
   private wheelHandler = (e: WheelEvent) => {
     e.preventDefault();
@@ -82,8 +83,9 @@ export class Masterplan3dScene {
     this.pinTextElement = pinTextEl;
 
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color('#0b1118');
-    this.scene.fog = new THREE.FogExp2(0x0b1118, 0.0028);
+    this.scene.background = new THREE.Color('#162230');
+    // Niebla lineal suave que no oscurece los stands en el rango principal de visión
+    this.scene.fog = new THREE.Fog(0x162230, 180, 520);
 
     const width = this.wrapper.clientWidth || 800;
     const height = this.wrapper.clientHeight || 500;
@@ -100,6 +102,8 @@ export class Masterplan3dScene {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.25;
 
     this.controls = new OrbitControls(this.camera, this.canvas);
     this.controls.enableDamping = true;
@@ -156,21 +160,33 @@ export class Masterplan3dScene {
   }
 
   private initLights(): void {
-    const ambientLight = new THREE.AmbientLight(0xdbeafe, 1.0);
+    // Luz ambiental clara y envolvente
+    const ambientLight = new THREE.AmbientLight(0xe0f2fe, 1.35);
     this.scene.add(ambientLight);
 
-    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    // Luz de hemisferio: cielo diáfano + rebote de piso para erradicar sombras negras en recovecos
+    const hemiLight = new THREE.HemisphereLight(0xe2e8f0, 0x1e293b, 0.85);
+    this.scene.add(hemiLight);
+
+    // Sol direccional principal con mayor intensidad
+    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.45);
     this.sunLight.position.set(120, 180, 90);
     this.sunLight.castShadow = true;
     const shadowResolution = (typeof window !== 'undefined' && window.innerWidth < 768) ? 512 : 1024;
     this.sunLight.shadow.mapSize.set(shadowResolution, shadowResolution);
     this.scene.add(this.sunLight);
 
-    const neonCyan = new THREE.DirectionalLight(0x00f0ff, 0.55);
+    // Luz de relleno contra-ángulo para iluminar laterales sombríos
+    const fillLight = new THREE.DirectionalLight(0xc7d2fe, 0.50);
+    fillLight.position.set(-90, 80, 80);
+    this.scene.add(fillLight);
+
+    // Acentos estéticos neón con presencia luminosa nítida
+    const neonCyan = new THREE.DirectionalLight(0x00f0ff, 0.70);
     neonCyan.position.set(-100, 50, -60);
     this.scene.add(neonCyan);
 
-    const neonOrange = new THREE.DirectionalLight(0xff7b00, 0.45);
+    const neonOrange = new THREE.DirectionalLight(0xff7b00, 0.60);
     neonOrange.position.set(80, 40, 80);
     this.scene.add(neonOrange);
   }
@@ -181,7 +197,7 @@ export class Masterplan3dScene {
     ground.receiveShadow = true;
     this.scene.add(ground);
 
-    const grid = new THREE.GridHelper(280, 56, 0x182430, 0x0e1720);
+    const grid = new THREE.GridHelper(280, 56, 0x2e445d, 0x1b2d40);
     grid.position.y = 0.01;
     this.scene.add(grid);
 
@@ -226,14 +242,14 @@ export class Masterplan3dScene {
 
   private buildPavilionWithExactWalls(): void {
     const pavilionGroup = new THREE.Group();
-    const pavFloor = new THREE.Mesh(new THREE.PlaneGeometry(96, 50), new THREE.MeshLambertMaterial({ color: 0x111827 }));
+    const pavFloor = new THREE.Mesh(new THREE.PlaneGeometry(96, 50), new THREE.MeshLambertMaterial({ color: 0x223246 }));
     pavFloor.rotation.x = -Math.PI / 2;
     pavFloor.position.set(0, 0.03, 0);
     pavFloor.receiveShadow = true;
     pavilionGroup.add(pavFloor);
 
     const wallMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b, roughness: 0.5, metalness: 0.1, transparent: true, opacity: 0.95
+      color: 0x334458, roughness: 0.45, metalness: 0.1, transparent: true, opacity: 0.92
     });
 
     const createWall = (w: number, h: number, d: number, x: number, y: number, z: number) => {
@@ -632,47 +648,67 @@ export class Masterplan3dScene {
       const flagGroup = new THREE.Group();
       flagGroup.position.set(poi.x, 0, poi.z);
 
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, poi.y), metalMat);
-      pole.position.y = poi.y / 2;
+      // Mástil y base más prominentes y estilizados
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, poi.y + 1.0), metalMat);
+      pole.position.y = (poi.y + 1.0) / 2;
       flagGroup.add(pole);
 
-      const ball = new THREE.Mesh(new THREE.SphereGeometry(0.75, 16, 16), new THREE.MeshBasicMaterial({ color: poi.color }));
-      ball.position.y = poi.y;
+      const ball = new THREE.Mesh(new THREE.SphereGeometry(1.15, 16, 16), new THREE.MeshBasicMaterial({ color: poi.color }));
+      ball.position.y = poi.y + 1.0;
       flagGroup.add(ball);
 
+      // Canvas de alta definición para texto hiper-nítido y grande
       const bCanvas = document.createElement('canvas');
-      bCanvas.width = 1024;
-      bCanvas.height = 320;
+      bCanvas.width = 1280;
+      bCanvas.height = 420;
       const bCtx = bCanvas.getContext('2d')!;
-      bCtx.fillStyle = 'rgba(9, 14, 22, 0.96)';
-      bCtx.roundRect(16, 16, 992, 288, 36);
+
+      // Fondo oscuro translúcido con curvatura elegante
+      bCtx.fillStyle = 'rgba(12, 18, 28, 0.96)';
+      bCtx.beginPath();
+      bCtx.roundRect(16, 16, 1248, 388, 52);
       bCtx.fill();
-      bCtx.lineWidth = 14;
+
+      // Borde grueso de color identificatorio del POI
+      bCtx.lineWidth = 22;
       bCtx.strokeStyle = '#' + poi.color.toString(16).padStart(6, '0');
       bCtx.stroke();
+
+      // Pastilla de acento decorativa superior
+      bCtx.fillStyle = '#' + poi.color.toString(16).padStart(6, '0');
+      bCtx.beginPath();
+      bCtx.roundRect(460, 24, 360, 14, 7);
+      bCtx.fill();
+
+      // Título principal del Punto de Interés (grande, nítido y legible desde lejos)
       bCtx.fillStyle = '#ffffff';
-      bCtx.font = 'bold 72px sans-serif';
+      bCtx.font = 'bold 84px sans-serif';
       bCtx.textAlign = 'center';
       bCtx.textBaseline = 'middle';
-      bCtx.fillText(poi.label, 512, 110);
+      bCtx.fillText(poi.label, 640, 145);
+
+      // Subtítulo con el color institucional del POI
       bCtx.fillStyle = '#' + poi.color.toString(16).padStart(6, '0');
-      bCtx.font = 'bold 44px sans-serif';
-      bCtx.fillText(poi.sub, 512, 210);
+      bCtx.font = 'bold 50px sans-serif';
+      bCtx.fillText(poi.sub, 640, 275);
 
       const bannerTex = this.trackTexture(new THREE.CanvasTexture(bCanvas));
       bannerTex.needsUpdate = true;
+
+      // Geometría del cartel: Dimensiones ampliadas al doble (18.0m x 5.8m vs 9.0m x 2.8m original)
       const bannerMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(9.0, 2.8),
+        new THREE.PlaneGeometry(18.0, 5.8),
         new THREE.MeshBasicMaterial({ map: bannerTex, transparent: true, side: THREE.DoubleSide })
       );
-      bannerMesh.position.set(0, poi.y + 1.8, 0);
+      bannerMesh.position.set(0, poi.y + 4.2, 0);
       flagGroup.add(bannerMesh);
 
+      // HitBox ampliado para permitir clickeado ágil y cómodo desde cualquier distancia
       const hitBox = new THREE.Mesh(
-        new THREE.BoxGeometry(9.5, poi.y + 4.0, 5.5),
+        new THREE.BoxGeometry(19.0, poi.y + 8.0, 7.0),
         new THREE.MeshBasicMaterial({ visible: false })
       );
-      hitBox.position.y = (poi.y + 4.0) / 2;
+      hitBox.position.y = (poi.y + 8.0) / 2;
 
       const poiStandPayload: StandData = {
         id: poi.id,
@@ -690,8 +726,8 @@ export class Masterplan3dScene {
         z: poi.z,
         rotY: 0,
         type: 'cubierto',
-        w: 5.5,
-        l: 5.5,
+        w: 6.0,
+        l: 6.0,
         isPOI: true
       };
 
@@ -700,8 +736,8 @@ export class Masterplan3dScene {
       this.pickableStands.push(hitBox);
       this.scene.add(flagGroup);
 
-      // Velocidad fija: el visor debe ser reproducible entre recargas.
-      this.animatedBanners.push({ mesh: bannerMesh, baseHeight: poi.y + 1.8, speed: 2 });
+      // Velocidad fija: el visor debe ser reproducible entre recargas
+      this.animatedBanners.push({ mesh: bannerMesh, baseHeight: poi.y + 4.2, speed: 2 });
     });
   }
 
@@ -747,14 +783,20 @@ export class Masterplan3dScene {
 
     // 2. Renderizar mallas iterando sobre los stands provistos
     stands.forEach(data => {
-      const standGroup = new THREE.Group();
-      standGroup.position.set(data.x, 0.04, data.z);
-      standGroup.rotation.y = data.rotY || 0;
-
       const isCedido = data.status === 'cedido';
       const isReservado = data.status === 'reservado';
       const cleanId = (data.id || '').toUpperCase().replace(/^(CUB-POL-|CUB-PL-|CUB-TRI-|CUB-|CORP-|EXT-P-|MAQ-)/, '');
       const standNum = parseInt(cleanId.replace(/\D/g, '')) || 0;
+
+      // A2 está unificado espacialmente con el gran stand esquina A1 (CUB-POL-A1).
+      // Se omite instanciar una geometría física duplicada para no superponer ni romper la forma poligonal de A1.
+      if (cleanId === 'A2') {
+        return;
+      }
+
+      const standGroup = new THREE.Group();
+      standGroup.position.set(data.x, 0.04, data.z);
+      standGroup.rotation.y = data.rotY || 0;
 
       // 1. STAND TRIANGULAR: A6, C35-C42 o type triangular
       if (data.type === 'triangular' || cleanId === 'A6' || data.id === 'CUB-TRI-A6' || cleanId.startsWith('TRI') || (cleanId.startsWith('C') && parseInt(cleanId.slice(1)) >= 35 && parseInt(cleanId.slice(1)) <= 42)) {
@@ -785,7 +827,7 @@ export class Masterplan3dScene {
           standGroup.add(col);
         });
       }
-      // 2. STAND A1: Trapecio con ochava orientada al pasillo Sureste
+      // 2. STAND A1: Polígono con ochava orientada al pasillo interior (geometría original oficial de plano)
       else if (cleanId === 'A1' || data.id === 'CUB-POL-A1') {
         const hw = data.w / 2;
         const hl = data.l / 2;
@@ -816,8 +858,8 @@ export class Masterplan3dScene {
           standGroup.add(col);
         });
       }
-      // 3. PLANTA LIBRE RECTANGULAR: A2, A5 o type planta_libre
-      else if (data.type === 'planta_libre' || cleanId === 'A5' || cleanId === 'A2' || data.id === 'CUB-PL-A5') {
+      // 3. PLANTA LIBRE RECTANGULAR: A5 o type planta_libre
+      else if (data.type === 'planta_libre' || cleanId === 'A5' || data.id === 'CUB-PL-A5') {
         const carpetColor = isCedido ? 0x8b5cf6 : (isReservado ? 0xfacc15 : 0x1e40af);
         const carpet = new THREE.Mesh(
           new THREE.BoxGeometry(data.w - 0.2, 0.08, data.l - 0.2),
@@ -960,6 +1002,15 @@ export class Masterplan3dScene {
       this.standMeshesMap[data.id] = { group: standGroup, hitBox, data };
       this.standMeshes.push(standGroup);
     });
+
+    // Enlazar A2 al stand unificado A1 para interactividad en el mapa
+    const a1Entry = this.standMeshesMap['A1'] || this.standMeshesMap['CUB-POL-A1'];
+    if (a1Entry && !this.standMeshesMap['A2']) {
+      const a2Data = stands.find(s => s.id === 'A2');
+      if (a2Data) {
+        this.standMeshesMap['A2'] = { group: a1Entry.group, hitBox: a1Entry.hitBox, data: a2Data };
+      }
+    }
 
     // 3. Selección y filtros
     if (this.currentSelectedStand) {
@@ -1120,71 +1171,107 @@ export class Masterplan3dScene {
    * 'all' | 'disponible' | 'reservado' | 'cedido'.
    * Atenua stands que no coinciden y resalta los coincidentes a opacidad 1.0.
    */
-  public applyStatusFilter(status: CommercialStatus | 'all'): void {
-    this.activeStatusFilter = status;
-    const filter = (status || 'all').toLowerCase();
+    /**
+   * Evalúa si un stand cumple simultáneamente con los filtros activos:
+   * Estado comercial, Categoría (Rubro idéntico a Expositores) y Búsqueda.
+   */
+  private isStandMatchingFilters(stand: StandData): boolean {
+    if (stand.isPOI) {
+      if (!this.activeSearchQuery) return true;
+      const q = this.activeSearchQuery.toLowerCase();
+      return stand.name.toLowerCase().includes(q) || (stand.desc || '').toLowerCase().includes(q);
+    }
+
+    // 1. Filtro por Estado Comercial
+    const statusFilter = (this.activeStatusFilter || 'all').toLowerCase();
+    const standStatus = (stand.status || 'disponible').toLowerCase();
+    if (statusFilter !== 'all' && standStatus !== statusFilter) {
+      return false;
+    }
+
+    // 2. Filtro por Categoría / Rubro (idéntico a Expositores)
+    const category = (this.activeRubroFilter || 'all').toLowerCase();
+    if (category !== 'all') {
+      const cleanId = (stand.id || '').toUpperCase().trim();
+      const company = (stand.company || '').toLowerCase();
+      const rubro = (stand.rubro || '').toLowerCase();
+      const sectorName = (stand.sectorName || '').toLowerCase();
+      const expCategory = (stand.expositor?.category || '').toLowerCase();
+
+      let matchCategory = false;
+      if (expCategory === category) {
+        matchCategory = true;
+      } else if (category === 'mineria') {
+        matchCategory = cleanId.startsWith('A') || rubro.includes('miner') || sectorName.includes('miner') || company.includes('litio') || company.includes('miner');
+      } else if (category === 'agro') {
+        matchCategory = cleanId.startsWith('B') || rubro.includes('agro') || sectorName.includes('agro') || company.includes('agro');
+      } else if (category === 'energia') {
+        matchCategory = cleanId.startsWith('E') || rubro.includes('energ') || sectorName.includes('energ') || company.includes('solar') || company.includes('energ');
+      } else if (category === 'tecnologia') {
+        matchCategory = cleanId.startsWith('D') || rubro.includes('tecno') || sectorName.includes('tecno') || company.includes('3d') || company.includes('tech') || company.includes('ia');
+      } else if (category === 'logistica') {
+        matchCategory = cleanId.startsWith('H') || cleanId.startsWith('G') || cleanId.startsWith('MAQ') || cleanId.startsWith('CORP') || rubro.includes('maquinaria') || rubro.includes('logistic') || rubro.includes('puerto');
+      } else {
+        matchCategory = rubro.includes(category) || sectorName.includes(category) || company.includes(category);
+      }
+
+      if (!matchCategory) return false;
+    }
+
+    // 3. Filtro por Búsqueda de texto
+    const q = (this.activeSearchQuery || '').toLowerCase().trim();
+    if (q) {
+      const matchSearch = !!(
+        stand.id.toLowerCase().includes(q) ||
+        (stand.company && stand.company.toLowerCase().includes(q)) ||
+        (stand.rubro && stand.rubro.toLowerCase().includes(q)) ||
+        (stand.sectorName && stand.sectorName.toLowerCase().includes(q))
+      );
+      if (!matchSearch) return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Actualiza la visibilidad de los stands en 3D combinando todos los filtros activos.
+   */
+  public updateStandVisibilities(): void {
     let firstMatch: StandData | null = null;
 
     Object.values(this.standMeshesMap).forEach(m => {
-      const stand = m.data;
-      const standStatus = (stand.status || 'disponible').toLowerCase();
-      const match = (filter === 'all' || standStatus === filter);
-
+      const match = this.isStandMatchingFilters(m.data);
       m.group.visible = match;
       m.hitBox.visible = match;
 
-      if (match && !firstMatch) firstMatch = stand;
+      if (match && !firstMatch && !m.data.isPOI) firstMatch = m.data;
     });
 
-    if (firstMatch && filter !== 'all') {
+    if (this.currentSelectedStand && !this.isStandMatchingFilters(this.currentSelectedStand)) {
+      if (firstMatch) {
+        this.selectStand(firstMatch, true);
+      } else if (this.highlightBox) {
+        this.highlightBox.visible = false;
+        if (this.pinElement) this.pinElement.classList.remove('visible');
+      }
+    } else if (!this.currentSelectedStand && firstMatch) {
       this.selectStand(firstMatch, true);
     }
   }
 
+  public applyStatusFilter(status: CommercialStatus | 'all'): void {
+    this.activeStatusFilter = status;
+    this.updateStandVisibilities();
+  }
+
   public applyFilter(rubro: string): void {
     this.activeRubroFilter = rubro;
-    const rubroKey = (rubro || 'all').toLowerCase();
-    let firstMatch: StandData | null = null;
-
-    Object.values(this.standMeshesMap).forEach(m => {
-      const stand = m.data;
-      const match = !!(rubroKey === 'all' ||
-        stand.rubro.toLowerCase().includes(rubroKey) ||
-        stand.sectorName.toLowerCase().includes(rubroKey) ||
-        (stand.company && stand.company.toLowerCase().includes(rubroKey)));
-
-      m.group.visible = match;
-      m.hitBox.visible = match;
-
-      if (match && !firstMatch) firstMatch = stand;
-    });
-
-    if (firstMatch && rubroKey !== 'all') {
-      this.selectStand(firstMatch);
-    }
+    this.updateStandVisibilities();
   }
 
   public applySearch(query: string): void {
-    const q = (query || '').toLowerCase().trim();
-    let firstMatch: StandData | null = null;
-
-    Object.values(this.standMeshesMap).forEach(m => {
-      const stand = m.data;
-      const match = !!(!q ||
-        stand.id.toLowerCase().includes(q) ||
-        (stand.company && stand.company.toLowerCase().includes(q)) ||
-        stand.rubro.toLowerCase().includes(q) ||
-        stand.sectorName.toLowerCase().includes(q));
-
-      m.group.visible = match;
-      m.hitBox.visible = match;
-
-      if (match && !firstMatch) firstMatch = stand;
-    });
-
-    if (firstMatch && q) {
-      this.selectStand(firstMatch);
-    }
+    this.activeSearchQuery = query;
+    this.updateStandVisibilities();
   }
 
   private updateFloatingPin(): void {

@@ -1,27 +1,23 @@
-<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 w-full">
-  <!-- Search Bar -->
-  <div class="w-full md:w-80">
-    <div class="relative">
-      <input 
-        class="map-search-input" 
-        id="masterplan-search" 
-        [value]="dataService.searchQuery()" 
-        (input)="onSearchChange($event)" 
-        placeholder="Buscar stand, empresa o rubro..." 
-        type="text">
-      <svg class="ms-icon search-icon" aria-hidden="true"><use href="#ms-search"/></svg>
+<div class="flex flex-col gap-3 w-full">
+  <!-- Fila Superior: Buscador y Filtro por Estado Comercial -->
+  <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 w-full">
+    <!-- Search Bar -->
+    <div class="w-full lg:w-80">
+      <div class="relative">
+        <input class="map-search-input" id="masterplan-search" [value]="dataService.searchQuery()"
+          (input)="onSearchChange($event)" placeholder="Buscar stand, empresa o rubro..." type="text">
+        <svg class="ms-icon search-icon" aria-hidden="true">
+          <use href="#ms-search" />
+        </svg>
+      </div>
+    </div>
+    <!-- Fila Inferior: Píldoras de Filtro por Categorías / Rubros (idéntico al Directorio de Expositores) -->
+    <div class="flex flex-wrap items-center gap-2" id="masterplan-category-tabs">
+      <span
+        class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1 hidden sm:inline">Rubro:</span>
+      <button *ngFor="let c of categoryFilters" class="filter-btn text-xs py-1.5 px-3"
+        [class.active-filter]="dataService.activeFilter() === c.key" (click)="setCategoryFilter(c.key)" type="button">
+        {{ c.label }}
+      </button>
     </div>
   </div>
-
-  <!-- Botones de Filtro por Estado Comercial: Todos, Disponibles, Reservados, Cedidos -->
-  <div class="flex flex-wrap items-center gap-2" id="masterplan-status-tabs">
-    <button 
-      *ngFor="let f of statusFilters" 
-      class="filter-btn"
-      [class.active-filter]="dataService.filterStatus() === f.key" 
-      (click)="setStatusFilter(f.key)"
-      type="button">
-      {{ f.label }}
-    </button>
-  </div>
-</div>

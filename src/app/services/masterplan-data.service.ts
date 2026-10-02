@@ -158,18 +158,26 @@ export class MasterplanDataService {
    * - Asigna stand.company = dto.expositor.name y stand.desc = dto.expositor.description
    * - Preserva coordenadas espaciales, dimensiones y color institucional (#8b5cf6 para cedidos)
    */
-    /**
-   * Normaliza la orientación geométrica (rotY) y dimensiones (w, l) para los stands
-   * del pabellón cubierto (especialmente pasillos diagonales C y perimetrales),
-   * evitando colisiones y solapamientos, y orientándolos correctamente hacia sus pasillos.
-   */
+  /**
+ * Normaliza la orientación geométrica (rotY) y dimensiones (w, l) para los stands
+ * del pabellón cubierto (especialmente pasillos diagonales C y perimetrales),
+ * evitando colisiones y solapamientos, y orientándolos correctamente hacia sus pasillos.
+ */
   public normalizeStandGeometry(dto: { id: string; x?: number; z?: number; rotY?: number; w?: number; l?: number }): { rotY: number; w: number; l: number } {
-    const cleanId = (dto.id || '').toUpperCase().replace(/^(STAND\s*|CUB-POL-|CUB-PL-|CUB-TRI-|CORP-|EXT-P-|MAQ-|CUB-)/gi, '');
     let rotY = dto.rotY || 0;
     let w = dto.w || 3.0;
     let l = dto.l || 3.0;
     const x = dto.x ?? 0;
     const z = dto.z ?? 0;
+
+    // Solo normalizar stands del Pabellón Cubierto; los exteriores (maquinaria, artesanos, corporativos) respetan su rotación original
+    const rawId = (dto.id || '').toUpperCase();
+    if (rawId.startsWith('MAQ-') || rawId.startsWith('EXT-P-') || rawId.startsWith('CORP-') ||
+        rawId.startsWith('H') || rawId.startsWith('G') || rawId.startsWith('F') || rawId.startsWith('I')) {
+      return { rotY, w, l };
+    }
+
+    const cleanId = rawId.replace(/^(STAND\s*|CUB-POL-|CUB-PL-|CUB-TRI-|CORP-|EXT-P-|MAQ-|CUB-)/gi, '');
 
     const diagNE = ['C8', 'C9', 'C21', 'C22', 'C23', 'C24', 'C25', 'C11', 'C12', 'C13', 'C14', 'C2', 'C3', 'C4'];
     const diagSW = ['C7', 'C20', 'C19', 'C10', 'C28', 'C27', 'C26', 'C18', 'C17', 'C16', 'C15', 'C1', 'C6', 'C5'];
