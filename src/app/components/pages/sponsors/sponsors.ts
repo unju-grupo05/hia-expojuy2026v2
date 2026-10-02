@@ -1,5 +1,5 @@
-import { Component, AfterViewInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 interface SponsorData {
   id: string;
@@ -19,20 +19,7 @@ interface SponsorData {
   templateUrl: './sponsors.html',
   styleUrl: './sponsors.css'
 })
-export class Sponsors implements AfterViewInit, OnDestroy {
-  public isModalOpen = false;
-  
-  public activeSponsor: SponsorData = {
-    id: '',
-    name: '',
-    role: '',
-    badge: '',
-    desc: '',
-    img: '',
-    website: 'https://expojuy.com.ar',
-    layerClass: ''
-  };
-
+export class Sponsors {
   // Matriz de marcas / Sponsors oficiales
   public col1Sponsors: SponsorData[] = [
     {
@@ -133,39 +120,27 @@ export class Sponsors implements AfterViewInit, OnDestroy {
     }
   ];
 
-  private escapeListener?: (e: KeyboardEvent) => void;
+  /**
+   * Normaliza la URL del sponsor para que siempre sea absoluta y externa.
+   *
+   * Sin esto, un `website` con forma `www.empresa.com` se resolvia como ruta
+   * relativa contra el origen de la app y el enlace terminaba en
+   * `/www.empresa.com` en lugar de abrir el sitio del sponsor.
+   */
+  public sponsorUrl(sponsor: SponsorData): string {
+    const raw = (sponsor.website ?? '').trim();
+    if (!raw) return '';
 
-  constructor(@Inject(PLATFORM_ID) private readonly platformId: Object) {}
+    if (/^(mailto:|tel:)/i.test(raw)) return raw;
 
-  ngAfterViewInit(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    this.escapeListener = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && this.isModalOpen) {
-        this.closeModal();
-      }
-    };
-    window.addEventListener('keydown', this.escapeListener);
-  }
-
-  ngOnDestroy(): void {
-    if (isPlatformBrowser(this.platformId) && this.escapeListener) {
-      window.removeEventListener('keydown', this.escapeListener);
+    // Protocolo-relative (`//host`) o esquema explícito (`http(s)://host`).
+    if (/^(https?:)?\/\//i.test(raw)) {
+      return `https://${raw.replace(/^(https?:)?\/\//i, '')}`;
     }
-  }
 
-  public openModal(sponsor: SponsorData): void {
-    this.activeSponsor = sponsor;
-    this.isModalOpen = true;
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = 'hidden';
-    }
-  }
+    // Ruta interna: no debe convertirse en enlace externo.
+    if (raw.startsWith('/')) return '';
 
-  public closeModal(): void {
-    this.isModalOpen = false;
-    if (isPlatformBrowser(this.platformId)) {
-      document.body.style.overflow = '';
-    }
+    return `https://${raw}`;
   }
 }

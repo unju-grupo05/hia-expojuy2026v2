@@ -5,7 +5,7 @@
     <p class="sponsors-eyebrow text-xs font-mono font-bold tracking-[0.35em] text-brand-cyan-accessible dark:text-[#00C2D1] uppercase mb-2">
       AUSPICIANTES & ALIANZAS ESTRATÉGICAS
     </p>
-    <h2 class="sponsors-title text-3xl md:text-5xl font-display font-extrabold uppercase tracking-tight text-brand-slate-dark dark:text-white">
+    <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
       Empresas que conectan el mundo
     </h2>
   </div>
@@ -18,20 +18,54 @@
 
     <div class="marquee-track flex gap-8 items-center animate-marquee">
       <!-- Grupo 1 de Sponsors -->
-      <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
+      <a
+        *ngFor="let item of col1Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
-      <div *ngFor="let item of col2Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
+      </a>
+      <a
+        *ngFor="let item of col2Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
+      </a>
 
       <!-- Duplicado exacto para lograr el bucle infinito perfecto -->
-      <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
+      <a
+        *ngFor="let item of col1Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
+        aria-hidden="true">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
-      <div *ngFor="let item of col2Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
+      </a>
+      <a
+        *ngFor="let item of col2Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
+        aria-hidden="true">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
+      </a>
     </div>
   </div>
 
@@ -42,49 +76,54 @@
 
     <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
       <!-- Grupo 2 de Sponsors -->
-      <div *ngFor="let item of col3Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
+      <a
+        *ngFor="let item of col3Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
-      <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card">
+      </a>
+      <a
+        *ngFor="let item of col1Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
+      </a>
 
       <!-- Duplicado exacto -->
-      <div *ngFor="let item of col3Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
+      <a
+        *ngFor="let item of col3Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
+        aria-hidden="true">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
-      <div *ngFor="let item of col1Sponsors" (click)="openModal(item)" class="sponsor-logo-card" aria-hidden="true">
+      </a>
+      <a
+        *ngFor="let item of col1Sponsors"
+        class="sponsor-logo-card"
+        [href]="sponsorUrl(item)"
+        target="_blank"
+        rel="noopener noreferrer"
+        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
+        [class.pointer-events-none]="!sponsorUrl(item)"
+        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
+        aria-hidden="true">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </div>
+      </a>
     </div>
   </div>
-
 </section>
-
-<!-- MODAL INTERACTIVO DE SPONSOR -->
-<div *ngIf="isModalOpen" class="fixed inset-0 z-[9000] flex items-center justify-center p-4">
-  <div (click)="closeModal()" class="sponsor-modal-backdrop absolute inset-0 transition-opacity"></div>
-  
-  <div class="sponsor-modal-panel relative flex flex-col z-10 mx-auto max-w-lg w-full rounded-2xl shadow-2xl p-6 sm:p-7">
-    <button (click)="closeModal()" class="sponsor-modal-close" aria-label="Cerrar modal">
-      <svg class="ms-icon" style="font-size:1.1rem;" aria-hidden="true"><use href="#ms-close"/></svg>
-    </button>
-    
-    <div class="sponsor-modal-img-container aspect-video w-full overflow-hidden rounded-xl mb-4 flex items-center justify-center p-4">
-      <img decoding="async" [src]="activeSponsor.img" [alt]="activeSponsor.name" class="w-full h-full object-contain" />
-    </div>
-
-    <div class="flex flex-col gap-2">
-      <p class="sponsor-modal-role text-xs font-mono uppercase tracking-widest font-semibold">{{ activeSponsor.role }}</p>
-      <h2 class="sponsor-modal-title text-2xl sm:text-3xl font-display font-extrabold">{{ activeSponsor.name }}</h2>
-      <div class="sponsor-modal-divider mt-1 h-px w-14"></div>
-      <p class="sponsor-modal-desc text-sm leading-relaxed mt-2.5">{{ activeSponsor.desc }}</p>
-      <div class="pt-4 mt-2">
-        <a [href]="activeSponsor.website" target="_blank" rel="noopener noreferrer" class="sponsor-modal-btn w-full inline-flex items-center justify-center gap-2 py-3 px-5 rounded-xl font-display font-bold text-sm transition-colors shadow-md">
-          <span>Visitar sitio web oficial</span>
-          <svg class="ms-icon text-base" aria-hidden="true"><use href="#ms-arrow_outward"/></svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
