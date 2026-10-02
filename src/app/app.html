@@ -5,6 +5,23 @@
   <app-stardust [active]="stardustEnabled" />
   <app-social-sidebar [stardustEnabled]="stardustEnabled" (stardustToggle)="onStardustToggle($event)" />
 
+  @if (showToast()) {
+    <div class="floating-toast">
+      <div class="toast-text">
+        <a
+          class="toast-yt-link"
+          href="https://www.youtube.com/@ExpoJujuy" 
+          target="_blank" 
+          rel="noopener noreferrer">
+          📺 <strong>¿Primera vez aquí?</strong> Mirá la guía rápida de uso en nuestro canal de YouTube. ¡Click aqui!
+        </a>
+      </div>
+      <button type="button" class="toast-close-btn" (click)="closeToast()" aria-label="Cerrar notificación">
+        ×
+      </button>
+    </div>
+  }
+
   <app-portal-layout />
 } @else {
   <router-outlet />

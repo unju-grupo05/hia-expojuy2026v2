@@ -9,7 +9,7 @@
 }
 
 html.dark .sponsors-marquee-section {
-  background: #0B0813;
+  background: var(--ej-bg);
 }
 
 .sponsors-eyebrow {
@@ -45,7 +45,7 @@ html.dark .sponsors-title {
 }
 
 html.dark .sponsors-fade-left {
-  background: linear-gradient(to right, #0B0813, transparent);
+  background: linear-gradient(to right, var(--ej-bg), transparent);
 }
 
 .sponsors-fade-right {
@@ -53,7 +53,7 @@ html.dark .sponsors-fade-left {
 }
 
 html.dark .sponsors-fade-right {
-  background: linear-gradient(to left, #0B0813, transparent);
+  background: linear-gradient(to left, var(--ej-bg), transparent);
 }
 
 /* Animaciones CSS puras e infinitas */
@@ -163,7 +163,7 @@ html.dark .sponsor-modal-backdrop {
 }
 
 html.dark .sponsor-modal-panel {
-  background: #0d0a1a;
+  background: var(--ej-surface-low);
   border-color: rgba(139, 92, 246, 0.35);
   box-shadow: 0 40px 90px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(0, 194, 209, 0.12);
   color: #ffffff;
