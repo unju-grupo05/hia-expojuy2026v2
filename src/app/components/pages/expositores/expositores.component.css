@@ -1,3 +1,33 @@
+    .expositores-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .whatsapp-exhibitors-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      background-color: #25d366;
+      color: #000000;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .whatsapp-exhibitors-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+      background-color: #20ba5a;
+    }
+
     /* ===== DIRECTORIO: GRILLA 3 x 4 (12 POR PAGINA) ===== */
     .expositores-grid {
       display: grid;

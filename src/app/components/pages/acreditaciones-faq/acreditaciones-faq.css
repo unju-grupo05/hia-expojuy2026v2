@@ -20,7 +20,8 @@
 :host-context(.dark) .faq-item,
 .dark .faq-item,
 html.dark .faq-item {
-  background-color: #161224 !important;
+  background-color: #0d0918 !important;
+  border-color: rgba(0, 242, 255, 0.15) !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 

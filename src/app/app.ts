@@ -17,6 +17,8 @@ import { SvgSpriteComponent } from './shared/components/svg-sprite/svg-sprite.co
 export class AppComponent {
   public stardustEnabled = true;
   public isAdminRoute = signal<boolean>(false);
+  public showToast = signal<boolean>(false);
+  private toastTimeout: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -28,6 +30,15 @@ export class AppComponent {
         localStorage.setItem(STARDUST_STORAGE_KEY, 'true');
       } catch {}
       this.isAdminRoute.set(window.location.pathname.startsWith('/admin'));
+
+      // Mostrar toast tras 3 segundos y ocultar automáticamente a los 5 segundos de mostrarlo
+      setTimeout(() => {
+        this.showToast.set(true);
+
+        this.toastTimeout = setTimeout(() => {
+          this.closeToast();
+        }, 5000);
+      }, 3000);
     }
 
     this.router.events
@@ -39,5 +50,12 @@ export class AppComponent {
 
   public onStardustToggle(enabled: boolean): void {
     this.stardustEnabled = enabled;
+  }
+
+  public closeToast(): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    this.showToast.set(false);
   }
 }

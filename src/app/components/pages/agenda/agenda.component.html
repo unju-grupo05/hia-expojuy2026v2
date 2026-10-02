@@ -96,7 +96,7 @@
 
 @if (modalOpen()) {
   <div class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 bg-brand-slate-dark/70 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="reminder-modal-title" (click)="closeReminderModal()">
-    <div class="modal-panel relative w-full max-w-md rounded-3xl bg-white dark:bg-[#17131f] border border-brand-cyan-electric/30 shadow-[0_20px_60px_rgba(0,194,209,0.25)] p-7 space-y-5" (click)="$event.stopPropagation()">
+    <div class="modal-panel relative w-full max-w-md rounded-3xl bg-white dark:bg-[var(--ej-surface-low)] border border-brand-cyan-electric/30 shadow-[0_20px_60px_rgba(0,194,209,0.25)] p-7 space-y-5" (click)="$event.stopPropagation()">
       <button class="absolute top-4 right-4 w-9 h-9 inline-flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant dark:text-[#c6bfd8] transition-colors cursor-pointer" (click)="closeReminderModal()" aria-label="Cerrar" type="button">
         <svg class="ms-icon text-lg" aria-hidden="true"><use href="#ms-close"/></svg>
       </button>

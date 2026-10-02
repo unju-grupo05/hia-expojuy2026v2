@@ -1,8 +1,8 @@
     <!-- Directorio de Expositores (Categorized & Searchable) -->
     <section id="expositores" class="w-full pt-28 pb-20 lg:pt-32 lg:pb-28 bg-neutral-surface-light text-on-surface">
       <div class="max-w-[1340px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="reveal-on-scroll is-visible flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
-          <div class="space-y-2">
+        <div class="reveal-on-scroll is-visible flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6 expositores-header">
+          <div class="space-y-2 header-titles">
             <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary dark:text-[#E879F9]">
               <svg class="ms-icon text-sm" aria-hidden="true"><use href="#ms-storefront"/></svg>
               <span>CATÁLOGO DE EMPRESAS CONFIRMADAS</span>
@@ -13,7 +13,7 @@
           <!-- Search Bar -->
           <div class="w-full md:w-80">
             <div class="relative">
-              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-[#1a1628] border border-slate-200 dark:border-[#2c2541] text-sm text-brand-slate-dark dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric shadow-xs"
+              <input class="w-full pl-10 pr-4 py-2.5 rounded-full bg-white dark:bg-[var(--ej-surface-container)] border border-slate-200 dark:border-[#2c2541] text-sm text-brand-slate-dark dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-cyan-electric shadow-xs"
                      id="exhibitor-search"
                      (input)="filterExhibitors($any($event.target).value)"
                      placeholder="Buscar por empresa o rubro..."
@@ -23,7 +23,7 @@
           </div>
         </div>
 
-        <!-- Filter Category Tabs -->
+                <!-- Filter Category Tabs -->
         <div class="reveal-on-scroll is-visible flex flex-wrap items-center gap-2 mb-8" id="category-tabs">
           <button type="button"
                   class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-bold bg-white text-on-surface-variant border border-slate-200 shadow-xs transition-all cursor-pointer"
@@ -49,6 +49,17 @@
                   class="filter-btn px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-on-surface-variant border border-slate-200 transition-all cursor-pointer"
                   [class.active-filter]="activeCategory() === 'logistica'"
                   (click)="setCategoryFilter('logistica')">Logística & Puertos</button>
+
+          <a type="button"
+            href="https://wa.me/543884212955"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="whatsapp-exhibitors-btn ml-8 sm:ml-40">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+  <path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.481 1.332 4.996L2 22l5.133-1.342a9.92 9.92 0 0 0 4.877 1.28h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.667-1.037-5.176-2.923-7.062A9.925 9.925 0 0 0 12.012 2zm.003 1.666c4.586 0 8.318 3.733 8.319 8.318 0 2.221-.865 4.31-2.438 5.882a8.272 8.272 0 0 1-5.88 2.436h-.003a8.261 8.261 0 0 1-4.218-1.157l-.302-.18-3.131.819.835-3.048-.197-.314A8.257 8.257 0 0 1 3.68 11.98c0-4.585 3.733-8.318 8.335-8.318zm-3.585 3.99c-.201 0-.435.076-.66.321-.227.245-.867.848-.867 2.068 0 1.22.888 2.398 1.011 2.563.123.164 1.748 2.67 4.237 3.743.592.255 1.054.408 1.414.522.595.189 1.137.162 1.564.098.477-.072 1.468-.6 1.674-1.18.206-.58.206-1.077.144-1.181-.061-.103-.226-.165-.473-.288-.246-.124-1.468-.724-1.695-.807-.226-.082-.391-.123-.556.124-.165.247-.638.807-.782.972-.144.165-.288.186-.535.062-.247-.124-1.043-.385-1.987-1.226-.734-.655-1.23-1.464-1.374-1.711-.144-.247-.015-.38.109-.504.111-.11.247-.288.371-.432.123-.144.164-.247.247-.412.082-.165.041-.309-.021-.432-.062-.124-.556-1.341-.762-1.832-.201-.48-.405-.415-.556-.423-.144-.008-.309-.01-.473-.01z"/>
+            </svg>
+            <span>Consultar por WhatsApp</span>
+          </a>
         </div>
 
 <!-- Exhibitor Grid (3 x 4 = 12 por pagina, paginacion server-side) -->

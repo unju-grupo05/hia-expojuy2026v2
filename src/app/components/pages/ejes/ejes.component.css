@@ -20,7 +20,7 @@
       height: 480px;
       bottom: -140px;
       right: -100px;
-      background: radial-gradient(circle at 60% 60%, rgba(139,92,246,0.45), transparent 70%);
+      background: radial-gradient(circle at 60% 60%, rgba(0, 194, 209, 0.25), transparent 70%);
       animation: auroraFloat 20s ease-in-out infinite alternate-reverse;
     }
     @keyframes auroraFloat {
