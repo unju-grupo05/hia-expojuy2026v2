@@ -5,13 +5,23 @@ import { MediaService } from '../../../services/media.service';
 import { scheduleIdle } from '../../../core/idle';
 import { NoticiaDTO } from '../../../models/noticia.model';
 
-interface NewsItem {
+export interface NewsItem {
   id: string;
   img: string;
   badge: string;
   date: string;
   title: string;
   body: string[];
+  isLarge: boolean;
+  displaySize: 'large' | 'small';
+}
+
+export interface NewsPage {
+  pageIndex: number;
+  largeCard: NewsItem | null;
+  leftCards: NewsItem[];     // Máximo 2
+  bottomCards: NewsItem[];   // Máximo 2
+  totalCards: number;
 }
 
 @Component({
@@ -22,11 +32,10 @@ interface NewsItem {
   styleUrls: ['./publicaciones.component.css']
 })
 export class NovedadesComponent implements OnInit, OnDestroy {
-  public readonly pageSize = 5;
   private cancelIdle: (() => void) | null = null;
 
   readonly news = signal<NewsItem[]>([]);
-  readonly slides = signal<NewsItem[][]>([]);
+  readonly pages = signal<NewsPage[]>([]);
   readonly loadingNews = signal<boolean>(false);
   readonly newsError = signal<boolean>(false);
 
@@ -40,7 +49,9 @@ export class NovedadesComponent implements OnInit, OnDestroy {
     badge: '',
     date: '',
     title: '',
-    body: []
+    body: [],
+    isLarge: false,
+    displaySize: 'small'
   };
 
   constructor(
@@ -59,17 +70,22 @@ export class NovedadesComponent implements OnInit, OnDestroy {
     this.noticiasService.getNoticias().subscribe({
       next: (res) => {
         const items: NoticiaDTO[] = res.data ?? [];
-        const parsed: NewsItem[] = items.map((n) => ({
-          id: String(n.id),
-          img: this.mediaService.normalizeImageUrl(n.imagen || ''),
-          badge: n.categoria || 'Noticia',
-          date: this.formatFecha(n.fecha),
-          title: n.titulo || '',
-          body: (n.descripcion || '').split(/\n+/).map((p) => p.trim()).filter((p) => p.length > 0)
-        }));
+        const parsed: NewsItem[] = items.map((n) => {
+          const isLarge = n.isLarge === true || n.displaySize === 'large';
+          return {
+            id: String(n.id),
+            img: this.mediaService.normalizeImageUrl(n.imagen || ''),
+            badge: n.categoria || 'Noticia',
+            date: this.formatFecha(n.fecha),
+            title: n.titulo || '',
+            body: (n.descripcion || '').split(/\n+/).map((p) => p.trim()).filter((p) => p.length > 0),
+            isLarge,
+            displaySize: isLarge ? 'large' : 'small'
+          };
+        });
 
         this.news.set(parsed);
-        this.armarSlides(parsed);
+        this.armarPaginas(parsed);
         this.currentSlide = 0;
         this.loadingNews.set(false);
       },
@@ -81,25 +97,60 @@ export class NovedadesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private armarSlides(items: NewsItem[]): void {
-    const chunks: NewsItem[][] = [];
-    for (let i = 0; i < items.length; i += this.pageSize) {
-      chunks.push(items.slice(i, i + this.pageSize));
+  /**
+   * Algoritmo de Llenado Prioritario y Reglas de Paginación:
+   * - 1 Noticia Grande + Hasta 4 Noticias Chicas (2 a la izquierda + 2 abajo) por página.
+   * - Regla de Noticias Grandes Múltiples: Cada página solo puede albergar 1 noticia Grande.
+   *   Si existen 2 noticias Grandes, la 2da noticia Grande se desplaza a la Página 2.
+   * - Llenado Prioritario de Huecos (Página 1 primero): Las noticias chicas rellenan primero
+   *   los 4 espacios de la Página 1 antes de derivarse a la Página 2.
+   */
+  private armarPaginas(items: NewsItem[]): void {
+    if (!items || items.length === 0) {
+      this.pages.set([]);
+      return;
     }
-    this.slides.set(chunks.length > 0 ? chunks : []);
-  }
 
-  // Distribuye los espaciados de la grilla (md: 2 columnas, lg: 3 columnas) para que ninguna fila quede incompleta, incluida la última página parcial.
-  public layoutClass(slide: NewsItem[], idx: number): string {
-    if (slide.length === this.pageSize) {
-      return idx === 0 ? 'md:col-span-2' : '';
+    const largeItems = items.filter((n) => n.isLarge);
+    const smallItems = items.filter((n) => !n.isLarge);
+
+    // Si no hay ninguna noticia configurada como grande, promovemos la primera chica
+    // para mantener la jerarquía visual de la maqueta
+    if (largeItems.length === 0 && smallItems.length > 0) {
+      const first = smallItems.shift();
+      if (first) {
+        largeItems.push({ ...first, isLarge: true, displaySize: 'large' });
+      }
     }
-    const last = idx === slide.length - 1;
-    if (slide.length === 1) return 'md:col-span-2 lg:col-span-3';
-    if (slide.length === 2) return last ? 'lg:col-span-2' : '';
-    if (slide.length === 3) return last ? 'md:col-span-2 lg:col-span-1' : '';
-    if (slide.length === 4) return last ? 'lg:col-span-3' : '';
-    return '';
+
+    const numPagesByLarge = largeItems.length;
+    const numPagesBySmall = Math.ceil(smallItems.length / 4);
+    const totalPages = Math.max(1, numPagesByLarge, numPagesBySmall);
+
+    const resultPages: NewsPage[] = [];
+
+    for (let p = 0; p < totalPages; p++) {
+      const largeCard = p < largeItems.length ? largeItems[p] : null;
+      
+      // Tomamos hasta 4 noticias chicas para la página 'p' (llenado prioritario de página 1 a n)
+      const pageSmallItems = smallItems.slice(p * 4, (p + 1) * 4);
+      const leftCards = pageSmallItems.slice(0, 2);   // Primeras 2 a la izquierda
+      const bottomCards = pageSmallItems.slice(2, 4); // Siguientes 2 abajo
+
+      const totalCards = (largeCard ? 1 : 0) + leftCards.length + bottomCards.length;
+
+      if (totalCards > 0) {
+        resultPages.push({
+          pageIndex: p,
+          largeCard,
+          leftCards,
+          bottomCards,
+          totalCards
+        });
+      }
+    }
+
+    this.pages.set(resultPages);
   }
 
   retryLoadNews(): void {
@@ -107,21 +158,23 @@ export class NovedadesComponent implements OnInit, OnDestroy {
   }
 
   nextSlide(): void {
-    const total = this.slides().length;
+    const total = this.pages().length;
     if (total > 0) {
       this.currentSlide = (this.currentSlide + 1) % total;
     }
   }
 
   prevSlide(): void {
-    const total = this.slides().length;
+    const total = this.pages().length;
     if (total > 0) {
       this.currentSlide = (this.currentSlide - 1 + total) % total;
     }
   }
 
   goToSlide(index: number): void {
-    this.currentSlide = index;
+    if (index >= 0 && index < this.pages().length) {
+      this.currentSlide = index;
+    }
   }
 
   openNewsModal(item: NewsItem): void {
@@ -129,7 +182,7 @@ export class NovedadesComponent implements OnInit, OnDestroy {
     this.isModalOpen = true;
     document.body.style.overflow = 'hidden';
   }
-  
+
   onCardKeydown(event: KeyboardEvent, item: NewsItem): void {
     if (event.key !== 'Enter' && event.key !== ' ') return;
     event.preventDefault();
@@ -173,3 +226,6 @@ export class NovedadesComponent implements OnInit, OnDestroy {
     return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 }
+
+// Alias para compatibilidad
+export { NovedadesComponent as NoticiasComponent };

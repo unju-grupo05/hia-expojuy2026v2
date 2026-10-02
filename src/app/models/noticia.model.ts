@@ -19,6 +19,8 @@ export interface NoticiaDTO {
   fecha: string;
   linkExterno: string | null;
   vigente: boolean;
+  isLarge?: boolean;
+  displaySize?: 'large' | 'small';
   createdAt: string;
   updatedAt: string;
 }
@@ -33,4 +35,6 @@ export interface NoticiaPayload {
   fecha: string;
   linkExterno?: string | null;
   vigente?: boolean;
+  isLarge?: boolean;
+  displaySize?: 'large' | 'small';
 }

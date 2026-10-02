@@ -52,7 +52,7 @@ export class PostsListComponent {
           category: n.categoria || 'General',
           date: n.fecha || '',
           status: n.vigente === false ? 'draft' : 'published',
-          displaySize: 'small',
+          displaySize: (n.isLarge || n.displaySize === 'large') ? 'large' : 'small',
           imageUrl: this.mediaService.normalizeImageUrl(n.imagen || ''),
           body: n.descripcion || ''
         }));
@@ -125,7 +125,9 @@ export class PostsListComponent {
       descripcion: formData.body,
       imagen: formData.imageUrl || null,
       fecha: formData.date,
-      vigente: formData.status === 'published'
+      vigente: formData.status === 'published',
+      isLarge: formData.displaySize === 'large',
+      displaySize: formData.displaySize
     };
 
     if (formData.id) {
