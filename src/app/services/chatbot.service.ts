@@ -5,13 +5,6 @@ import { API_URL } from '../core/api-url';
 import { ApiResponse } from '../models/api-response.model';
 import { ChatQueryData, ChatResult, ChatSuggestion } from '../models/chatbot.model';
 
-/**
- * Cliente HTTP del asistente virtual "PachAI".
- *
- * No mantiene estado del hilo: eso es responsabilidad del componente. Acá solo
- * se traduce el texto del usuario a la consulta contra el backend y se aplica
- * el `debounce` que evita enviar una petición por tecla.
- */
 @Injectable({
   providedIn: 'root',
 })
@@ -21,11 +14,6 @@ export class ChatbotService {
   /** Flujo de texto sobre el que se aplica el debounce de 300 ms. */
   private readonly consultas$ = new Subject<string>();
 
-  /**
-   * Consulta diferida: cada emisión que llega dentro de los 300 ms siguientes
-   * cancela la anterior, y `switchMap` descarta la respuesta HTTP que ya no
-   * interesa. Así nunca se acumulan peticiones por tecleo.
-   */
   readonly consultaDiferida$: Observable<ChatQueryData> = this.consultas$.pipe(
     debounceTime(300),
     distinctUntilChanged(),
@@ -39,10 +27,6 @@ export class ChatbotService {
     this.consultas$.next(texto);
   }
 
-  /**
-   * Paso 1 del flujo: `POST /api/chatbot/query`.
-   * El backend sanitiza, extrae palabras clave y consulta PostgreSQL.
-   */
   consultar(texto: string): Observable<ChatQueryData> {
     return this.http
       .post<ApiResponse<ChatQueryData>>(this.urlBase + '/query', { query: texto })
@@ -56,12 +40,6 @@ export class ChatbotService {
       .pipe(map(respuesta => respuesta.data ?? []));
   }
 
-  /**
-   * Preguntas frecuentes (`GET /api/chatbot/sugerencias`).
-   *
-   * Si el backend devuelve una lista vacía se usan las sugerencias locales, de
-   * modo que el chat sigue siendo usable aunque el endpoint no esté montado.
-   */
   obtenerSugerencias(): Observable<ChatSuggestion[]> {
     return this.http.get<ApiResponse<ChatSuggestion[]>>(this.urlBase + '/sugerencias').pipe(
       map(respuesta => {

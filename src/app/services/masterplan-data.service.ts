@@ -3,16 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, expand, map, reduce } from 'rxjs/operators';
 import { API_URL } from '../core/api-url';
-import {
-  BlenderPayload,
-  CommercialStatus,
-  PointOfInterest,
-  SectorKey,
-  StandApiResponse,
-  StandBackendDto,
-  StandData,
-  StandType
-} from '../components/models/stand.model';
+import { BlenderPayload, CommercialStatus, PointOfInterest, SectorKey, StandApiResponse, StandBackendDto, StandData, StandType } from '../components/models/stand.model';
 import { SectorActivity } from '../components/models/sector-info.model';
 import { ExpositoresService } from './expositores.service';
 import { Expositor } from '../models/expositor.model';
@@ -95,7 +86,6 @@ export class MasterplanDataService {
     { id: "POI-FOOD-2", label: "Tinglado Food Trucks 2", sub: "Sector Gastronómico Techado", x: 1.46, y: 10.0, z: 121.36, color: 0xff7b00, desc: "Segunda nave cubierta con amplia oferta de parrilla, empanadas jujeñas y cafetería de especialidad." }
   ];
 
-  // Traslado completo de coordenadas y props exportados de Blender
   public readonly BLENDER_PAYLOAD: BlenderPayload = {
     portico: {
       id: "PORTICO-ENTRADA",
@@ -151,18 +141,7 @@ export class MasterplanDataService {
       });
   }
 
-  /**
-   * Adapter: Transforma el DTO oficial del backend en la interfaz StandData de Three.js / UI:
-   * - Mapea dto.estado a stand.status ('disponible' | 'reservado' | 'cedido')
-   * - Mapea dto.superficie a stand.area y stand.superficie
-   * - Asigna stand.company = dto.expositor.name y stand.desc = dto.expositor.description
-   * - Preserva coordenadas espaciales, dimensiones y color institucional (#8b5cf6 para cedidos)
-   */
-  /**
- * Normaliza la orientación geométrica (rotY) y dimensiones (w, l) para los stands
- * del pabellón cubierto (especialmente pasillos diagonales C y perimetrales),
- * evitando colisiones y solapamientos, y orientándolos correctamente hacia sus pasillos.
- */
+
   public normalizeStandGeometry(dto: { id: string; x?: number; z?: number; rotY?: number; w?: number; l?: number }): { rotY: number; w: number; l: number } {
     let rotY = dto.rotY || 0;
     let w = dto.w || 3.0;

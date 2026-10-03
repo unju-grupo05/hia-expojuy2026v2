@@ -5,19 +5,7 @@ import { CommercialStatus } from '../components/models/stand.model';
 
 export type MasterplanCameraMode = 'iso' | 'top' | 'entrance';
 
-/**
- * Fachada perezosa del visualizador 3D.
- *
- * `UbicacionPredioHubComponent` registra este servicio en `providers`, asi que la
- * clase vive en el bundle inicial. Por eso la dependencia pesada (`three`,
- * `OrbitControls` y `gsap`) NO se importa aqui de forma estatica: se resuelve
- * con `import()` dentro de `init()`, es decir, unicamente cuando el canvas 3D
- * entra en pantalla. Asi `three` deja de formar parte de los chunks iniciales
- * que el navegador descarga y parsea antes de pintar.
- *
- * Los metodos son seguros de llamar antes de que la escena exista: los estados
- * pendientes (filtro, busqueda, pausa, resize) se reproducen en cuanto llega.
- */
+
 @Injectable()
 export class Masterplan3dService implements OnDestroy {
   private readonly dataService = inject(MasterplanDataService);
@@ -174,11 +162,6 @@ export class Masterplan3dService implements OnDestroy {
     this.scene?.resumeLoop();
   }
 
-  /**
-   * Libera la escena y deja el servicio reutilizable. Es idempotente: la puede
-   * llamar tanto `CanvasComponent` al destruirse como Angular al desmontar el
-   * proveedor del hub.
-   */
   public destroy(): void {
     this.generation++;
     this.scene?.destroy();

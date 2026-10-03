@@ -14,7 +14,6 @@ export class FooterComponent {
       url: window.location.href
     }).catch(() => {});
   } else {
-    // Fallback: Copia el enlace al portapapeles si la API nativa no está soportada
     navigator.clipboard.writeText(window.location.href);
     alert('¡Enlace copiado al portapapeles!');
   }

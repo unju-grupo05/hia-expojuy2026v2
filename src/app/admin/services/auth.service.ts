@@ -25,7 +25,7 @@ export interface AdminUser {
   email: string;
   name: string;
   role: string;
-  /** URL de avatar provista por el backend. Opcional: la UI debe mostrar un fallback local. */
+  /** URL de avatar provista por el backend. */
   avatar?: string;
 }
 
@@ -60,8 +60,6 @@ export class AuthService {
 
     const token = readAuthToken();
 
-    // Un token vencido o ilegible no habilita sesión: se limpian los restos
-    // para no mostrar un panel "autenticado" cuya primera petición saldrá con 401.
     if (!token || isTokenExpired(token)) {
       clearAuthStorage();
       this.isAuthenticated.set(false);
@@ -72,8 +70,6 @@ export class AuthService {
     this.isAuthenticated.set(true);
     this.currentUser.set(
       readAuthUser<AdminUser>() ?? {
-        // Sin datos de perfil persistidos: se construye un usuario mínimo
-        // SIN imagen externa. El avatar real debe provenir del backend.
         id: 'admin-01',
         email: '',
         name: 'Administrador ExpoJuy',
@@ -94,7 +90,6 @@ export class AuthService {
       })
     };
 
-    // El Backend espera `identificador` (correo o legajo) y `password`
     const body = {
       identificador: emailTrimmed,
       password

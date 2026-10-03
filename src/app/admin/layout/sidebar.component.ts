@@ -23,13 +23,6 @@ export class SidebarComponent {
 
   public readonly navItems: NavItem[] = [
     {
-      label: 'Métricas',
-      route: '/admin/metrics',
-      icon: 'dashboard_customize',
-      badge: 'KPI',
-      badgeColor: 'bg-brand-cyan-electric/20 text-brand-cyan-accessible dark:text-brand-cyan-electric'
-    },
-    {
       label: 'Publicaciones',
       route: '/admin/posts',
       icon: 'rss_feed',

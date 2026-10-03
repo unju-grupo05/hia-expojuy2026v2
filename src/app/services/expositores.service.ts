@@ -3,9 +3,9 @@ import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { API_URL } from '../core/api-url';
 import { ApiResponse, PaginatedResponse } from '../models/api-response.model';
-import { Expositor, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
+import { Expositor, ExpositorLogoResponse, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
 
-export type { Expositor, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
+export type { Expositor, ExpositorLogoResponse, ExpositorPayload, ExpositorQuery } from '../models/expositor.model';
 
 @Injectable({
   providedIn: 'root',
@@ -51,5 +51,33 @@ export class ExpositoresService {
   //***********************ELIMINACION FISICA*************************
   deleteExpositor(id: string): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(this.urlBase + id);
+  }
+
+  //***********************LOGO (WebP <=150x150)*************************
+  /**
+   * Sube el logo de un expositor que ya existe. El backend lo convierte a WebP
+   * (máx. 150x150 px, quality 80), lo guarda en `uploads/` y actualiza la
+   * columna `logo` del expositor.
+   *
+   * No se fija `Content-Type`: el navegador debe generar el boundary del
+   * `multipart/form-data` (el token lo agrega el `AuthInterceptor`).
+   */
+  uploadExpositorLogo(id: string, file: File): Observable<ExpositorLogoResponse> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    return this.http.post<ExpositorLogoResponse>(`${this.urlBase}${id}/logo`, formData);
+  }
+
+  /**
+   * Convierte el logo a WebP y devuelve su URL sin asociarlo a ningún expositor.
+   * Se usa al dar de alta un expositor nuevo: la URL viaja en el `logo` del
+   * `POST /api/expositores`.
+   */
+  uploadExpositorLogoSinAsignar(file: File): Observable<ExpositorLogoResponse> {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    return this.http.post<ExpositorLogoResponse>(`${this.urlBase}logo`, formData);
   }
 }

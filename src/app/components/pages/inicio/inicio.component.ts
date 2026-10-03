@@ -1,15 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Inject,
-  OnDestroy,
-  OnInit,
-  PLATFORM_ID,
-  effect,
-  signal,
-  viewChild
-} from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, effect, signal, viewChild } from '@angular/core';
 import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { EjesComponent } from '../ejes/ejes.component';
 import { UbicacionPredioHubComponent } from '../ubicacion-predio-hub/ubicacion-predio-hub';
@@ -47,17 +36,13 @@ type GsapTween = ReturnType<GsapBundle['gsap']['to']>;
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
-  // â”€â”€ View queries (signal based) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private readonly bgVideo = viewChild<ElementRef<HTMLVideoElement>>('bgVideo');
   private readonly predioComponent = viewChild(UbicacionPredioHubComponent);
   private readonly heroSection = viewChild<ElementRef<HTMLElement>>('heroSection');
   private readonly heroBg = viewChild<ElementRef<HTMLElement>>('heroBg');
 
-  // â”€â”€ Estado de UI (consumido por la plantilla) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   readonly countdown = signal({ days: '30', hours: '00', minutes: '00', seconds: '00' });
 
-  // â”€â”€ Recursos con teardown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // GSAP y Lenis se resuelven con `import()` diferido para no bloquear el First Paint.
   private gsap!: GsapBundle['gsap'];
   private ScrollTrigger!: GsapBundle['ScrollTrigger'];
   private LenisCtor: typeof Lenis | null = null;
@@ -198,7 +183,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       video.play().catch(() => {
         const resumeOnFirstGesture = () => {
           window.removeEventListener('click', resumeOnFirstGesture);
-          video.play().catch(() => { /* el navegador puede seguir bloqueandolo */ });
+          video.play().catch(() => { });
         };
         window.addEventListener('click', resumeOnFirstGesture, { once: true });
         this.listenerCleanups.push(() => window.removeEventListener('click', resumeOnFirstGesture));
@@ -233,7 +218,7 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.lenisInstance = lenis;
 
-    // `lenis.on` devuelve la funcion de baja: no hace falta `off` ni busquedas.
+
     this.lenisScrollUnsubscribe = lenis.on('scroll', (instance) => {
       if (instance.animatedScroll <= 0) {
         window.scrollTo(0, 0);
@@ -245,7 +230,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gsap.ticker.add(this.gsapTickerFn);
     this.gsap.ticker.lagSmoothing(0);
 
-    // El menu movil del header (persistente, fuera de esta ruta) navega
     // mediante el servicio: asi el smooth scroll tiene un unico dueno.
     this.chromeScrollHandler = (target: string) => this.smoothScrollTo(target);
     this.chrome.registerScrollHandler(this.chromeScrollHandler);
@@ -289,19 +273,6 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   // =========================================================================
   // HERO LAYERS & PARALLAX
   // =========================================================================
-  /**
-   * Garantiza que las capas del hero sean visibles.
-   *
-   * Antes se ocultaban con `gsap.set({ opacity: 0, visibility: 'hidden' })` y se
-   * revelaban con un tween escalonado. Eso costaba el LCP: Chrome descarta del
-   * LCP todo elemento con `opacity: 0` y lo vuelve a registrar como candidato
-   * en el instante en que pasa a visible, con lo que el LCP quedaba atado al
-   * fin de la carga de GSAP y no al primer pintado. Un LCP de 3,4 s con el
-   * `<h1>` del hero como elemento candidato es exactamente esa firma.
-   *
-   * La animacion, ademas, nunca se llegaba a ver: el overlay opaco del splash
-   * la tapaba durante toda su duracion, asi que solo costaba reflow y pintura.
-   */
   private revealHeroLayers(): void {
     this.heroSection()?.nativeElement
       .querySelectorAll<HTMLElement>('.hero-layer')

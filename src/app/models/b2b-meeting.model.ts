@@ -15,12 +15,6 @@ export interface B2BMeetingRequest {
   observaciones: string;
 }
 
-/**
- * Respuesta del alta. El controller distingue dos casos con el mismo `201`:
- * - `emailEnviado: true`  -> se notifico al expositor.
- * - `emailEnviado: false` -> la solicitud quedo guardada, pero el aviso fallo
- *   y `message` trae el motivo.
- */
 export interface B2BMeetingResponse {
   success: boolean;
   data: { id: number } | null;

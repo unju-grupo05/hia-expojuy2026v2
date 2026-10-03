@@ -46,9 +46,6 @@
     <svg class="ms-icon" aria-hidden="true"><use [attr.href]="'#bx-' + net.icon"/></svg>
   </a>
 
-  <!-- Invitación: aparece sola tras ~4,5 s y una única vez por sesión.
-       Va al final del <aside> a propósito: los :nth-child() que anima el
-       despliegue del menú cuentan la posición de los hijos. -->
   <div
     class="social-sidebar__bubble"
     [class.is-visible]="showBubble()"

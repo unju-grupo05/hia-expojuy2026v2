@@ -1,15 +1,4 @@
-import {
-  Component,
-  DestroyRef,
-  ElementRef,
-  Inject,
-  OnDestroy,
-  OnInit,
-  PLATFORM_ID,
-  ViewChild,
-  inject,
-  signal
-} from '@angular/core';
+import { Component, DestroyRef, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { AgendaService } from '../../../services/agenda.service';
@@ -60,13 +49,6 @@ export class AgendaComponent implements OnInit, OnDestroy {
   selectedActivityTitle: string = '';
   selectedActivityTime: string = '';
 
-  /**
-   * Estado del modal de recordatorio.
-   *
-   * Antes se controlaba con `document.getElementById` + `classList`
-   * (`modal-open`, `hidden`), lo que ademas deixaba el body bloqueado si el
-   * componente se destruia con el modal abierto.
-   */
   readonly modalOpen = signal<boolean>(false);
   readonly modalStatus = signal<ModalStatus>('form');
   readonly modalErrorMessage = signal<string>('');

@@ -8,13 +8,8 @@
   <meta name="description" content="Portal interactivo oficial de la ExpoJuy 2026 en Ciudad Cultural, Jujuy, Argentina. Minería sustentable, litio, energías limpias y el Corredor Bioceánico.">
   <link rel="icon" type="image/png" href="img/expojuy26_isologotipo.png">
 
-  <!-- El poster es la imagen mas pesada del area critica (LCP). Se pide antes de
-       que arranque Angular para que no dependa del critical path de JS.
-       OJO: cuelga de `public/`, por eso la ruta es `/img/...` y no
-       `assets/img/...`. Debe coincidir con el `poster` del <video> del hero. -->
   <link rel="preload" as="image" href="/img/Expojuy-5.webp" type="image/webp" fetchpriority="high">
 
-  <!-- Inmediato Theme Detector (anti-flicker) -->
   <script>
     (function () {
       try {

@@ -24,12 +24,6 @@ export class PortalLayoutComponent implements OnInit, OnDestroy {
     { id: 'galeria', title: 'Galería', label: 'Galería' }
   ];
 
-  /**
-   * El listener de scroll vive en el servicio y se registra una sola vez por
-   * montaje del layout. Antes se registraba en `InicioComponent` sobre
-   * `window` sin desregistrar nunca, de modo que cada visita a `/` sumaba un
-   * listener nuevo y el work de scroll se multiplicaba.
-   */
   ngOnInit(): void {
     this.chrome.initTheme();
     this.chrome.startReadingTracker();
@@ -44,10 +38,6 @@ export class PortalLayoutComponent implements OnInit, OnDestroy {
     return this.chrome.activeSection() === navTarget;
   }
 
-  /**
-   * El rail navega por el mismo servicio que el menu movil: un solo dueno del
-   * scroll (Lenis) y, cuando el destino es el mapa, el mismo cambio de tab.
-   */
   protected onRailClick(event: Event, sectionId: string): void {
     event.preventDefault();
     this.chrome.closeMobileMenu();

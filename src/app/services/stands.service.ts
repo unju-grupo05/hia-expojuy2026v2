@@ -26,10 +26,6 @@ export class StandsService {
     return this.http.get<ApiResponse<StandBackendDto[]>>(this.urlBase, { params: httpParams });
   }
 
-  /**
-   * Obtiene los stands disponibles para asignación comercial.
-   * Si se pasa expositorId, incluye las parcelas actualmente asignadas a ese expositor.
-   */
   getStandsDisponibles(expositorId?: string): Observable<ApiResponse<StandBackendDto[]>> {
     let httpParams = new HttpParams();
     if (expositorId) {
@@ -37,31 +33,19 @@ export class StandsService {
     }
     return this.http.get<ApiResponse<StandBackendDto[]>>(`${this.urlBase}/disponibles`, { params: httpParams });
   }
-
-  /**
-   * Obtiene el detalle de un stand individual por su ID
-   */
+ 
   getStandPorId(id: string): Observable<ApiResponse<StandBackendDto>> {
     return this.http.get<ApiResponse<StandBackendDto>>(`${this.urlBase}/${id}`);
   }
 
-  /**
-   * Crea un nuevo stand físico
-   */
   postStand(payload: Partial<StandBackendDto>): Observable<ApiResponse<StandBackendDto>> {
     return this.http.post<ApiResponse<StandBackendDto>>(this.urlBase, payload);
   }
 
-  /**
-   * Actualiza los datos de un stand físico
-   */
   putStand(id: string, payload: Partial<StandBackendDto>): Observable<ApiResponse<StandBackendDto>> {
     return this.http.put<ApiResponse<StandBackendDto>>(`${this.urlBase}/${id}`, payload);
   }
 
-  /**
-   * Elimina un stand físico
-   */
   deleteStand(id: string): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.urlBase}/${id}`);
   }

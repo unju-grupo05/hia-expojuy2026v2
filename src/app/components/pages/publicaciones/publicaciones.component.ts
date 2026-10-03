@@ -19,8 +19,8 @@ export interface NewsItem {
 export interface NewsPage {
   pageIndex: number;
   largeCard: NewsItem | null;
-  leftCards: NewsItem[];     // Máximo 2
-  bottomCards: NewsItem[];   // Máximo 2
+  leftCards: NewsItem[];     
+  bottomCards: NewsItem[];   
   totalCards: number;
 }
 

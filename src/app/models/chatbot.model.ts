@@ -1,11 +1,3 @@
-/**
- * Tipos del asistente virtual "PachAI".
- *
- * Reflejan el contrato de `POST /api/chatbot/query`:
- * el backend responde con el envelope `{ success, data, message }` que ya
- * declara `ApiResponse<T>`.
- */
-
 /** Quién escribió el mensaje en el hilo. */
 export type ChatSender = 'user' | 'bot';
 

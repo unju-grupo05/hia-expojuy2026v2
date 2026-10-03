@@ -5,16 +5,6 @@ import gsap from 'gsap';
 import { MasterplanDataService } from './masterplan-data.service';
 import { StandData, PropItem, CommercialStatus } from '../components/models/stand.model';
 
-/**
- * Implementacion concreta de la escena 3D del predio.
- *
- * Este modulo NUNCA se importa de forma estatica: `Masterplan3dService` lo carga
- * con `import()` la primera vez que el visualizador entra en pantalla. Eso deja
- * `three` (~700 kB) y `gsap` fuera del grafo de modulos inicial, de modo que el
- * hilo principal no los descarga ni los parsea durante el render inicial.
- *
- * No es un `@Injectable`: se instancia a mano desde la fachada.
- */
 export class Masterplan3dScene {
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
@@ -44,11 +34,6 @@ export class Masterplan3dScene {
   private carpetMaterialsCache: Map<number, THREE.MeshLambertMaterial> = new Map();
   private sharedMaterials: Map<string, THREE.Material> = new Map();
 
-  /**
-   * Texturas creadas con canvas (CanvasTexture) que no son referenciadas por
-   * ningún campo de la clase. `material.dispose()` NO libera las texturas, por
-   * lo que se registran aquí para liberarlas explícitamente en `destroy()`.
-   */
   private canvasTextures: Set<THREE.Texture> = new Set();
 
   /** Evita que `destroy()` se ejecute dos veces o tras un re-init. */
@@ -787,9 +772,6 @@ export class Masterplan3dScene {
       const isReservado = data.status === 'reservado';
       const cleanId = (data.id || '').toUpperCase().replace(/^(CUB-POL-|CUB-PL-|CUB-TRI-|CUB-|CORP-|EXT-P-|MAQ-)/, '');
       const standNum = parseInt(cleanId.replace(/\D/g, '')) || 0;
-
-      // A2 está unificado espacialmente con el gran stand esquina A1 (CUB-POL-A1).
-      // Se omite instanciar una geometría física duplicada para no superponer ni romper la forma poligonal de A1.
       if (cleanId === 'A2') {
         return;
       }
@@ -1031,10 +1013,6 @@ export class Masterplan3dScene {
     }
   }
 
-  /**
-   * Genera o refresca los stands procedimentales en la escena 3D.
-   * Método de compatibilidad e inicialización sincrónica.
-   */
   public buildProceduralStands(): void {
     const stands = this.dataService.stands().length > 0
       ? this.dataService.stands()
@@ -1166,15 +1144,6 @@ export class Masterplan3dScene {
     }
   }
 
-  /**
-   * Filtra los stands en la escena 3D segun su estado comercial:
-   * 'all' | 'disponible' | 'reservado' | 'cedido'.
-   * Atenua stands que no coinciden y resalta los coincidentes a opacidad 1.0.
-   */
-    /**
-   * Evalúa si un stand cumple simultáneamente con los filtros activos:
-   * Estado comercial, Categoría (Rubro idéntico a Expositores) y Búsqueda.
-   */
   private isStandMatchingFilters(stand: StandData): boolean {
     if (stand.isPOI) {
       if (!this.activeSearchQuery) return true;
@@ -1335,11 +1304,7 @@ export class Masterplan3dScene {
     this.renderer.render(this.scene, this.camera);
   }
 
-  /**
-   * Liberacion completa de la escena. Es idempotente: puede invocarse mas de
-   * una vez sin efectos secundarios, y bloquea cualquier `resumeLoop()` o
-   * `handleResize()` posterior (p. ej. los setTimeout del fullscreen).
-   */
+
   public destroy(): void {
     if (this.isDestroyed) return;
     this.isDestroyed = true;

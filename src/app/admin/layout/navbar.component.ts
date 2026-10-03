@@ -26,12 +26,6 @@ export class NavbarComponent {
 
   public sectionInfo = computed(() => {
     const url = this.currentUrl();
-    if (url.includes('/admin/metrics')) {
-      return {
-        title: 'Métricas del Evento',
-        subtitle: 'Resumen ejecutivo de actividad, consultas y contenidos'
-      };
-    }
     if (url.includes('/admin/posts')) {
       return {
         title: 'Publicaciones y Noticias',

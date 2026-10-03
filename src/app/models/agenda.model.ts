@@ -1,10 +1,3 @@
-/**
- * Contrato de `Agenda` (`/api/agendas`).
- *
- * Los campos que el modelo declara `allowNull: true` se tipan `| null` y cada
- * componente decide su fallback: la agenda publica muestra `''` y la de admin
- * muestra el placeholder del formulario.
- */
 export interface AgendaEvento {
   id: number;
   dia: number;

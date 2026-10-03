@@ -2,7 +2,7 @@
 .gallery-ac {
   display: flex;
   align-items: stretch;
-  gap: 0.5rem; /* Separación limpia entre tarjetas */
+  gap: 0.5rem; 
   justify-content: center;
   overflow: hidden;
   padding: 0.5rem 0;
@@ -12,8 +12,8 @@
 .gallery-ac-item {
   position: relative;
   flex: 0 0 auto;
-  width: 4.5rem;         /* Ancho de tarjeta colapsada */
-  height: 30rem;         /* Altura prominente */
+  width: 4.5rem;         
+  height: 30rem;         
   border-radius: 1.5rem;
   overflow: hidden;
   cursor: pointer;
@@ -29,7 +29,7 @@
 /* Expansión vía JS o Hover directo */
 .gallery-ac-item.is-active,
 .gallery-ac-item:hover {
-  width: 26rem;          /* Ancho de tarjeta expandida */
+  width: 26rem;  
 }
 
 /* En pantallas grandes (Desktop XL), darle más espacio al expandir */

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Stand, StandFormData, StandFormModalComponent, CATEGORY_OPTIONS } from './stand-form-modal.component';
 import { ExpositoresService } from '../../../services/expositores.service';
+import { ASSETS_BASE } from '../../../core/api-url';
 
 @Component({
   selector: 'app-stands-list',
@@ -51,6 +52,7 @@ export class StandsListComponent {
           subtitle: expositor.subtitle ?? '',
           description: expositor.description ?? '',
           origin: expositor.origin ?? '',
+          logo: expositor.logo ?? null,
           standIds: (expositor.stands || []).map(s => s.id)
         })));
         this.loading.set(false);
@@ -82,6 +84,15 @@ export class StandsListComponent {
 
   public formatCategory(category: string): string {
     return this.categoryLabelMap[category] || category;
+  }
+
+  /** URL absoluta del logo WebP servido desde `/uploads` (vacía si no tiene). */
+  public logoUrl(stand: Stand): string {
+    const logo = stand.logo?.trim();
+    if (!logo) return '';
+    if (logo.startsWith('http://') || logo.startsWith('https://') || logo.startsWith('data:')) return logo;
+
+    return `${ASSETS_BASE}${logo.startsWith('/') ? logo : `/${logo}`}`;
   }
 
   public openCreateModal(): void {
@@ -116,7 +127,8 @@ export class StandsListComponent {
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
-        description: formData.description
+        description: formData.description,
+        logo: formData.logo ?? null
       }).subscribe({
         next: () => {
           this.showToast('Expositor actualizado correctamente.');
@@ -136,7 +148,8 @@ export class StandsListComponent {
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
-        description: formData.description
+        description: formData.description,
+        logo: formData.logo ?? null
       }).subscribe({
         next: () => {
           this.showToast('Nuevo expositor registrado exitosamente.');

@@ -1,8 +1,15 @@
-import { Component, effect, inject, input, output, signal, computed } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, input, output, signal, computed, viewChild } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { StandsService } from '../../../services/stands.service';
 import { StandBackendDto } from '../../../components/models/stand.model';
+import { ExpositoresService } from '../../../services/expositores.service';
+import { ASSETS_BASE } from '../../../core/api-url';
+
+/** Mismo filtro que aplica `upload.middleware.js` en el backend. */
+const LOGO_MIME_PERMITIDOS = ['image/jpeg', 'image/png', 'image/webp', 'image/avif'];
+const LOGO_MAX_BYTES = 5 * 1024 * 1024;
 
 export interface Stand {
   id: string;
@@ -12,6 +19,7 @@ export interface Stand {
   subtitle: string;
   description: string;
   origin: string;
+  logo?: string | null;
   standIds?: string[];
 }
 
@@ -44,6 +52,8 @@ export const CATEGORY_OPTIONS: { value: string; label: string }[] = [
 export class StandFormModalComponent {
   private fb = inject(FormBuilder);
   private standsService = inject(StandsService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly expositoresService = inject(ExpositoresService);
 
   public isOpen = input<boolean>(false);
   public standToEdit = input<Stand | null>(null);
@@ -57,6 +67,16 @@ export class StandFormModalComponent {
   public selectedStandIds = signal<string[]>([]);
   public standsSearch = signal<string>('');
   public isStandSelectorOpen = signal<boolean>(false);
+
+  /** Ruta del logo WebP vigente (`/uploads/logo-<uuid>.webp`) o null. */
+  public logoPath = signal<string | null>(null);
+  /** Vista previa local mientras se sube el archivo (object URL). */
+  public logoPreviewUrl = signal<string | null>(null);
+  public logoUploading = signal<boolean>(false);
+  public logoError = signal<string | null>(null);
+
+  private readonly logoInput = viewChild<ElementRef<HTMLInputElement>>('logoInput');
+  private objectUrlPendiente: string | null = null;
 
   public categories = CATEGORY_OPTIONS;
 
@@ -82,6 +102,8 @@ export class StandFormModalComponent {
   });
 
   constructor() {
+    this.destroyRef.onDestroy(() => this.revokeObjectUrl());
+
     effect(() => {
       const open = this.isOpen();
       const stand = this.standToEdit();
@@ -104,6 +126,8 @@ export class StandFormModalComponent {
             description: stand.description || ''
           });
 
+          this.resetLogo(stand.logo ?? null);
+
           this.cargarStandsDisponibles(stand.id);
         } else {
           this.selectedStandIds.set([]);
@@ -115,6 +139,9 @@ export class StandFormModalComponent {
             origin: 'Jujuy, Argentina',
             description: ''
           });
+
+          this.resetLogo(null);
+
           this.cargarStandsDisponibles();
         }
 
@@ -168,6 +195,109 @@ export class StandFormModalComponent {
     return this.selectedStandIds().includes(standId);
   }
 
+  //=============================== LOGO ===============================
+
+  /** URL absoluta para previsualizar el logo (WebP servido desde /uploads). */
+  public logoPreviewSrc(): string {
+    const preview = this.logoPreviewUrl();
+    if (preview) return preview;
+
+    const path = this.logoPath();
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
+
+    return `${ASSETS_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  /**
+   * Sube el logo elegido. El backend lo normaliza a WebP (<=150x150 px, quality 80):
+   * - expositor existente → `POST /api/expositores/:id/logo` (asigna y borra el anterior);
+   * - alta nueva → `POST /api/expositores/logo` (devuelve la URL para el payload).
+   */
+  public onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    this.logoError.set(null);
+
+    if (!LOGO_MIME_PERMITIDOS.includes(file.type)) {
+      this.logoError.set('Formato no permitido. Solo se admiten imágenes (JPEG, PNG, WebP o AVIF).');
+      this.resetFileInput();
+      return;
+    }
+
+    if (file.size > LOGO_MAX_BYTES) {
+      this.logoError.set('El archivo excede el tamaño máximo permitido de 5MB.');
+      this.resetFileInput();
+      return;
+    }
+
+    this.revokeObjectUrl();
+    this.logoPreviewUrl.set(URL.createObjectURL(file));
+    this.objectUrlPendiente = this.logoPreviewUrl();
+    this.logoUploading.set(true);
+
+    const expositorId = this.standToEdit()?.id;
+    const request = expositorId
+      ? this.expositoresService.uploadExpositorLogo(expositorId, file)
+      : this.expositoresService.uploadExpositorLogoSinAsignar(file);
+
+    request.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (res) => {
+        this.logoUploading.set(false);
+        this.logoPath.set(expositorId ? (res.data?.logo ?? null) : (res.data?.url ?? null));
+
+        if (!this.logoPath()) {
+          this.logoError.set('No se pudo obtener la URL del logo convertido.');
+          this.revokeObjectUrl();
+          this.logoPreviewUrl.set(null);
+        }
+      },
+      error: (err) => {
+        this.logoUploading.set(false);
+        this.revokeObjectUrl();
+        this.logoPreviewUrl.set(null);
+        this.logoError.set(err?.error?.message || 'No se pudo subir el logo del expositor.');
+        this.resetFileInput();
+      }
+    });
+  }
+
+  /** Quita el logo (se envía `logo: null` al guardar y el backend borra el archivo). */
+  public removeLogo(): void {
+    this.revokeObjectUrl();
+    this.logoPreviewUrl.set(null);
+    this.logoPath.set(null);
+    this.logoError.set(null);
+    this.resetFileInput();
+  }
+
+  public onLogoPreviewError(): void {
+    this.logoError.set('El logo cargado no se pudo previsualizar.');
+  }
+
+  private resetLogo(logo: string | null): void {
+    this.revokeObjectUrl();
+    this.logoPreviewUrl.set(null);
+    this.logoPath.set(logo && logo.trim() ? logo.trim() : null);
+    this.logoError.set(null);
+    this.logoUploading.set(false);
+    this.resetFileInput();
+  }
+
+  private resetFileInput(): void {
+    const input = this.logoInput()?.nativeElement;
+    if (input) input.value = '';
+  }
+
+  private revokeObjectUrl(): void {
+    if (!this.objectUrlPendiente) return;
+    URL.revokeObjectURL(this.objectUrlPendiente);
+    this.objectUrlPendiente = null;
+  }
+
   public onSubmit(): void {
     if (this.selectedStandIds().length === 0) {
       this.standForm.get('stand')?.setErrors({ required: true });
@@ -177,6 +307,11 @@ export class StandFormModalComponent {
 
     if (this.standForm.invalid) {
       this.standForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.logoUploading()) {
+      this.logoError.set('Espera a que termine de subir el logo antes de guardar.');
       return;
     }
 
@@ -190,7 +325,8 @@ export class StandFormModalComponent {
       category: val.category || 'mineria',
       subtitle: val.subtitle || '',
       origin: val.origin || 'Jujuy, Argentina',
-      description: val.description || ''
+      description: val.description || '',
+      logo: this.logoPath()
     };
 
     this.save.emit(data);

@@ -19,10 +19,6 @@ export const ADMIN_ROUTES: Routes = [
         pathMatch: 'full'
       },
       {
-        path: 'metrics',
-        loadComponent: () => import('./pages/metrics/metrics.component').then(m => m.MetricsComponent)
-      },
-      {
         path: 'posts',
         loadComponent: () => import('./pages/posts/posts-list.component').then(m => m.PostsListComponent)
       },

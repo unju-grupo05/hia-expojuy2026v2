@@ -18,6 +18,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, Validati
 import { Expositor } from '../../../models/expositor.model';
 import { B2BMeetingRequest } from '../../../models/b2b-meeting.model';
 import { ExpositoresService } from '../../../services/expositores.service';
+import { ASSETS_BASE } from '../../../core/api-url';
 import { scheduleIdle } from '../../../core/idle';
 import { B2BMeetingService } from '../../../services/b2b-meeting.service';
 
@@ -44,6 +45,12 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   readonly b2bErrorMessage = signal('');
   readonly b2bSuccessMessage = signal('');
   readonly today = this.getToday();
+
+  /**
+   * Logos que fallaron al cargar (URL rota o archivo borrado del servidor).
+   * Se ocultan para no dejar el cuadradito vacío en la tarjeta.
+   */
+  private readonly brokenLogos = signal<ReadonlySet<string>>(new Set<string>());
 
   /** Numeros de pagina (1..totalPages) que se pintan como puntos. */
   readonly totalPagesArray = computed<number[]>(() =>
@@ -276,6 +283,35 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   filterExhibitors(query: string): void {
     this.currentSearchQuery = (query ?? '').trim();
     this.loadExhibitors(1);
+  }
+
+  /**
+   * URL absoluta del logo del expositor, lista para el `src` de la imagen.
+   *
+   * El backend guarda la ruta relativa (`/uploads/logo-<uuid>.webp`), así que en
+   * desarrollo hay que prefijarla con el origen del server (`ASSETS_BASE`); en
+   * producción `ASSETS_BASE` es vacío y la ruta ya es del mismo origen.
+   * Devuelve cadena vacía cuando el expositor no tiene logo o falló la carga.
+   */
+  exhibitorLogoUrl(ex: Expositor): string {
+    const logo = ex.logo?.trim();
+    if (!logo || this.brokenLogos().has(logo)) return '';
+
+    if (logo.startsWith('http://') || logo.startsWith('https://') || logo.startsWith('data:')) {
+      return logo;
+    }
+
+    const ruta = logo.startsWith('/') ? logo : `/${logo}`;
+    return `${ASSETS_BASE}${ruta}`;
+  }
+
+  /** Marca el logo como no disponible para que la tarjeta no muestre el hueco. */
+  onLogoError(ex: Expositor): void {
+    const logo = ex.logo?.trim();
+    if (!logo || this.brokenLogos().has(logo)) return;
+
+    this.brokenLogos.update(prev => new Set(prev).add(logo));
+    console.warn('No se pudo cargar el logo del expositor:', logo);
   }
 
   /**
