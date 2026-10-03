@@ -1,0 +1,115 @@
+<!-- PachAI: Asistente Virtual Flotante -->
+<div class="chatbot-root">
+  <button class="chatbot-launcher" id="chatbot-launcher" type="button" aria-haspopup="dialog"
+    [attr.aria-expanded]="chatOpen()" aria-controls="chatbot-panel"
+    aria-label="Abrir asistente virtual PachAI" (click)="toggleChatbot()">
+    <img class="chatbot-avatar-img" src="icons/chatbot-avatar.svg" alt="" width="26" height="26" />
+    <span class="chatbot-launcher-dot"></span>
+  </button>
+
+  <div class="chatbot-panel" id="chatbot-panel" role="dialog" aria-modal="false" aria-labelledby="chatbot-title"
+    [class.is-open]="chatOpen()" [attr.aria-hidden]="!chatOpen()">
+    <div class="chatbot-header">
+      <div class="chatbot-header-info">
+<span class="chatbot-avatar">
+          <img class="chatbot-avatar-img" src="icons/chatbot-avatar.svg" alt="" width="34" height="34" />
+        </span>
+        <div>
+          <strong id="chatbot-title">PachAI</strong>
+          <span>Chat bot de la ExpoJuy 2026</span>
+        </div>
+      </div>
+      <button class="chatbot-close" id="chatbot-close" type="button" aria-label="Cerrar asistente"
+        (click)="closeChatbot()">
+        <svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor"
+            d="M6.697 4.575a.75.75 0 0 0-1.06 1.061L10.939 12l-5.302 6.364a.75.75 0 1 0 1.06 1.06L12 13.061l5.302 6.364a.75.75 0 1 0 1.06-1.06L13.061 12l5.302-6.364a.75.75 0 0 0-1.06-1.06L12 10.939 6.697 4.575z" />
+        </svg>
+      </button>
+    </div>
+
+    <!--
+      `data-lenis-prevent-wheel` es imprescindible para el aislamiento: Lenis
+      se inicializa con `smoothWheel: true`, engancha el wheel en `window` y hace
+      preventDefault para animar el scroll él mismo. Por eso `overscroll-behavior`
+      no alcanzaba: es un mecanismo nativo y Lenis lo evita entero. Con este
+      atributo Lenis ignora el wheel que nace dentro del chat y el navegador
+      scrollea el contenedor de forma nativa, momento en el que sí aplica
+      `overscroll-behavior: contain` y la cadena hacia el body se corta.
+      Solo wheel: con `syncTouch: false` Lenis no interviene el táctil, asi que
+      el scroll nativo del dedo ya queda contenido.
+    -->
+    <div class="chatbot-messages" id="chatbot-messages" aria-live="polite" #chatMessagesBox
+      data-lenis-prevent-wheel>
+      @for (message of chatMessages(); track $index) {
+        <div class="chatbot-message chatbot-message--{{ message.sender }}">
+          <span class="chatbot-message-text">{{ message.text }}</span>
+
+          <!-- Tarjetas con las coincidencias devueltas por PostgreSQL -->
+          @if (tieneResultados(message)) {
+            <div class="chatbot-results">
+              @for (resultado of message.results; track resultado.enlace + resultado.titulo) {
+                <button class="chatbot-result" type="button" (click)="irAResultado(resultado)">
+                  <span class="chatbot-result-head">
+                    <span class="chatbot-result-badge">{{ resultado.etiqueta }}</span>
+                    @if (resultado.fecha) {
+                      <span class="chatbot-result-date">{{ formatoFecha(resultado) }}</span>
+                    }
+                  </span>
+                  <span class="chatbot-result-title">{{ resultado.titulo }}</span>
+                  @if (resultado.descripcion) {
+                    <span class="chatbot-result-desc">{{ resultado.descripcion }}</span>
+                  }
+                  @if (resultado.metadato) {
+                    <span class="chatbot-result-meta">{{ resultado.metadato }}</span>
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (esperando()) {
+        <div class="chatbot-message chatbot-message--bot chatbot-message--typing">
+          <span></span><span></span><span></span>
+        </div>
+      }
+    </div>
+
+    <!-- Sugerencias de consultas frecuentes -->
+    @if (chatOpen() && chatMessages().length <= 1 && sugerencias().length > 0) {
+      <div class="chatbot-suggestions">
+        @for (sugerencia of sugerencias(); track sugerencia.consulta) {
+          <button class="chatbot-suggestion" type="button" (click)="usarSugerencia(sugerencia.consulta)">
+            {{ sugerencia.texto }}
+          </button>
+        }
+      </div>
+    }
+
+    <form class="chatbot-input-row" id="chatbot-form" (submit)="sendChatMessage($event)">
+      <input #chatInputField type="text" id="chatbot-input" name="chatInput" [value]="chatDraft()"
+        (input)="updateChatDraft($any($event.target).value)" placeholder="Escribí tu consulta..."
+        aria-label="Escribí tu consulta para PachAI" autocomplete="off" [disabled]="esperando()">
+
+      <button type="button" id="chatbot-mic" class="chatbot-mic"
+        [class.is-recording]="micActivo()"
+        [class.is-unsupported]="microfonoDeshabilitado() || !vozSoportada()"
+        [attr.aria-label]="micActivo() ? 'Detener dictado por voz' : 'Dictar mensaje por voz'"
+        (click)="toggleVoiceInput()">
+        <svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor"
+            d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm7 10a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.929V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.071A7 7 0 0 0 19 12z" />
+        </svg>
+      </button>
+
+      <button type="submit" [disabled]="!puedeEnviar()" aria-label="Enviar mensaje">
+        <svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor"
+            d="M3 20.573v-5.919a.9.9 0 0 1 .45-.77l14.998-7.198a.9.9 0 0 1 1.157 1.204l-5.16 15.32a.9.9 0 0 1-1.565.253l-4.58-5.423-4.395 2.508a.9.9 0 0 1-.896 0zm12.876-9.72-10.54 5.06-.2.115 4.86 5.747 5.88-10.922z" />
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>

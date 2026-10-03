@@ -18,52 +18,18 @@
 
     <div class="marquee-track flex gap-8 items-center animate-marquee">
       <!-- Grupo 1 de Sponsors -->
-      <a
-        *ngFor="let item of col1Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
+      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
-      <a
-        *ngFor="let item of col2Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
+      <a *ngFor="let item of col2Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
 
       <!-- Duplicado exacto para lograr el bucle infinito perfecto -->
-      <a
-        *ngFor="let item of col1Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
-        aria-hidden="true">
+      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
-      <a
-        *ngFor="let item of col2Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
-        aria-hidden="true">
+      <a *ngFor="let item of col2Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
     </div>
@@ -76,54 +42,21 @@
 
     <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
       <!-- Grupo 2 de Sponsors -->
-      <a
-        *ngFor="let item of col3Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
+      <a *ngFor="let item of col3Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
-      <a
-        *ngFor="let item of col1Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'">
+      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
 
       <!-- Duplicado exacto -->
-      <a
-        *ngFor="let item of col3Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
-        aria-hidden="true">
+      <a *ngFor="let item of col3Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
-      <a
-        *ngFor="let item of col1Sponsors"
-        class="sponsor-logo-card"
-        [href]="sponsorUrl(item)"
-        target="_blank"
-        rel="noopener noreferrer"
-        [attr.aria-label]="'Visitar sitio oficial de ' + item.name"
-        [class.pointer-events-none]="!sponsorUrl(item)"
-        [attr.tabindex]="sponsorUrl(item) ? null : '-1'"
-        aria-hidden="true">
+      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
         <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
       </a>
     </div>
   </div>
+
 </section>

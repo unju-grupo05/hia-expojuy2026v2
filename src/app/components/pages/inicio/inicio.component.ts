@@ -19,6 +19,7 @@ import { NovedadesComponent } from '../publicaciones/publicaciones.component';
 import { GaleriaComponent } from '../galeria/galeria.component';
 import { AcreditacionesFaq } from '../acreditaciones-faq/acreditaciones-faq';
 import { Sponsors } from '../sponsors/sponsors';
+import { ChatbotComponent } from '../../chatbot/chatbot.component';
 import { UiChromeService } from '../../../core/ui-chrome.service';
 import { GsapBundle, loadGsap } from '../../../core/gsap-loader';
 import { scheduleIdle } from '../../../core/idle';
@@ -26,20 +27,6 @@ import type Lenis from 'lenis';
 import type * as ScrollTriggerTypes from 'gsap/ScrollTrigger';
 
 type GsapTween = ReturnType<GsapBundle['gsap']['to']>;
-
-interface ChatMessage {
-  sender: 'user' | 'bot';
-  text: string;
-}
-
-/** Subconjunto de la API de Web Speech usada por el chatbot. */
-interface SpeechRecognitionLike {
-  lang: string;
-  interimResults: boolean;
-  onresult: ((event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null;
-  start(): void;
-  abort(): void;
-}
 
 @Component({
   selector: 'app-inicio',
@@ -53,30 +40,23 @@ interface SpeechRecognitionLike {
     NovedadesComponent,
     GaleriaComponent,
     AcreditacionesFaq,
-    Sponsors
+    Sponsors,
+    ChatbotComponent
   ],
   templateUrl: './inicio.component.html',
   styleUrl: './inicio.component.css'
 })
 export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
-  // ── View queries (signal based) ──────────────────────────────────────────
+  // â”€â”€ View queries (signal based) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   private readonly bgVideo = viewChild<ElementRef<HTMLVideoElement>>('bgVideo');
   private readonly predioComponent = viewChild(UbicacionPredioHubComponent);
   private readonly heroSection = viewChild<ElementRef<HTMLElement>>('heroSection');
   private readonly heroBg = viewChild<ElementRef<HTMLElement>>('heroBg');
-  private readonly chatMessagesBox = viewChild<ElementRef<HTMLDivElement>>('chatMessagesBox');
-  private readonly chatInputField = viewChild<ElementRef<HTMLInputElement>>('chatInputField');
 
-  // ── Estado de UI (consumido por la plantilla) ───────────────────────────
+  // â”€â”€ Estado de UI (consumido por la plantilla) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   readonly countdown = signal({ days: '30', hours: '00', minutes: '00', seconds: '00' });
-  readonly chatOpen = signal(false);
-  readonly chatTyping = signal(false);
-  readonly chatDraft = signal('');
-  readonly chatMessages = signal<ChatMessage[]>([
-    { sender: 'bot', text: '¡Hola! Soy PachAI, tu asistente virtual de ExpoJuy 2026. ¿En qué puedo ayudarte hoy?' }
-  ]);
 
-  // ── Recursos con teardown ───────────────────────────────────────────────
+  // â”€â”€ Recursos con teardown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // GSAP y Lenis se resuelven con `import()` diferido para no bloquear el First Paint.
   private gsap!: GsapBundle['gsap'];
   private ScrollTrigger!: GsapBundle['ScrollTrigger'];
@@ -90,40 +70,16 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly scrollTriggers: ScrollTriggerTypes.ScrollTrigger[] = [];
   private readonly observers: IntersectionObserver[] = [];
   private readonly timeouts = new Set<ReturnType<typeof setTimeout>>();
-  private readonly typingTimers = new Set<ReturnType<typeof setTimeout>>();
   private readonly idleCancels = new Set<() => void>();
-  private chatScrollFrame: number | null = null;
   private videoSourceAttached = false;
   private readonly rafIds = new Set<number>();
   private readonly listenerCleanups: Array<() => void> = [];
-  private activeRecognition: SpeechRecognitionLike | null = null;
   private viewDestroyed = false;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private chrome: UiChromeService
-  ) {
-    // Autoscroll del hilo cuando llega un mensaje nuevo o el indicador de typing.
-    effect(() => {
-      this.chatMessages();
-      this.chatTyping();
-
-      if (typeof requestAnimationFrame !== 'function') return;
-      if (this.chatScrollFrame !== null) cancelAnimationFrame(this.chatScrollFrame);
-
-      this.chatScrollFrame = requestAnimationFrame(() => {
-        this.chatScrollFrame = null;
-        const box = this.chatMessagesBox()?.nativeElement;
-        if (box) box.scrollTop = box.scrollHeight;
-      });
-    });
-
-    // La clase vive en <body> porque el CSS de la barra lateral tambien la consulta.
-    effect(() => {
-      if (typeof document === 'undefined') return;
-      document.body.classList.toggle('chat-open', this.chatOpen());
-    });
-  }
+  ) { }
 
   ngOnInit(): void { }
 
@@ -210,25 +166,14 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
     for (const timeout of this.timeouts) clearTimeout(timeout);
     this.timeouts.clear();
 
-    for (const timer of this.typingTimers) clearTimeout(timer);
-    this.typingTimers.clear();
-
     for (const rafId of this.rafIds) cancelAnimationFrame(rafId);
     this.rafIds.clear();
-
-    if (this.chatScrollFrame !== null) cancelAnimationFrame(this.chatScrollFrame);
-    this.chatScrollFrame = null;
 
     for (const cancel of this.idleCancels) cancel();
     this.idleCancels.clear();
 
     for (const cleanup of this.listenerCleanups) cleanup();
     this.listenerCleanups.length = 0;
-
-    this.activeRecognition?.abort();
-    this.activeRecognition = null;
-
-    document.body.classList.remove('chat-open');
   }
 
   // =========================================================================
@@ -563,111 +508,5 @@ export class InicioComponent implements OnInit, AfterViewInit, OnDestroy {
       io.observe(h);
       this.observers.push(io);
     });
-  }
-
-  // =========================================================================
-  // PACHAI CHATBOT FLOTANTE
-  // =========================================================================
-  toggleChatbot(): void {
-    const next = !this.chatOpen();
-    this.chatOpen.set(next);
-    if (next) {
-      this.chatInputField()?.nativeElement.focus();
-    }
-  }
-
-  closeChatbot(): void {
-    this.chatOpen.set(false);
-  }
-
-  sendChatMessage(event: Event): void {
-    event.preventDefault();
-    this.submitChatDraft();
-  }
-
-  updateChatDraft(value: string): void {
-    this.chatDraft.set(value);
-  }
-
-  private submitChatDraft(text?: string): void {
-    const message = (text ?? this.chatDraft()).trim();
-    if (!message) return;
-
-    this.chatMessages.update(messages => [...messages, { sender: 'user', text: message }]);
-    this.chatDraft.set('');
-    this.chatTyping.set(true);
-
-    const timer = setTimeout(() => {
-      this.typingTimers.delete(timer);
-      this.chatTyping.set(false);
-      this.chatMessages.update(messages => [
-        ...messages,
-        { sender: 'bot', text: this.getBotReply(message) }
-      ]);
-    }, 750);
-
-    this.typingTimers.add(timer);
-  }
-
-  toggleVoiceInput(): void {
-    const win = window as unknown as {
-      SpeechRecognition?: new () => SpeechRecognitionLike;
-      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
-    };
-    const SpeechRecognitionCtor = win.SpeechRecognition || win.webkitSpeechRecognition;
-
-    if (!SpeechRecognitionCtor) {
-      this.chatMessages.update(messages => [
-        ...messages,
-        { sender: 'bot', text: 'Tu navegador no soporta reconocimiento de voz nativo. Por favor escribe tu consulta.' }
-      ]);
-      return;
-    }
-
-    try {
-      const recognition = new SpeechRecognitionCtor();
-      recognition.lang = 'es-AR';
-      recognition.interimResults = false;
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        this.chatDraft.set(transcript);
-        this.submitChatDraft(transcript);
-      };
-      this.activeRecognition = recognition;
-      recognition.start();
-    } catch {
-      this.chatMessages.update(messages => [
-        ...messages,
-        { sender: 'bot', text: 'No se pudo activar el micrófono. Puedes escribir tu consulta directamente.' }
-      ]);
-    }
-  }
-
-  private getBotReply(text: string): string {
-    const lower = text.toLowerCase();
-
-    if (/litio|miner[ií]a|bater[ií]a/.test(lower)) {
-      return 'El rubro de Minería y Litio está dentro del listado de "Expositores" (podés activar su filtro) y además cuenta con disertaciones propias en la Agenda.';
-    }
-    if (/entrada|acredit|ticket|precio|costo/.test(lower)) {
-      return 'El acceso general no tiene costo: solo tenés que llenar el formulario que está en "Contacto" y vas a recibir tu credencial digital por correo antes del evento.';
-    }
-    if (/d[oó]nde|ubicaci[oó]n|lugar|predio|llegar|mapa/.test(lower)) {
-      return 'La feria se lleva a cabo en el Predio Ferial de San Salvador de Jujuy (Ciudad Cultural). En la sección "Mapa" encontrás el plano 3D de los pabellones y la ubicación en mapa interactivo.';
-    }
-    if (/fecha|cu[aá]ndo/.test(lower)) {
-      return 'ExpoJuy 2026 tiene lugar del 9 al 18 de octubre de 2026 en el Predio Ferial de la Ciudad Cultural de San Salvador de Jujuy.';
-    }
-    if (/agenda|charla|conferencia|actividad|horario/.test(lower)) {
-      return 'Dentro de "Agenda" vas a ver pestañas ordenadas por día y filtros de actividad. También podés guardar las charlas que te interesan con el botón de "Avisarme".';
-    }
-    if (/expositor|empresa|stand/.test(lower)) {
-      return 'En "Expositores" podés buscar por nombre o filtrar por rubro con carga continua inteligente sin límite de páginas.';
-    }
-    if (/gracias/.test(lower)) {
-      return '¡Con gusto! Si tenés otra consulta, estoy a tu disposición para ayudarte.';
-    }
-
-    return 'Te puedo ayudar con expositores, agenda, ubicación del predio o acreditaciones. ¿Querés que profundicemos en alguno de esos temas?';
   }
 }

@@ -193,33 +193,6 @@
       }
     </div>
   </div>
-  
-<!-- PachAI: Asistente Virtual Flotante -->
-<div class="chatbot-root">
-  <button class="chatbot-launcher" id="chatbot-launcher" type="button" aria-haspopup="dialog" [attr.aria-expanded]="chatOpen()" aria-controls="chatbot-panel" aria-label="Abrir asistente virtual PachAI" (click)="toggleChatbot()">
-    <svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12c0 .793 .099 1.562 .284 2.297l-1.517 1.517A1 1 0 0 0 .323 17l3.283 3.283a1 1 0 0 0 1.414 0l1.517-1.517c.735.185 1.504.284 2.297.284 5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-.793 0-1.562-.099-2.297-.284l.103-.103c.465-.465 1.206-.465 1.67 0l.814.814c-1.045.363-2.164.573-3.29.573zm6.272-6.351c-.39.39-1.019.39-1.409 0l-2.678-2.678a1 1 0 0 1 0-1.414l1.414-1.414 1.414 1.414 2.086-2.086 1.414 1.414-1.414 1.414 2.678 2.678c.39.39.39 1.019 0 1.409zm4.707-4.706-1.414-1.414-4.951 4.951H10.086l-4.951-4.951-1.414 1.414 5.24 5.239H4v2h4.875L4 16.14v2.86h2.86l4.875-4.875V20h2v-4.875l5.24-5.24z"/></svg>
-    <span class="chatbot-launcher-dot"></span>
-  </button>
-  <div class="chatbot-panel" id="chatbot-panel" role="dialog" aria-modal="false" aria-labelledby="chatbot-title" [class.is-open]="chatOpen()" [attr.aria-hidden]="!chatOpen()">
-    <div class="chatbot-header">
-      <div class="chatbot-header-info">
-        <span class="chatbot-avatar"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C6.477 2 2 6.477 2 12c0 .793 .099 1.562 .284 2.297l-1.517 1.517A1 1 0 0 0 .323 17l3.283 3.283a1 1 0 0 0 1.414 0l1.517-1.517c.735.185 1.504.284 2.297.284 5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18c-.793 0-1.562-.099-2.297-.284l.103-.103c.465-.465 1.206-.465 1.67 0l.814.814c-1.045.363-2.164.573-3.29.573zm6.272-6.351c-.39.39-1.019.39-1.409 0l-2.678-2.678a1 1 0 0 1 0-1.414l1.414-1.414 1.414 1.414 2.086-2.086 1.414 1.414-1.414 1.414 2.678 2.678c.39.39.39 1.019 0 1.409zm4.707-4.706-1.414-1.414-4.951 4.951H10.086l-4.951-4.951-1.414 1.414 5.24 5.239H4v2h4.875L4 16.14v2.86h2.86l4.875-4.875V20h2v-4.875l5.24-5.24z"/></svg></span>
-        <div><strong id="chatbot-title">PachAI</strong><span>Asistente virtual ExpoJuy 2026</span></div>
-      </div>
-      <button class="chatbot-close" id="chatbot-close" type="button" aria-label="Cerrar asistente" (click)="closeChatbot()"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6.697 4.575a.75.75 0 0 0-1.06 1.061L10.939 12l-5.302 6.364a.75.75 0 1 0 1.06 1.06L12 13.061l5.302 6.364a.75.75 0 1 0 1.06-1.06L13.061 12l5.302-6.364a.75.75 0 0 0-1.06-1.06L12 10.939 6.697 4.575z"/></svg></button>
-    </div>
-    <div class="chatbot-messages" id="chatbot-messages" aria-live="polite" #chatMessagesBox>
-      @for (message of chatMessages(); track $index) {
-        <div class="chatbot-message chatbot-message--{{ message.sender }}">{{ message.text }}</div>
-      }
-      @if (chatTyping()) {
-        <div class="chatbot-message chatbot-message--bot chatbot-message--typing"><span></span><span></span><span></span></div>
-      }
-    </div>
-    <form class="chatbot-input-row" id="chatbot-form" (submit)="sendChatMessage($event)">
-      <input #chatInputField type="text" id="chatbot-input" name="chatInput" [value]="chatDraft()" (input)="updateChatDraft($any($event.target).value)" placeholder="Escriba­ tu consulta..." aria-label="Escriba­ tu consulta para PachAI" autocomplete="off">
-      <button type="button" id="chatbot-mic" class="chatbot-mic" aria-label="Dictar mensaje por voz" (click)="toggleVoiceInput()"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm7 10a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.929V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-2.071A7 7 0 0 0 19 12z"/></svg></button>
-      <button type="submit" aria-label="Enviar mensaje"><svg class="ms-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 20.573v-5.919a.9.9 0 0 1 .45-.77l14.998-7.198a.9.9 0 0 1 1.157 1.204l-5.16 15.32a.9.9 0 0 1-1.565.253l-4.58-5.423-4.395 2.508a.9.9 0 0 1-.896 0zm12.876-9.72-10.54 5.06-.2.115 4.86 5.747 5.88-10.922z"/></svg></button>
-    </form>
-  </div>
-</div>
+
+  <!-- Asistente virtual "PachAI" (componente independiente) -->
+  <app-chatbot></app-chatbot>
