@@ -127,9 +127,27 @@
     </div>
   </section>
 
-  <!-- Secciones Secundarias con Carga Diferida (@defer on viewport) y Anclas Preservadas -->
+  <!--
+    Secciones Secundarias con carga diferida.
+
+    Se combinan DOS triggers porque el título de cada sección vive dentro del
+    componente diferido, mientras el ancla (`#novedades`, `#galeria`, ...) queda
+    fuera del bloque. Con `on viewport` en alone, entrar a `/` dejaba el ancla
+    apuntando a un placeholder vacío de 400px: los títulos no aparecian hasta
+    que el usuario scrolleaba, y por eso solo se veian con el hash en la URL
+    (el hash fuerza el scroll, el viewport se dispara y el bloque renderiza).
+
+      - `on viewport` conserva la carga diferida real para lo que este bajo el fold.
+      - `on idle` renderiza el bloque cuando el hilo principal se libera, o sea
+        al poco de cargar `/`. Asi las secciones existen antes de que el usuario
+        scrollee y los anclas nunca apuntan a un hueco.
+
+    Ojo: `prefetch on idle` NO sirve para esto. `prefetch` solo descarga el chunk;
+    el bloque sigue sin renderizar hasta que se dispare un trigger. Para forzar
+    el render hay que agregar `on idle` como trigger real.
+  -->
   <div id="sobre-expojuy">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-ejes></app-ejes>
     } @placeholder {
       <div class="w-full min-h-[400px]"></div>
@@ -137,7 +155,7 @@
   </div>
 
   <div id="mapa">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-ubicacion-predio-hub></app-ubicacion-predio-hub>
     } @placeholder {
       <div class="w-full min-h-[500px]"></div>
@@ -145,7 +163,7 @@
   </div>
 
   <div id="expositores">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-expositores></app-expositores>
     } @placeholder {
       <div class="w-full min-h-[400px]"></div>
@@ -153,7 +171,7 @@
   </div>
 
   <div id="agenda">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-agenda></app-agenda>
     } @placeholder {
       <div class="w-full min-h-[400px]"></div>
@@ -161,7 +179,7 @@
   </div>
 
   <div id="novedades">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-novedades></app-novedades>
     } @placeholder {
       <div class="w-full min-h-[400px]"></div>
@@ -169,7 +187,7 @@
   </div>
 
   <div id="galeria">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-galeria></app-galeria>
     } @placeholder {
       <div class="w-full min-h-[400px]"></div>
@@ -177,7 +195,7 @@
   </div>
 
   <div id="sponsors-section">
-    @defer (on viewport) {
+    @defer (on viewport; on idle) {
       <app-sponsors></app-sponsors>
     } @placeholder {
       <div class="w-full min-h-[300px]"></div>
@@ -186,7 +204,7 @@
 
   <div id="acreditaciones-faq">
     <div id="acreditaciones-section">
-      @defer (on viewport) {
+      @defer (on viewport; on idle) {
         <app-acreditaciones-faq></app-acreditaciones-faq>
       } @placeholder {
         <div class="w-full min-h-[300px]"></div>

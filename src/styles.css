@@ -317,7 +317,10 @@
     }
 
     /* Estado activo — exclusivo (solo una clase activa a la vez) y con prioridad
-       sobre cualquier hover/focus para no perder contraste */
+       sobre cualquier hover/focus para no perder contraste.
+       WCAG AA: en modo claro, texto blanco sobre #5E3A8C = ~8.2:1 ✓
+       En modo oscuro, --ej-primary = #bda3e2 (lavanda claro), por lo que
+       se necesita texto oscuro para mantener contraste ≥4.5:1. */
     .map-filter-btn.active-filter,
     .filter-btn.active-filter,
     .day-tab.active-day {
@@ -325,6 +328,14 @@
       color: #ffffff !important;
       border-color: transparent !important;
       box-shadow: none !important;
+    }
+
+    /* En modo oscuro, el primario es lavanda clara (#bda3e2): usar tinta oscura
+       para garantizar contraste ≥ 7:1 (AAA) sobre ese fondo claro. */
+    html.dark .map-filter-btn.active-filter,
+    html.dark .filter-btn.active-filter,
+    html.dark .day-tab.active-day {
+      color: #1A1226 !important;
     }
 
     /* Hover / focus de botones inactivos — modo claro */
