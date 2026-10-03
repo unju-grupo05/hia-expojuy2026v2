@@ -1,12 +1,3 @@
-/**
- * Contrato de `Noticia` (`/api/noticias`).
- *
- * Refleja el modelo Sequelize `noticias`. Ojo: los campos van en espanol y los
- * nombres NO son `resumen` / `cuerpo` / `imagenUrl`; son `descripcion`,
- * `imagen` y `fecha`. Este tipo es la unica fuente de verdad del contrato: los
- * componentes que necesitaban otra forma (admin en ingles, grilla publica con
- * parrafos pre-partidos) siguen teniendo sus view models, derivados de aqui.
- */
 export interface NoticiaDTO {
   id: number;
   slug: string;

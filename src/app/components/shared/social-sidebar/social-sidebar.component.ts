@@ -28,8 +28,6 @@ export class SocialSidebarComponent implements OnInit, OnDestroy {
   @Input() public stardustEnabled = true;
   @Output() public stardustToggle = new EventEmitter<boolean>();
 
-  // Signals, no campos booleanos: la app corre sin zone.js (zoneless), asi que
-  // una asignacion dentro de un setTimeout no dispara deteccion de cambios.
   public readonly isOpen = signal(false);
   public readonly showHint = signal(false);
   public readonly showBubble = signal(false);
@@ -37,7 +35,6 @@ export class SocialSidebarComponent implements OnInit, OnDestroy {
   public socials: SocialLink[] = [
     { label: 'Instagram', url: 'https://www.instagram.com/expojuy/', icon: 'instagram' },
     { label: 'Facebook', url: 'https://www.facebook.com/ExpoJuy/', icon: 'facebook' },
-    { label: 'LinkedIn', url: 'https://www.linkedin.com/company/expojuy', icon: 'linkedin' }
   ];
 
   private longPressTimer: ReturnType<typeof setTimeout> | null = null;
@@ -124,11 +121,6 @@ export class SocialSidebarComponent implements OnInit, OnDestroy {
     }, HINT_VISIBLE_MS);
   }
 
-  /**
-   * La burbuja aparece sola a los ~4,5 s para no competir con el contenido
-   * inicial, y solo una vez por sesión (sessionStorage): si el usuario navega
-   * por la SPA no vuelve a interrumpirle.
-   */
   private scheduleBubble(): void {
     if (this.readSessionFlag(BUBBLE_SEEN_KEY)) return;
     this.bubbleTimer = setTimeout(() => {

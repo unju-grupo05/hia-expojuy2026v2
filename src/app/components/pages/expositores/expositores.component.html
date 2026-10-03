@@ -77,8 +77,28 @@
                   </span>
                   <svg class="ms-icon text-outline shrink-0 ml-2" aria-hidden="true"><use href="#ms-verified"/></svg>
                 </div>
-                <h3 class="font-display text-lg font-bold text-brand-slate-dark">{{ ex.name }}</h3>
-                <p class="text-xs text-outline mt-1 font-semibold uppercase tracking-wider">{{ ex.subtitle }}</p>
+
+                <!-- Identidad del expositor: nombre a la izquierda, logo mas grande a la derecha -->
+                <div class="exhibitor-identity flex items-center justify-between gap-3">
+                    <div class="exhibitor-identity-text min-w-0 flex-1">
+                      <h3 class="font-display text-lg font-bold text-brand-slate-dark dark:text-white">{{ ex.name }}</h3>
+                      <p class="text-xs text-outline mt-1 font-semibold uppercase tracking-wider">{{ ex.subtitle }}</p>
+                    </div>
+
+                    @if (exhibitorLogoUrl(ex); as logoUrl) {
+                      <span class="exhibitor-logo-wrap shrink-0 w-14 h-14 sm:w-16 sm:h-16">
+                        <img [src]="logoUrl"
+                            [alt]="'Logo ' + ex.name"
+                            loading="lazy"
+                            decoding="async"
+                            width="64"
+                            height="64"
+                            class="exhibitor-logo-img"
+                            (error)="onLogoError(ex)" />
+                      </span>
+                    }
+                  </div>
+
                 <p class="text-sm text-on-surface-variant mt-3 leading-relaxed">
                   {{ ex.description }}
                 </p>

@@ -42,8 +42,6 @@ export class PostsListComponent {
 
     this.noticiasService.getNoticias(true).subscribe({
       next: (res) => {
-        // `NoticiaDTO` es el contrato de la API (campos en espanol). `Post` es el
-        // view model del panel: traduce los nombres y decide el `status`.
         const items: NoticiaDTO[] = res.data ?? [];
         const mapped: Post[] = items.map((n) => ({
           id: String(n.id),

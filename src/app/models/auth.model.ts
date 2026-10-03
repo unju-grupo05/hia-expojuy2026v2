@@ -1,9 +1,3 @@
-/**
- * Contrato de autenticacion (`POST /api/usuarios/login`).
- *
- * El backend acepta `identificador` (correo o legajo) y devuelve el token mas
- * un `usuario` que es el payload del JWT, no la fila completa del modelo.
- */
 export interface AuthCredentials {
   email: string;
   password: string;

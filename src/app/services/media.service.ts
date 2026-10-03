@@ -30,9 +30,6 @@ export class MediaService {
 
   constructor(private http: HttpClient) {}
 
-  // El token lo adjunta el AuthInterceptor. En `uploadImage` NO se fija
-  // Content-Type a propósito: el navegador debe generar el boundary de
-  // multipart/form-data al enviar el FormData.
   public uploadImage(file: File): Observable<UploadMediaResponse> {
     const formData = new FormData();
     formData.append('image', file);

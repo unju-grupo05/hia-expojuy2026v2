@@ -1,7 +1,4 @@
-/* ============ PachAI: Asistente Virtual Flotante ============
-   Estilos movidos desde inicio.component.css al independizar el componente.
-   El panel mantiene la paleta oscura/cyan y las variables del tema global
-   (--ej-surface, --ej-primary, --ej-cyan…) definidas en src/styles.css. */
+/* ============ PachAI: Asistente Virtual Flotante ============*/
 .chatbot-root {
   position: fixed;
   bottom: 1.5rem;
@@ -150,17 +147,6 @@
 .chatbot-close:hover { background: rgba(255, 255, 255, 0.25); }
 
 /* ---------- Hilo de mensajes ---------- */
-/*
- * Aislamiento de scroll.
- *
- * `overscroll-behavior: contain` es la clave: sin él, al llegar al final de la
- * lista el scroll "rebota" y arrastra al body, así que la página se mueve
- * mientras el usuario recorre los mensajes. `touch-action: pan-y` acota el
- * gesto al eje vertical y evita que un swipe horizontal robe el scroll.
- *
- * No hace falta `!important`: la única otra regla que toca este selector
- * (`:host-context(html.dark)`) solo define el fondo.
- */
 .chatbot-messages {
   flex: 1;
   padding: 1.25rem;

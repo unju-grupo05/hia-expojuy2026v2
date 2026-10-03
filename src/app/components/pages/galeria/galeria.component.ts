@@ -5,10 +5,6 @@ import { GaleriaItem } from '../../../models/galeria.model';
 import { MediaService } from '../../../services/media.service';
 import { scheduleIdle } from '../../../core/idle';
 
-/**
- * View model del carrusel. Se deriva de `GaleriaItem` (contrato de la API)
- * normalizando los textos opcionales: el template no tiene que chequear nulos.
- */
 export interface GaleriaItemView {
   id: number;
   titulo: string;

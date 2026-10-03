@@ -28,17 +28,6 @@
       </button>
     </div>
 
-    <!--
-      `data-lenis-prevent-wheel` es imprescindible para el aislamiento: Lenis
-      se inicializa con `smoothWheel: true`, engancha el wheel en `window` y hace
-      preventDefault para animar el scroll él mismo. Por eso `overscroll-behavior`
-      no alcanzaba: es un mecanismo nativo y Lenis lo evita entero. Con este
-      atributo Lenis ignora el wheel que nace dentro del chat y el navegador
-      scrollea el contenedor de forma nativa, momento en el que sí aplica
-      `overscroll-behavior: contain` y la cadena hacia el body se corta.
-      Solo wheel: con `syncTouch: false` Lenis no interviene el táctil, asi que
-      el scroll nativo del dedo ya queda contenido.
-    -->
     <div class="chatbot-messages" id="chatbot-messages" aria-live="polite" #chatMessagesBox
       data-lenis-prevent-wheel>
       @for (message of chatMessages(); track $index) {

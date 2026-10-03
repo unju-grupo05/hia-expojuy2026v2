@@ -1,20 +1,9 @@
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  PLATFORM_ID,
-  computed,
-  effect,
-  inject,
-  signal,
-  viewChild
-} from '@angular/core';
+import { Component, ElementRef, OnDestroy, PLATFORM_ID, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { ChatbotService } from '../../services/chatbot.service';
 import { ChatMessage, ChatResult, ChatSuggestion } from '../../models/chatbot.model';
 
-/** Subconjunto de la API de Web Speech usada por el micrófono. */
 interface SpeechRecognitionLike {
   lang: string;
   interimResults: boolean;
@@ -36,7 +25,7 @@ export class ChatbotComponent implements OnDestroy {
   private readonly chatMessagesBox = viewChild<ElementRef<HTMLDivElement>>('chatMessagesBox');
   private readonly chatInputField = viewChild<ElementRef<HTMLInputElement>>('chatInputField');
 
-  // ── Estado de UI ────────────────────────────────────────────────────────
+  // ── Estado de UI ────
   readonly chatOpen = signal(false);
   readonly chatTyping = signal(false);
   readonly chatDraft = signal('');
@@ -49,10 +38,8 @@ export class ChatbotComponent implements OnDestroy {
   readonly vozSoportada = signal(false);
   readonly microfonoDeshabilitado = signal(false);
 
-  /** Botón de envío bloqueado mientras se espera la respuesta del backend. */
   readonly esperando = computed(() => this.chatTyping());
 
-  /** El envío se habilita solo con texto y sin una petición en vuelo. */
   readonly puedeEnviar = computed(() => this.chatDraft().trim().length > 0 && !this.chatTyping());
 
   private readonly subscriptions = new Subscription();
@@ -60,7 +47,6 @@ export class ChatbotComponent implements OnDestroy {
   private activeRecognition: SpeechRecognitionLike | null = null;
 
   constructor() {
-    // Autoscroll del hilo cuando llega un mensaje nuevo o el indicador de typing.
     effect(() => {
       this.chatMessages();
       this.chatTyping();
@@ -75,7 +61,6 @@ export class ChatbotComponent implements OnDestroy {
       });
     });
 
-    // La clase vive en <body> porque el CSS de las barras laterales también la consulta.
     effect(() => {
       if (typeof document === 'undefined') return;
       document.body.classList.toggle('chat-open', this.chatOpen());
@@ -132,13 +117,6 @@ export class ChatbotComponent implements OnDestroy {
     this.enviar(consulta);
   }
 
-  /**
-   * Publica la consulta en el hilo y la delega al servicio.
-   *
-   * El servicio aplica `debounceTime(300)` y `switchMap`, así que las
-   * peticiones duplicadas se cancelan solas. `chatTyping` mantiene el botón y
-   * el input bloqueados mientras dura el ida y vuelta al backend.
-   */
   private enviar(texto: string): void {
     const mensaje = texto.trim();
     if (!mensaje || this.chatTyping()) return;
@@ -150,12 +128,7 @@ export class ChatbotComponent implements OnDestroy {
     this.chatbot.enviarConsulta(mensaje);
   }
 
-  /**
-   * Suscripción al flujo diferido del servicio.
-   *
-   * Se mantiene abierta de forma permanente: es el canal por el que llegan todas
-   * las respuestas del backend.
-   */
+
   private escucharConsultas(): Subscription {
     return this.chatbot.consultaDiferida$.subscribe({
       next: data => {
@@ -182,22 +155,11 @@ export class ChatbotComponent implements OnDestroy {
     });
   }
 
-  // =========================================================================
-  // RESULTADOS
-  // =========================================================================
 
-  /** ¿Este mensaje tiene tarjetas de coincidencia para renderizar? */
   tieneResultados(mensaje: ChatMessage): boolean {
     return (mensaje.results?.length ?? 0) > 0;
   }
 
-  /**
-   * Navega a la sección del sitio a la que apunta una tarjeta.
-   *
-   * Los enlaces del backend son anclas internas (`/#agenda`). Como el sitio es
-   * una SPA de una sola ruta, se actualiza el hash y se emite el scroll para que
-   * el mismo smooth scroll del header lo ataje.
-   */
   irAResultado(resultado: ChatResult): void {
     this.closeChatbot();
 
@@ -274,7 +236,6 @@ export class ChatbotComponent implements OnDestroy {
     }
   }
 
-  /** Agrega un mensaje del bot sin pasar por el backend. */
   private responder(texto: string): void {
     this.chatMessages.update(mensajes => [...mensajes, { sender: 'bot', text: texto }]);
   }

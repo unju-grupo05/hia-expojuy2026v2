@@ -14,10 +14,6 @@ import { CommercialStatus } from '../../../../models/stand.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ControlsComponent {
-  /**
-   * Filtros de estado comercial soportados:
-   * Todos, Disponibles, Reservados, Cedidos
-   */
   public statusFilters: { key: CommercialStatus | 'all'; label: string }[] = [
     { key: 'all', label: 'Todos' },
     { key: 'disponible', label: 'Disponibles' },
@@ -25,10 +21,6 @@ export class ControlsComponent {
     { key: 'cedido', label: 'Cedidos' }
   ];
 
-  /**
-   * Filtros de categorías oficiales (idéntico al Directorio de Expositores):
-   * Todos, Minería & Litio, Agroindustria, Energías Renovables, Tecnología & IA, Logística & Puertos
-   */
   public categoryFilters = [
     { key: 'all', label: 'Todos' },
     { key: 'mineria', label: 'Minería & Litio' },

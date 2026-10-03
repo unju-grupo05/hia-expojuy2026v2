@@ -116,6 +116,19 @@
                 <!-- Empresa & Stand -->
                 <td class="py-3.5 px-4 sm:px-6">
                   <div class="flex items-center gap-3">
+                    @if (logoUrl(stand); as standLogo) {
+                      <img [src]="standLogo"
+                           [alt]="'Logo ' + stand.name"
+                           loading="lazy"
+                           decoding="async"
+                           width="40"
+                           height="40"
+                           class="w-10 h-10 shrink-0 object-contain p-1 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700" />
+                    } @else {
+                      <span class="grid place-items-center w-10 h-10 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-300 dark:text-slate-600">
+                        <svg class="ms-icon text-[18px]" aria-hidden="true"><use href="#ms-perm_media"/></svg>
+                      </span>
+                    }
                     <div class="min-w-0 max-w-sm">
                       <p class="font-bold text-slate-900 dark:text-white truncate">
                         {{ stand.name }}
@@ -247,8 +260,21 @@
                 <svg class="ms-icon text-primary text-base" aria-hidden="true"><use href="#ms-verified"/></svg>
               </div>
 
-              <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ stand.name }}</h3>
-              <p class="text-xs text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{{ formatCategory(stand.category) }}</p>
+              <div class="flex items-center gap-3">
+                @if (logoUrl(stand); as previewLogo) {
+                  <span class="grid place-items-center w-12 h-12 shrink-0 rounded-xl bg-white dark:bg-[#151026] border border-primary/20 dark:border-white/10 overflow-hidden">
+                    <img [src]="previewLogo"
+                         [alt]="'Logo ' + stand.name"
+                         loading="lazy"
+                         decoding="async"
+                         class="w-full h-full object-contain p-1" />
+                  </span>
+                }
+                <div class="min-w-0">
+                  <h3 class="font-display text-lg font-bold text-slate-900 dark:text-white">{{ stand.name }}</h3>
+                  <p class="text-xs text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{{ formatCategory(stand.category) }}</p>
+                </div>
+              </div>
               @if (stand.subtitle) {
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">{{ stand.subtitle }}</p>
               }

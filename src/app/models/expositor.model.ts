@@ -1,11 +1,3 @@
-/**
- * Contrato de `Expositor` (`/api/expositores`).
- *
- * Consolida el que antes vivia suelto en `components/models/exhibitor.model.ts`.
- * `category` es texto libre en la base (columna `STRING` sin constraint), asi
- * que se tipa como `string`; las pestanas de filtro de la seccion publica
- * comparan contra literales, no contra el tipo.
- */
 export interface ExpositorStandSummary {
   id: string;
   sector: string;
@@ -22,6 +14,7 @@ export interface Expositor {
   description: string | null;
   origin: string | null;
   email: string | null;
+  logo?: string | null;
   stands?: ExpositorStandSummary[];
   createdAt?: string;
   updatedAt?: string;
@@ -46,4 +39,18 @@ export interface ExpositorPayload {
   description?: string | null;
   origin?: string | null;
   email?: string | null;
+  logo?: string | null;
+}
+
+export interface ExpositorLogoResponse {
+  success: boolean;
+  data: (Partial<Expositor> & {
+    url?: string | null;
+    filename?: string;
+    size?: number;
+    width?: number;
+    height?: number;
+    format?: string;
+  }) | null;
+  message?: string;
 }

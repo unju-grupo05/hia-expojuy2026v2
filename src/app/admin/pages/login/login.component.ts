@@ -38,7 +38,7 @@ export class LoginComponent {
       password: password || ''
     }).subscribe({
       next: () => {
-        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/metrics';
+        const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/admin/posts';
         this.router.navigateByUrl(returnUrl);
       },
       error: (err: Error) => {

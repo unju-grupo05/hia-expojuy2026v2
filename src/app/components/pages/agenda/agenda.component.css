@@ -1,7 +1,3 @@
-    /* Modal backdrop.
-       El modal se inserta con `@if (modalOpen())`, por lo que cuando existe ya
-       es visible: la animacion de entrada se resuelve con `animation` en lugar
-       de depender de la clase `.modal-open` aplicada por JS. */
     .modal-backdrop {
       animation: modalFadeIn 0.25s ease both;
     }

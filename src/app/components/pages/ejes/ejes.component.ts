@@ -91,7 +91,7 @@ export class EjesComponent implements OnInit, OnDestroy {
     // si la promesa aun no se resolvio, no hay triggers que refrescar.
     void loadGsap()
       .then(({ ScrollTrigger }) => ScrollTrigger.getAll().forEach(trigger => trigger.refresh()))
-      .catch(() => { /* sin GSAP no hay nada que refrescar */ });
+      .catch(() => { });
   }
 
   ngOnDestroy(): void {

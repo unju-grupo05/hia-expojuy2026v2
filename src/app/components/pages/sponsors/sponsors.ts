@@ -120,13 +120,7 @@ export class Sponsors {
     }
   ];
 
-  /**
-   * Normaliza la URL del sponsor para que siempre sea absoluta y externa.
-   *
-   * Sin esto, un `website` con forma `www.empresa.com` se resolvia como ruta
-   * relativa contra el origen de la app y el enlace terminaba en
-   * `/www.empresa.com` en lugar de abrir el sitio del sponsor.
-   */
+  //normaliza la URL del sponsor para que siempre sea absoluta y externa.
   public sponsorUrl(sponsor: SponsorData): string {
     const raw = (sponsor.website ?? '').trim();
     if (!raw) return '';

@@ -10,8 +10,6 @@
   position: relative;
   width: 3.25rem;
   height: 3.25rem;
-  /* Centro del FAB respecto a su borde izquierdo: la burbuja se ancla al
-     borde izquierdo del FAB, así que su piquillo debe apuntar a este valor. */
   --fab-center: 1.625rem;
 }
 
@@ -237,18 +235,10 @@
   align-items: flex-start;
   gap: 0.5rem;
   width: max-content;
-  /* El FAB está pegado al borde izquierdo del viewport, así que centrar la
-     burbuja sobre él (left:50% + translateX(-50%)) sacaba fuera de pantalla
-     unos 74px. Se ancla al borde izquierdo del FAB y crece hacia la derecha;
-     el tope de ancho nunca supera el espacio libre. */
   max-width: min(15.5rem, calc(100vw - 3rem));
   padding: 0.7rem 0.7rem 0.7rem 0.85rem;
   border: 1px solid rgba(0, 194, 209, 0.55);
   border-radius: 0.85rem;
-  /* Fondo oscuro fijo: legible sobre cualquier sección de la portada. Por eso
-     el texto NO puede usar --ej-text: en tema claro ese token es casi negro
-     (#1b1b23) y quedaría ilegible sobre este fondo. Se usan tonos claros
-     fijos, que además coinciden con los de html.dark. */
   background: linear-gradient(155deg, #241c3a 0%, var(--ej-slate-dark) 100%);
   color: #e7e2f3;
   box-shadow:
@@ -318,9 +308,6 @@
   color: var(--ej-cyan);
 }
 
-/* Piquillo que ancla la burbuja al FAB. Como la burbuja ya no está centrada
-   sino alineada a su borde izquierdo, el piquillo se sitúa en el centro real
-   del FAB (--fab-center) y no en el 50% de la burbuja. */
 .social-sidebar__bubble::after {
   content: "";
   position: absolute;
