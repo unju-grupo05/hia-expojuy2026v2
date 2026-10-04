@@ -13,5 +13,5 @@ export const environment = {
    * Los servicios construyen sus endpoints a partir de este valor
    * (por ejemplo: `${environment.apiUrl}/noticias/`).
    */
-  apiUrl: 'http://localhost:3000/api'
+  apiUrl: 'https://api.expojuy.com.ar/api'
 };
