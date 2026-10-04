@@ -17,5 +17,5 @@ export const environment = {
   production: true,
 
   /** Raíz de la API. Debe incluir el sufijo `/api`. */
-  apiUrl: 'http://localhost:3000/api'
+  apiUrl: 'https://api.expojuy.com.ar/api'
 };
