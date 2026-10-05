@@ -113,16 +113,22 @@
           <!-- Escenario / Auditorio y Etiqueta -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1" for="lugarInput">
                 Escenario / Auditorio *
               </label>
-              <select
+              <input
+                id="lugarInput"
+                type="text"
+                list="lugaresList"
                 formControlName="lugar"
-                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all">
+                placeholder="Selecciona o escribe un escenario..."
+                class="w-full px-3.5 py-2 text-sm rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all"
+              />
+              <datalist id="lugaresList">
                 @for (lugar of LUGARES; track lugar) {
-                  <option [value]="lugar">{{ lugar }}</option>
+                  <option [value]="lugar"></option>
                 }
-              </select>
+              </datalist>
             </div>
 
             <div>

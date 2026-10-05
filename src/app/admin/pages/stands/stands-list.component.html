@@ -105,6 +105,7 @@
               <th class="py-3.5 px-4 text-start">Rubro</th>
               <th class="py-3.5 px-4 text-start">Actividad / Descripción</th>
               <th class="py-3.5 px-4 text-start">Origen</th>
+              <th class="py-3.5 px-4 text-start">Contacto</th>
               <th class="py-3.5 px-4 sm:px-6 text-end">Acciones</th>
             </tr>
           </thead>
@@ -162,6 +163,20 @@
                   {{ stand.origin || 'Argentina' }}
                 </td>
 
+                <!-- Contacto -->
+                <td class="py-3.5 px-4 text-xs">
+                  @if (stand.email) {
+                    <a
+                      [href]="'mailto:' + stand.email"
+                      class="inline-flex items-center gap-1.5 font-medium text-brand-cyan-accessible dark:text-brand-cyan-electric hover:underline break-all">
+                      <svg class="ms-icon text-[14px] shrink-0" aria-hidden="true"><use href="#ms-mail"/></svg>
+                      <span class="truncate">{{ stand.email }}</span>
+                    </a>
+                  } @else {
+                    <span class="text-slate-400 dark:text-slate-500 italic">Sin correo</span>
+                  }
+                </td>
+
                 <!-- Acciones -->
                 <td class="py-3.5 px-4 sm:px-6 text-end whitespace-nowrap">
                   <div class="inline-flex items-center gap-1.5">
@@ -198,7 +213,7 @@
               </tr>
             } @empty {
               <tr>
-                <td colspan="5" class="py-12 px-4 text-center">
+                <td colspan="6" class="py-12 px-4 text-center">
                   <div class="max-w-sm mx-auto flex flex-col items-center">
                     <svg class="ms-icon text-4xl text-slate-300 dark:text-slate-600 mb-2" aria-hidden="true"><use href="#ms-storefront"/></svg>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-300">

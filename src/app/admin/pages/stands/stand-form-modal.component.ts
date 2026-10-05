@@ -19,6 +19,8 @@ export interface Stand {
   subtitle: string;
   description: string;
   origin: string;
+  /** Correo de contacto. Opcional: vacio o null cuando el expositor no lo cargo. */
+  email: string;
   logo?: string | null;
   standIds?: string[];
 }
@@ -26,21 +28,32 @@ export interface Stand {
 export type StandFormData = Omit<Stand, 'id'> & { id?: string; standIds: string[] };
 
 export const CATEGORY_LABELS: Record<string, string> = {
+  agroindustria: 'Agroindustria & Tabaco',
+  automotor: 'Automotor & Maquinaria Pesada',
+  construccion: 'Construcción e Inmobiliaria',
   mineria: 'Minería & Litio',
-  energia: 'Energías Renovables',
-  agro: 'Agroindustria',
-  tecnologia: 'Tecnología & IA',
-  logistica: 'Logística & Puertos',
-  general: 'Industria & Comercio General'
+  alimentos_bebidas: 'Alimentos, Bebidas & Regionales',
+  medios_comunicacion: 'Medios de Comunicación',
+  educacion: 'Educación & Académico',
+  institucional: 'Institucional & Gobierno',
+  comercio_servicios: 'Comercio, Banca & Servicios',
+  bazar_regaleria: 'Bazar, Regalería & Moda',
+  tecnologia_3d: 'Tecnología, 3D & Electrónica'
 };
 
+/** Opciones para los selectores/dropdowns de la interfaz */
 export const CATEGORY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'agroindustria', label: 'Agroindustria & Tabaco' },
+  { value: 'automotor', label: 'Automotor & Maquinaria Pesada' },
+  { value: 'construccion', label: 'Construcción e Inmobiliaria' },
   { value: 'mineria', label: 'Minería & Litio' },
-  { value: 'energia', label: 'Energías Renovables' },
-  { value: 'agro', label: 'Agroindustria' },
-  { value: 'tecnologia', label: 'Tecnología & IA' },
-  { value: 'logistica', label: 'Logística & Puertos' },
-  { value: 'general', label: 'Industria & Comercio General' }
+  { value: 'alimentos_bebidas', label: 'Alimentos, Bebidas & Regionales' },
+  { value: 'medios_comunicacion', label: 'Medios de Comunicación' },
+  { value: 'educacion', label: 'Educación & Académico' },
+  { value: 'institucional', label: 'Institucional & Gobierno' },
+  { value: 'comercio_servicios', label: 'Comercio, Banca & Servicios' },
+  { value: 'bazar_regaleria', label: 'Bazar, Regalería & Moda' },
+  { value: 'tecnologia_3d', label: 'Tecnología, 3D & Electrónica' }
 ];
 
 @Component({
@@ -83,9 +96,12 @@ export class StandFormModalComponent {
   public standForm = this.fb.group({
     name: ['', [Validators.required, Validators.minLength(3)]],
     stand: ['', [Validators.required]],
-    category: ['mineria', [Validators.required]],
+    category: ['comercio_servicios', [Validators.required]],
     subtitle: [''],
     origin: ['Jujuy, Argentina', [Validators.required]],
+    // Opcional: `Validators.email` acepta el valor vacio, asi que solo bloquea el envio
+    // cuando hay algo escrito con un formato que no es de correo.
+    email: ['', [Validators.email, Validators.maxLength(254)]],
     description: ['', [Validators.required, Validators.minLength(10)]]
   });
 
@@ -120,9 +136,10 @@ export class StandFormModalComponent {
           this.standForm.patchValue({
             name: stand.name,
             stand: parsedIds.join(', '),
-            category: stand.category || 'mineria',
+            category: stand.category || 'comercio_servicios',
             subtitle: stand.subtitle || '',
             origin: stand.origin || 'Jujuy, Argentina',
+            email: stand.email || '',
             description: stand.description || ''
           });
 
@@ -134,9 +151,10 @@ export class StandFormModalComponent {
           this.standForm.reset({
             name: '',
             stand: '',
-            category: 'mineria',
+            category: 'comercio_servicios',
             subtitle: '',
             origin: 'Jujuy, Argentina',
+            email: '',
             description: ''
           });
 
@@ -250,7 +268,7 @@ export class StandFormModalComponent {
         this.logoPath.set(expositorId ? (res.data?.logo ?? null) : (res.data?.url ?? null));
 
         if (!this.logoPath()) {
-          this.logoError.set('No se pudo obtener la URL del logo convertido.');
+          this.logoError.set('No se pudo obtener la URL del logo converted.');
           this.revokeObjectUrl();
           this.logoPreviewUrl.set(null);
         }
@@ -322,9 +340,10 @@ export class StandFormModalComponent {
       name: val.name || '',
       stand: standIds.join(', '),
       standIds: standIds,
-      category: val.category || 'mineria',
+      category: val.category || 'comercio_servicios',
       subtitle: val.subtitle || '',
       origin: val.origin || 'Jujuy, Argentina',
+      email: val.email?.trim() || '',
       description: val.description || '',
       logo: this.logoPath()
     };
