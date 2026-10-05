@@ -142,6 +142,15 @@ html.dark .sponsor-logo-img {
   transform: scale(1.05);
 }
 
+/* En celular no existe hover: el logo se quedaria siempre en escala de grises.
+   Por eso en movil se muestran a color; el escritorio mantiene el efecto. */
+@media (max-width: 640px) {
+  .sponsor-logo-img,
+  html.dark .sponsor-logo-img {
+    filter: grayscale(0%) opacity(1);
+  }
+}
+
 /* ============ ESTILOS DEL MODAL ============ */
 .sponsor-modal-backdrop {
   background: rgba(15, 12, 25, 0.7);

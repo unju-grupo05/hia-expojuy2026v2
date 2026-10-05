@@ -353,12 +353,12 @@
   }
 
   .social-sidebar__item .ms-icon {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   .social-sidebar__star-icon {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1.3rem;
+    height: 1.3rem;
   }
 
   .social-sidebar.is-open .social-sidebar__item:nth-child(2) {

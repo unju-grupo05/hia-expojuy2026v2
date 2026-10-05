@@ -24,10 +24,10 @@ export interface AgendaDia {
 }
 
 const RESUMEN_DIAS: Record<number, string> = {
-  1: 'Inauguración & Litio',
-  2: 'Corredor Bioceánico',
-  3: 'Energías & AgroTech',
-  4: 'Rondas B2B & Cierre'
+  1: '',
+  2: '',
+  3: '',
+  4: ''
 };
 
 type ModalStatus = 'form' | 'enviando' | 'exito' | 'error';

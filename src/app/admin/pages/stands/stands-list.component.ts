@@ -52,6 +52,7 @@ export class StandsListComponent {
           subtitle: expositor.subtitle ?? '',
           description: expositor.description ?? '',
           origin: expositor.origin ?? '',
+          email: expositor.email ?? '',
           logo: expositor.logo ?? null,
           standIds: (expositor.stands || []).map(s => s.id)
         })));
@@ -74,7 +75,8 @@ export class StandsListComponent {
       const matchesTerm = !term ||
         stand.name.toLowerCase().includes(term) ||
         stand.stand.toLowerCase().includes(term) ||
-        stand.category.toLowerCase().includes(term);
+        stand.category.toLowerCase().includes(term) ||
+        stand.email.toLowerCase().includes(term);
 
       const matchesCategory = category === 'all' || stand.category === category;
 
@@ -127,6 +129,7 @@ export class StandsListComponent {
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
+        email: formData.email || null,
         description: formData.description,
         logo: formData.logo ?? null
       }).subscribe({
@@ -148,6 +151,7 @@ export class StandsListComponent {
         category: formData.category,
         subtitle: formData.subtitle,
         origin: formData.origin,
+        email: formData.email || null,
         description: formData.description,
         logo: formData.logo ?? null
       }).subscribe({
