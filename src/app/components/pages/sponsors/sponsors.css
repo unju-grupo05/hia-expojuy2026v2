@@ -276,21 +276,24 @@ html.dark .sponsor-modal-btn:hover {
   color: #0b0813;
 }
 
-/* Botón Desplegable */
+/* ============ BOTÓN DESPLEGABLE CORREGIDO ============ */
 .toggle-sponsors-btn {
-  background: var(--ej-surface, #120d24);
-  border: 1px solid rgba(0, 242, 255, 0.3);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  background-color: var(--color-brand-cyan-electric, #00f2ff);
+  color: #0f172a; /* text-slate-900 para lectura clara */
+  box-shadow: 0 4px 14px rgba(0, 242, 255, 0.25);
   cursor: pointer;
-  will-change: transform, box-shadow;
+  will-change: transform;
+  transition: all 0.3s ease;
 }
 
 .toggle-sponsors-btn:hover {
-  background: rgba(0, 242, 255, 0.1);
-  border-color: #00f2ff;
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+  background-color: #32e2f0;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(0, 242, 255, 0.4);
+}
+
+.toggle-sponsors-btn:active {
+  transform: scale(0.95);
 }
 
 /* Animación de apertura */
