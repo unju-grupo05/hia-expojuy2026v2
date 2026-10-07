@@ -110,3 +110,35 @@
   border-color: transparent !important;
   box-shadow: 0 2px 8px rgba(189, 163, 226, 0.4) !important;
 }
+
+.category-scroll-container {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px; 
+}
+
+.category-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.category-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 255, 0.3);
+  border-radius: 10px;
+}
+
+.category-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 242, 255, 0.6);
+}
+
+.filter-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}

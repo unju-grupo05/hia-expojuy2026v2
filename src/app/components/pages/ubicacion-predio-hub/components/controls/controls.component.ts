@@ -23,11 +23,18 @@ export class ControlsComponent {
 
   public categoryFilters = [
     { key: 'all', label: 'Todos' },
+    { key: 'agroindustria', label: 'Agroindustria & Tabaco' },
+    { key: 'automotor', label: 'Automotor & Maquinaria Pesada' },
+    { key: 'construccion', label: 'Construcción e Inmobiliaria' },
     { key: 'mineria', label: 'Minería & Litio' },
-    { key: 'agro', label: 'Agroindustria' },
-    { key: 'energia', label: 'Energías Renovables' },
-    { key: 'tecnologia', label: 'Tecnología & IA' },
-    { key: 'logistica', label: 'Logística & Puertos' }
+    { key: 'alimentos_bebidas', label: 'Alimentos, Bebidas & Regionales' },
+    { key: 'medios_comunicacion', label: 'Medios de Comunicación' },
+    { key: 'educacion', label: 'Educación & Académico' },
+    { key: 'institucional', label: 'Institucional & Gobierno' },
+    { key: 'comercio_servicios', label: 'Comercio, Banca & Servicios' },
+    { key: 'bazar_regaleria', label: 'Bazar, Regalería & Moda' },
+    { key: 'tecnologia_3d', label: 'Tecnología, 3D & Electrónica' }
+    
   ];
 
   constructor(

@@ -19,7 +19,6 @@ export interface Stand {
   subtitle: string;
   description: string;
   origin: string;
-  /** Correo de contacto. Opcional: vacio o null cuando el expositor no lo cargo. */
   email: string;
   logo?: string | null;
   standIds?: string[];

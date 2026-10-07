@@ -39,6 +39,7 @@ export class SidebarComponent {
     corporativo: ['mineria', 'energia'],
     descubierto: ['logistica', 'tecnologia'],
     artesano: ['agro'],
+    gastronomico: ['general'],
     cubierto: ['tecnologia', 'agro']
   };
 

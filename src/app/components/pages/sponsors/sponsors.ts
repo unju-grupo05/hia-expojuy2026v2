@@ -10,6 +10,7 @@ interface SponsorData {
   img: string;
   website: string;
   layerClass: string;
+  category?: 'organizador' | 'platino' | 'oro';
 }
 
 @Component({
@@ -20,121 +21,256 @@ interface SponsorData {
   styleUrl: './sponsors.css'
 })
 export class Sponsors {
-  // Matriz de marcas / Sponsors oficiales
+  public isExpanded: boolean = false;
+
+  public toggleDesplegable(): void {
+    this.isExpanded = !this.isExpanded;
+  }
+
+  // Matriz de Sponsors oficiales organizada en pirámide invertida (7 -> 4 -> 3)
   public col1Sponsors: SponsorData[] = [
     {
-      id: 'exar',
-      name: 'Exar',
-      role: '{MAIN DIAMOND}',
-      badge: '{MAIN DIAMOND}',
-      desc: 'Líder mundial en tecnologías de litio y extracción sustentable en la Puna jujeña, acelerando la transición energética y almacenamiento de nueva generación.',
-      img: './img/sponsors/1-Exar.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-behind'
-    },
-    {
-      id: 'compania-seguros',
-      name: 'Compañia de Seguros',
+      id: 'capitan-cortez',
+      name: 'CAPITAN CORTEZ',
       role: '{PLATINUM SPONSOR}',
       badge: '{PLATINUM}',
-      desc: 'Alianza de integración subcontinental que promueve el comercio exterior, la conectividad logística y el desarrollo de la Zona de Integración del Centro Oeste Sudamericano.',
-      img: './img/sponsors/2-Compañia-Seguros.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-front'
+      desc: 'alianza estratégica de tres empresas, las cuales combinadas brindan un servicio integral para el transporte de cargas.',
+      img: './img/sponsors/logo_ccgroup.webp',
+      website: 'https://capitancortes.com/cc-group',
+      layerClass: 'sponsor-layer-behind',
+      category: 'platino'
     },
     {
-      id: 'cannava',
-      name: 'Cannava',
-      role: '{GLOBAL PARTNER}',
-      badge: '{GLOBAL PARTNER}',
-      desc: 'Operador del parque solar Cauchari, uno de los más altos y eficientes del planeta, impulsando la descarbonización industrial en el Cono Sur.',
-      img: './img/sponsors/3-cannava.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-behind'
+      id: 'hierros-la-quiaca',
+      name: 'HIERROS LA QUIACA',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Líderes en acero con soluciones que trascienden.',
+      img: './img/sponsors/logo_hlq.webp',
+      website: 'https://hierroslaquiaca.com.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'platino'
+    },
+    {
+      id: 'madre-miga',
+      name: 'MADRE MIGA',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Panadería y pastelería artesanal...',
+      img: './img/sponsors/logo_madre_miga.webp',
+      website: 'https://www.instagram.com/madremigajujuy/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'platino'
+    },
+    {
+      id: 'viap',
+      name: 'VIAP',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Somos una empresa del NOA dedicada al diseño, fabricación, comercialización, distribución e instalación de módulos habitacionales.',
+      img: './img/sponsors/logo_viap.webp',
+      website: 'https://www.viap.com.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'platino'
+    },
+    {
+      id: 'transporte-atacama',
+      name: 'TRASPORTE ATACAMA',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Servicios de logística y transporte regional...',
+      img: './img/sponsors/logo_atacama.webp',
+      website: 'https://www.instagram.com/atacamajujuy/?hl=en',
+      layerClass: 'sponsor-layer-behind',
+      category: 'platino'
+    },
+    {
+      id: 'white',
+      name: 'WHITE',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Soluciones empresariales e innovación...',
+      img: './img/sponsors/logo_white.webp',
+      website: 'https://www.instagram.com/whitebs.ok/',
+      layerClass: 'sponsor-layer-front',
+      category: 'platino'
+    },
+    {
+      id: 'antropo',
+      name: 'ANTROPO',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'En diciembre del 2020, jóvenes apasionados por la vitivinicultura, crearon la primera bodega urbana de San Salvador de Jujuy: Antropo Wines.',
+      img: './img/sponsors/logo_antropo_wines.webp',
+      website: 'https://jarillawines.com/antropo-wines/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'platino'
     }
   ];
 
   public col2Sponsors: SponsorData[] = [
     {
-      id: 'kelimpio',
-      name: 'Kelimpio',
-      role: '{MAIN DIAMOND}',
-      badge: '{MAIN DIAMOND}',
-      desc: 'Entidad financiera multilateral que canaliza capital estratégico en infraestructura portuaria, ferrocarril y corredores bioceánicos de Sudamérica.',
-      img: './img/sponsors/4-Kelimpio.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-front'
+      id: 'grido',
+      name: 'GRIDO',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Cadena de heladerías con presencia regional...',
+      img: './img/sponsors/logo_grido.webp',
+      website: 'https://www.instagram.com/gridohelados/',
+      layerClass: 'sponsor-layer-front',
+      category: 'platino'
     },
     {
-      id: 'jujuyacompaña',
-      name: 'Jujuy Acompaña',
+      id: 'joy',
+      name: 'JOY',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'Todo lo que necesitás para viajar mejor',
+      img: './img/sponsors/logo_JOY.webp',
+      website: 'https://joyairline.com.ar/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'platino'
+    },
+    {
+      id: 'palpetrol',
+      name: 'AXION-PALPETROL',
+      role: '{PLATINUM SPONSOR}',
+      badge: '{PLATINUM}',
+      desc: 'En Palpetrol S.R.L., nos dedicamos a la comercialización de combustibles, lubricantes y productos relacionados. Con una trayectoria consolidada en el mercado, ofrecemos servicios y productos de alta calidad, respondiendo a las necesidades de nuestros clientes con eficiencia y compromiso.',
+      img: './img/sponsors/logo_palpetrol.webp',
+      website: 'https://www.instagram.com/palpetrolsrljujuy/',
+      layerClass: 'sponsor-layer-front',
+      category: 'platino'
+    },
+    {
+      id: 'exincor',
+      name: 'EXINCOR',
       role: '{GOLD SPONSOR}',
-      badge: '{GOLD SPONSOR}',
-      desc: 'Infraestructura en la nube soberana con centros de datos de alta eficiencia energética, computación cuántica y ciberseguridad para el sector corporativo.',
-      img: './img/sponsors/5-jujuyacompaña.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-behind'
-    },
-    {
-      id: 'municipalidad',
-      name: 'Municipalidad',
-      role: '{TECH PARTNER}',
-      badge: '{TECH PARTNER}',
-      desc: 'Soluciones de telemetría IoT, robótica autónoma y analítica predictiva diseñadas para la extracción mineral de huella cero y máxima seguridad operativa.',
-      img: './img/sponsors/6-municipalidad.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-front'
+      badge: '{GOLD}',
+      desc: 'Fabricamos cajas y envases de cartón CALIDAD, DISEÑO Y TECNOLOGÍA',
+      img: './img/sponsors/logo_exincor.webp',
+      website: 'https://exincor.com.ar/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'oro'
     }
   ];
 
   public col3Sponsors: SponsorData[] = [
     {
+      id: 'melius',
+      name: 'MELIUS',
+      role: '{GOLD SPONSOR}',
+      badge: '{GOLD}',
+      desc: 'Somos Melius, una consultora independiente formada por profesionales expertos en finanzas, cuya misión es brindar asesoramiento sobre inversiones en el mercado de valores',
+      img: './img/sponsors/logo_melius.webp',
+      website: 'https://meliusfinanzas.com.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'oro'
+    },
+    {
+      id: 'solci media',
+      name: 'SOLCI MEDIA',
+      role: '{GOLD SPONSOR}',
+      badge: '{GOLD}',
+      desc: 'Ronda de negocios y articulación comercial...',
+      img: './img/sponsors/logo_SOLCI_MEDIA.webp',
+      website: 'https://www.instagram.com/solci.media/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'oro'
+    },
+    {
+      id: 'compania-seguros',
+      name: 'COMPAÑIA DE SEGUROS DE JUJUY',
+      role: '{GOLD SPONSOR}',
+      badge: '{GOLD}',
+      desc: 'Aseguradora oficial de la provincia de Jujuy...',
+      img: './img/sponsors/logo_campañia_seguros.webp',
+      website: 'https://companiasegurosdejujuy.gob.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'oro'
+    },
+    {
+      id: 'BYD-logistic',
+      name: 'BYD LOGISTIC',
+      role: '{GOLD SPONSOR}',
+      badge: '{GOLD}',
+      desc: 'Soluciones de transporte y logística de alta precisión...',
+      img: './img/sponsors/logo_byd.webp',
+      website: 'https://bydlogistic.com.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'oro'
+    }
+  ];
+
+    public col4Sponsors: SponsorData[] = [
+
+    {
       id: 'cfi',
       name: 'CFI',
       role: '{INSTITUTIONAL}',
       badge: '{INSTITUTIONAL}',
-      desc: 'Organismo rector que potencia el comercio internacional del Noroeste Argentino con los mercados del Asia-Pacífico y el Mercosur ampliado.',
-      img: './img/sponsors/7-CFI.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-behind'
+      desc: 'Organismo rector del comercio...',
+      img: './img/sponsors/logo_CFI.webp',
+      website: 'https://cfi.org.ar/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'organizador'
     },
     {
-      id: 'camara-comercio',
+      id: 'camara-arg-comercio',
       name: 'Camara de Comercio',
       role: '{PLATINUM SPONSOR}',
       badge: '{PLATINUM}',
-      desc: 'Flota multimodal de transporte bioceánico por el Paso de Jama hacia puertos chilenos, garantizando tiempos récord y trazabilidad integral.',
-      img: './img/sponsors/8-Camara-comercio.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-front'
+      desc: 'Flota multimodal de transporte...',
+      img: './img/sponsors/logo_Camara-comercio.webp',
+      website: 'https://www.cac.com.ar/',
+      layerClass: 'sponsor-layer-front',
+      category: 'organizador'
     },
     {
-      id: 'secretaria-turismo',
-      name: 'Secretaria de Turismo',
-      role: '{CREATIVE PARTNER}',
-      badge: '{CREATIVE}',
-      desc: 'Ecosistema de innovación tecnológica y economía del conocimiento jujeña que incuba startups y proyectos de software de exportación.',
-      img: './img/sponsors/9-secretaria-turismo.webp',
-      website: 'https://expojuy.com.ar',
-      layerClass: 'sponsor-layer-behind'
+      id: 'gobierno-jujuy',
+      name: 'Gobierno de Jujuy',
+      role: '{INSTITUTIONAL}',
+      badge: '{INSTITUTIONAL}',
+      desc: 'Ilustre Municipalidad de San Salvador de Jujuy',
+      img: './img/sponsors/logo_municipalidad.webp',
+      website: 'https://www.sansalvadordejujuy.gob.ar/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'organizador'
+    },
+    {
+      id: 'camara-comercio-exterior',
+      name: 'Camara de Comercio Exterior',
+      role: '{INSTITUTIONAL}',
+      badge: '{INSTITUTIONAL}',
+      desc: 'Ilustre Municipalidad de San Salvador de Jujuy',
+      img: './img/sponsors/logo_camaradecomercioexterior.webp',
+      website: 'https://camcomexjujuy.com.ar/',
+      layerClass: 'sponsor-layer-behind',
+      category: 'organizador'
     }
   ];
 
-  //normaliza la URL del sponsor para que siempre sea absoluta y externa.
+  // Clasificación de listas estáticas en memoria
+  public get organizadores(): SponsorData[] {
+    return [...this.col1Sponsors, ...this.col2Sponsors, ...this.col3Sponsors, ...this.col4Sponsors].filter(s => s.category === 'organizador');
+  }
+
+  public get platino(): SponsorData[] {
+    return [...this.col1Sponsors, ...this.col2Sponsors, ...this.col3Sponsors, ...this.col4Sponsors].filter(s => s.category === 'platino');
+  }
+
+  public get oro(): SponsorData[] {
+    return [...this.col1Sponsors, ...this.col2Sponsors, ...this.col3Sponsors, ...this.col4Sponsors].filter(s => s.category === 'oro');
+  }
+
   public sponsorUrl(sponsor: SponsorData): string {
     const raw = (sponsor.website ?? '').trim();
     if (!raw) return '';
-
     if (/^(mailto:|tel:)/i.test(raw)) return raw;
-
-    // Protocolo-relative (`//host`) o esquema explícito (`http(s)://host`).
     if (/^(https?:)?\/\//i.test(raw)) {
       return `https://${raw.replace(/^(https?:)?\/\//i, '')}`;
     }
-
-    // Ruta interna: no debe convertirse en enlace externo.
     if (raw.startsWith('/')) return '';
-
     return `https://${raw}`;
   }
 }

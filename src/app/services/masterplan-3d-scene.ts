@@ -28,15 +28,16 @@ export class Masterplan3dScene {
   // Techo y vigas
   public roofGroup!: THREE.Group;
   public roofMat!: THREE.MeshStandardMaterial;
+  public tingladoRoofMat!: THREE.MeshStandardMaterial;
   public roofVisible = true;
 
   // Flyweight
   private carpetMaterialsCache: Map<number, THREE.MeshLambertMaterial> = new Map();
   private sharedMaterials: Map<string, THREE.Material> = new Map();
 
+
   private canvasTextures: Set<THREE.Texture> = new Set();
 
-  /** Evita que `destroy()` se ejecute dos veces o tras un re-init. */
   private isDestroyed = false;
 
   private tempVec = new THREE.Vector3();
@@ -319,6 +320,12 @@ export class Masterplan3dScene {
           opacity: 0.88,
           duration: 0.4
         });
+        if (this.tingladoRoofMat) {
+          gsap.to(this.tingladoRoofMat, {
+            opacity: 0.95,
+            duration: 0.4
+          });
+        }
       } else {
         gsap.to(this.roofMat, {
           opacity: 0,
@@ -327,9 +334,18 @@ export class Masterplan3dScene {
             this.roofGroup.visible = false;
           }
         });
+        if (this.tingladoRoofMat) {
+          gsap.to(this.tingladoRoofMat, {
+            opacity: 0,
+            duration: 0.3
+          });
+        }
       }
     } else {
       this.roofMat.opacity = visible ? 0.88 : 0;
+      if (this.tingladoRoofMat) {
+        this.tingladoRoofMat.opacity = visible ? 0.95 : 0;
+      }
       this.roofGroup.visible = visible;
     }
   }
@@ -559,21 +575,30 @@ export class Masterplan3dScene {
     rGeo.setAttribute('position', new THREE.BufferAttribute(rVerts, 3));
     rGeo.computeVertexNormals();
 
-    const roofSkin = new THREE.Mesh(
-      rGeo,
-      new THREE.MeshStandardMaterial({ color: 0x223249, roughness: 0.35, metalness: 0.6, side: THREE.DoubleSide })
-    );
-    tGroup.add(roofSkin);
+    if (!this.tingladoRoofMat) {
+      this.tingladoRoofMat = new THREE.MeshStandardMaterial({
+        color: 0x223249,
+        roughness: 0.35,
+        metalness: 0.6,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: this.roofVisible ? 0.95 : 0
+      });
+    }
 
-    const truckPositions = [-w / 3, 0, w / 3];
-    truckPositions.forEach((tx, idx) => {
-      const truck = new THREE.Mesh(
-        new THREE.BoxGeometry(4.4, 2.2, 2.4),
-        new THREE.MeshStandardMaterial({ color: idx % 2 === 0 ? 0xdc2626 : 0x0284c7, roughness: 0.4 })
-      );
-      truck.position.set(tx, 1.15, -l / 4);
-      tGroup.add(truck);
-    });
+    const tingladoRoofGroup = new THREE.Group();
+    tingladoRoofGroup.position.set(prop.x, 0, prop.z);
+    tingladoRoofGroup.rotation.y = prop.rotY || 0;
+
+    const roofSkin = new THREE.Mesh(rGeo, this.tingladoRoofMat);
+    roofSkin.castShadow = true;
+    tingladoRoofGroup.add(roofSkin);
+
+    if (this.roofGroup) {
+      this.roofGroup.add(tingladoRoofGroup);
+    } else {
+      tGroup.add(roofSkin);
+    }
 
     this.scene.add(tGroup);
   }
@@ -611,7 +636,7 @@ export class Masterplan3dScene {
     };
 
     createSameUnit(-66, -24, -19.9);
-    createSameUnit(-62, 120, 115.9);
+    createSameUnit(-72, 120, 115.9);
 
     const jGroup = new THREE.Group();
     jGroup.position.set(45, 0, 92);
@@ -772,6 +797,9 @@ export class Masterplan3dScene {
       const isReservado = data.status === 'reservado';
       const cleanId = (data.id || '').toUpperCase().replace(/^(CUB-POL-|CUB-PL-|CUB-TRI-|CUB-|CORP-|EXT-P-|MAQ-)/, '');
       const standNum = parseInt(cleanId.replace(/\D/g, '')) || 0;
+
+      // A2 está unificado espacialmente con el gran stand esquina A1 (CUB-POL-A1).
+      // Se omite instanciar una geometría física duplicada para no superponer ni romper la forma poligonal de A1.
       if (cleanId === 'A2') {
         return;
       }
@@ -863,7 +891,7 @@ export class Masterplan3dScene {
         }
       }
       // 4. LOTES CORPORATIVOS: F1, F2, G1-G3, CORP- o type corporativo
-      else if (data.type === 'corporativo' || data.id.startsWith('CORP-') || cleanId.startsWith('F') || (cleanId.startsWith('G') && standNum >= 1 && standNum <= 3)) {
+      else if (data.type === 'corporativo' || data.id.startsWith('CORP-') || cleanId.startsWith('F') || (cleanId.startsWith('G') && standNum >= 1 && standNum <= 4)) {
         const deck = new THREE.Mesh(
           new THREE.BoxGeometry(data.w, 0.18, data.l),
           new THREE.MeshStandardMaterial({ color: 0x18202c, roughness: 0.45, metalness: 0.25 })
@@ -892,7 +920,7 @@ export class Masterplan3dScene {
         }
       }
       // 5. MAQUINARIAS Y VEHÍCULOS (descubierto)
-      else if (data.type === 'descubierto' || data.id.startsWith('MAQ-') || cleanId.startsWith('H') || (cleanId.startsWith('G') && standNum >= 4)) {
+      else if (data.type === 'descubierto' || data.id.startsWith('MAQ-') || cleanId.startsWith('H') || (cleanId.startsWith('G') && standNum >= 5)) {
         const parcelBase = new THREE.Mesh(
           new THREE.BoxGeometry(data.w, 0.06, data.l),
           this.sharedMaterials.get('parcelWhite')!
@@ -941,7 +969,71 @@ export class Masterplan3dScene {
           standGroup.add(machine);
         }
       }
-      // 6. STANDS MODULARES (cubierto / artesano / fallback general)
+      // 6. SECTOR GASTRONÓMICO / FOOD TRUCKS: K1-K11 o type gastronomico
+      else if (data.sectorKey === 'gastronomico' || data.type === 'gastronomico' || cleanId.startsWith('K')) {
+        const bodyColor = isCedido ? 0x8b5cf6 : (isReservado ? 0xf59e0b : 0x0284c7);
+        const roofColor = 0x1e293b;
+
+        // Chasis y cuerpo del Food Truck
+        const truckBody = new THREE.Mesh(
+          new THREE.BoxGeometry(data.w - 0.2, 1.8, data.l - 0.2),
+          new THREE.MeshStandardMaterial({ color: bodyColor, roughness: 0.35, metalness: 0.25 })
+        );
+        truckBody.position.y = 1.05;
+        truckBody.castShadow = true;
+        truckBody.receiveShadow = true;
+        standGroup.add(truckBody);
+
+        // Techo de Food Truck
+        const truckRoof = new THREE.Mesh(
+          new THREE.BoxGeometry(data.w, 0.22, data.l),
+          new THREE.MeshStandardMaterial({ color: roofColor, roughness: 0.4 })
+        );
+        truckRoof.position.y = 2.05;
+        standGroup.add(truckRoof);
+
+        // Ventana de atención / barra hacia el frente (-l/2)
+        const windowFrame = new THREE.Mesh(
+          new THREE.BoxGeometry(data.w * 0.65, 0.85, 0.1),
+          new THREE.MeshBasicMaterial({ color: 0x0f172a })
+        );
+        windowFrame.position.set(0, 1.15, -data.l / 2 + 0.08);
+        standGroup.add(windowFrame);
+
+        // Mostrador de despacho
+        const counterBar = new THREE.Mesh(
+          new THREE.BoxGeometry(data.w * 0.7, 0.1, 0.4),
+          new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5 })
+        );
+        counterBar.position.set(0, 0.72, -data.l / 2 - 0.15);
+        standGroup.add(counterBar);
+
+        // Toldo / Alero sobre la ventana
+        const awningMat = new THREE.MeshStandardMaterial({
+          color: isCedido ? 0xa855f7 : (isReservado ? 0xfbbf24 : 0x38bdf8),
+          roughness: 0.35
+        });
+        const awning = new THREE.Mesh(
+          new THREE.BoxGeometry(data.w * 0.75, 0.08, 0.7),
+          awningMat
+        );
+        awning.rotation.x = 0.3;
+        awning.position.set(0, 1.75, -data.l / 2 - 0.3);
+        standGroup.add(awning);
+
+        // Ruedas laterales estéticas
+        const wheelGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.14, 12);
+        const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0b1016, roughness: 0.8 });
+        wheelGeo.rotateZ(Math.PI / 2);
+        for (const wx of [-data.w / 2 + 0.8, data.w / 2 - 0.8]) {
+          for (const wz of [-data.l / 2 + 0.4, data.l / 2 - 0.4]) {
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.position.set(wx, 0.22, wz);
+            standGroup.add(wheel);
+          }
+        }
+      }
+      // 7. STANDS MODULARES (cubierto / artesano / fallback general)
       else {
         const carpetColor = isCedido ? 0x8b5cf6 : (data.carpetColor || 0x334155);
         const carpet = new THREE.Mesh(
@@ -1013,6 +1105,10 @@ export class Masterplan3dScene {
     }
   }
 
+  /**
+   * Genera o refresca los stands procedimentales en la escena 3D.
+   * Método de compatibilidad e inicialización sincrónica.
+   */
   public buildProceduralStands(): void {
     const stands = this.dataService.stands().length > 0
       ? this.dataService.stands()
@@ -1144,6 +1240,15 @@ export class Masterplan3dScene {
     }
   }
 
+  /**
+   * Filtra los stands en la escena 3D segun su estado comercial:
+   * 'all' | 'disponible' | 'reservado' | 'cedido'.
+   * Atenua stands que no coinciden y resalta los coincidentes a opacidad 1.0.
+   */
+    /**
+   * Evalúa si un stand cumple simultáneamente con los filtros activos:
+   * Estado comercial, Categoría (Rubro idéntico a Expositores) y Búsqueda.
+   */
   private isStandMatchingFilters(stand: StandData): boolean {
     if (stand.isPOI) {
       if (!this.activeSearchQuery) return true;
@@ -1338,6 +1443,9 @@ export class Masterplan3dScene {
     if (this.roofMat) {
       gsap.killTweensOf(this.roofMat);
     }
+    if (this.tingladoRoofMat) {
+      gsap.killTweensOf(this.tingladoRoofMat);
+    }
 
     // 4. Recorrer la escena liberando TODOS los recursos, no solo mallas.
     //    `isMesh` dejaba fuera LineSegments (el highlight), Line y Points.
@@ -1436,6 +1544,7 @@ export class Masterplan3dScene {
     this.currentSelectedStand = null;
     this.roofGroup = undefined as unknown as THREE.Group;
     this.roofMat = undefined as unknown as THREE.MeshStandardMaterial;
+    this.tingladoRoofMat = undefined as unknown as THREE.MeshStandardMaterial;
 
     // 9. Liberar el renderer y el contexto WebGL.
     if (this.controls) {
