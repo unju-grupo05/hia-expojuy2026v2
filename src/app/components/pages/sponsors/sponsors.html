@@ -2,61 +2,132 @@
   
   <!-- Encabezado de la Sección -->
   <div class="text-center mb-10 px-4">
-     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/30 text-xs font-bold uppercase tracking-wider">
-        Nuestros Aliados
-      </div>
-    <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-cyan-electric/15 text-brand-cyan-accessible border border-brand-cyan-electric/30 text-xs font-bold uppercase tracking-wider">
+      Nuestros Aliados
+    </div>
+    <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-3">
       Empresas que conectan el mundo
     </h2>
   </div>
 
-  <!-- Carrusel Infinito - Fila 1 (Se desplaza hacia la izquierda) -->
-  <div class="marquee-wrapper relative flex overflow-hidden my-6">
-    <!-- Degradados para suavizar los bordes lateralmente -->
-    <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
-    <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
+  <!-- MARQUESINA GIRATORIA (SE OCULTA AL DESPLEGAR) -->
+  <ng-container *ngIf="!isExpanded">
+    
+    <!-- Carrusel Infinito - Fila 1 (Izquierda) -->
+    <div class="marquee-wrapper relative flex overflow-hidden my-6">
+      <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
+      <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
 
-    <div class="marquee-track flex gap-8 items-center animate-marquee">
-      <!-- Grupo 1 de Sponsors -->
-      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
-      <a *ngFor="let item of col2Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
+      <div class="marquee-track flex gap-8 items-center animate-marquee">
+        <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+        <a *ngFor="let item of col2Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
 
-      <!-- Duplicado exacto para lograr el bucle infinito perfecto -->
-      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
-      <a *ngFor="let item of col2Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
+        <!-- Duplicados para bucle continuo -->
+        <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+        <a *ngFor="let item of col2Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+      </div>
     </div>
+
+    <!-- Carrusel Infinito - Fila 2 (Derecha) -->
+    <div class="marquee-wrapper relative flex overflow-hidden my-6">
+      <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
+      <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
+
+      <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
+        <a *ngFor="let item of col3Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+        <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+
+        <!-- Duplicados -->
+        <a *ngFor="let item of col3Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+        <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+        </a>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Botón Desplegable -->
+  <div class="flex justify-center my-8">
+    <button (click)="toggleDesplegable()" class="toggle-sponsors-btn inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all duration-300" [attr.aria-expanded]="isExpanded">
+      <span>{{ isExpanded ? 'Ver marquesina en movimiento' : 'Ver Todos por Nivel de Aporte' }}</span>
+      <svg class="w-5 h-5 transition-transform duration-300" [class.rotate-180]="isExpanded" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
   </div>
 
-  <!-- Carrusel Infinito - Fila 2 (Se desplaza en sentido inverso / derecha) -->
-  <div class="marquee-wrapper relative flex overflow-hidden my-6">
-    <div class="sponsors-fade-left pointer-events-none absolute left-0 top-0 bottom-0 w-24 z-10"></div>
-    <div class="sponsors-fade-right pointer-events-none absolute right-0 top-0 bottom-0 w-24 z-10"></div>
+  <!-- SECCIÓN DESPLEGABLE ORDENADA POR APORTES -->
+  <div *ngIf="isExpanded" class="expanded-sponsors-container max-w-6xl mx-auto px-4 mt-8 space-y-12">
 
-    <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
-      <!-- Grupo 2 de Sponsors -->
-      <a *ngFor="let item of col3Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
-      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
-
-      <!-- Duplicado exacto -->
-      <a *ngFor="let item of col3Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
-      <a *ngFor="let item of col1Sponsors" [href]="item.website" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-        <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
-      </a>
+    <!-- 1. PATROCINADOR PRINCIPAL / PLATINO (CELESTE ELECTRIC) -->
+    <div *ngIf="platino.length > 0">
+      <div class="tier-header mb-6">
+        <h3 class="tier-title text-center text-sm font-mono font-bold tracking-[0.25em] text-brand-cyan-electric uppercase">
+          PATROCINADOR PRINCIPAL & PLATINUM
+        </h3>
+        <div class="tier-divider bg-brand-cyan-electric/30"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
+        <a *ngFor="let item of platino" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-cyan">
+          <div class="tier-card-img-wrap">
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+          </div>
+          <span class="tier-badge text-cyan-300 border-cyan-500/30">{{ item.name }}</span>
+        </a>
+      </div>
     </div>
+
+    <!-- 2. PATROCINADORES ORO (AMARILLO ORO) -->
+    <div *ngIf="oro.length > 0">
+      <div class="tier-header mb-6">
+        <h3 class="tier-title text-center text-sm font-mono font-bold tracking-[0.25em] text-yellow-500 uppercase">
+          PATROCINADORES ORO
+        </h3>
+        <div class="tier-divider bg-yellow-500/30"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
+        <a *ngFor="let item of oro" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-gold">
+          <div class="tier-card-img-wrap">
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+          </div>
+          <span class="tier-badge text-yellow-300 border-yellow-500/30">{{ item.name }}</span>
+        </a>
+      </div>
+    </div>
+
+       <!-- 3. ORGANIZAN Y ACOMPAÑAN (ROJO) -->
+    <div *ngIf="organizadores.length > 0">
+      <div class="tier-header mb-6">
+        <h3 class="tier-title text-center text-sm font-mono font-bold tracking-[0.25em] text-red-500 uppercase">
+          ORGANIZAN Y ACOMPAÑAN
+        </h3>
+        <div class="tier-divider bg-red-500/30"></div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
+        <a *ngFor="let item of organizadores" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-red">
+          <div class="tier-card-img-wrap">
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+          </div>
+          <span class="tier-badge text-red-400 border-red-500/30">{{ item.name }}</span>
+        </a>
+      </div>
+    </div>
+
   </div>
 
 </section>

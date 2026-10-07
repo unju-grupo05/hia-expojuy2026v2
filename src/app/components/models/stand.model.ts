@@ -1,4 +1,4 @@
-export type StandType = 'cubierto' | 'triangular' | 'planta_libre' | 'corporativo' | 'descubierto' | 'artesano';
+export type StandType = 'cubierto' | 'triangular' | 'planta_libre' | 'corporativo' | 'descubierto' | 'artesano' | 'gastronomico';
 export type CommercialStatus = 'disponible' | 'reservado' | 'cedido';
 export type SectorKey = 'cubierto' | 'corporativo' | 'descubierto' | 'artesano' | 'gastronomico' | 'all';
 

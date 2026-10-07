@@ -319,3 +319,54 @@
   padding: 0.35rem;
   filter: drop-shadow(0 1px 2px rgb(15 23 42 / 0.12));
 }
+
+/* ===== CONTENEDOR DE RUBROS CON SCROLL HORIZONTAL ===== */
+.category-scroll-container {
+  display: flex !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  white-space: nowrap !important;
+  scroll-behavior: smooth;
+  
+  /* Habilita el desplazamiento horizontal directo en celulares/pantallas táctiles */
+  touch-action: pan-x !important;
+  -webkit-overflow-scrolling: touch !important;
+  
+  padding-bottom: 6px;
+}
+
+/* Personalización de la barra de desplazamiento horizontal */
+.category-scroll-container::-webkit-scrollbar {
+  height: 4px;
+}
+
+.category-scroll-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+
+:host-context(.dark) .category-scroll-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.category-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 255, 0.4);
+  border-radius: 10px;
+}
+
+.category-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 242, 255, 0.7);
+}
+
+/* Forzar que los botones de filtro mantengan su tamaño único sin encogerse */
+.category-scroll-container .filter-btn {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  touch-action: manipulation;
+}
+
+/* Adaptación del botón de WhatsApp en la misma fila */
+.whatsapp-exhibitors-btn {
+  margin-left: 0 !important; /* Limpia márgenes rígidos anteriores */
+  white-space: nowrap;
+}

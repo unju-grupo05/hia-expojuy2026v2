@@ -46,6 +46,21 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
   readonly b2bSuccessMessage = signal('');
   readonly today = this.getToday();
 
+  public categoryFilters = [
+    { key: 'all', label: 'Todos' },
+    { key: 'agroindustria', label: 'Agroindustria & Tabaco' },
+    { key: 'automotor', label: 'Automotor & Maquinaria Pesada' },
+    { key: 'construccion', label: 'Construcción e Inmobiliaria' },
+    { key: 'mineria', label: 'Minería & Litio' },
+    { key: 'alimentos_bebidas', label: 'Alimentos, Bebidas & Regionales' },
+    { key: 'medios_comunicacion', label: 'Medios de Comunicación' },
+    { key: 'educacion', label: 'Educación & Académico' },
+    { key: 'institucional', label: 'Institucional & Gobierno' },
+    { key: 'comercio_servicios', label: 'Comercio, Banca & Servicios' },
+    { key: 'bazar_regaleria', label: 'Bazar, Regalería & Moda' },
+    { key: 'tecnologia_3d', label: 'Tecnología, 3D & Electrónica' }
+  ];
+
   /**
    * Logos que fallaron al cargar (URL rota o archivo borrado del servidor).
    * Se ocultan para no dejar el cuadradito vacío en la tarjeta.
@@ -275,24 +290,12 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     this.loadExhibitors(1);
   }
 
-  /**
-   * La consulta llega desde el binding `(input)="filterExhibitors($any($event.target).value)"`.
-   * Antes se leia con `document.getElementById('exhibitor-search')` y ademas se
-   * publicaba un global `window.filtrarExpositores` que nunca se eliminaba.
-   */
+
   filterExhibitors(query: string): void {
     this.currentSearchQuery = (query ?? '').trim();
     this.loadExhibitors(1);
   }
 
-  /**
-   * URL absoluta del logo del expositor, lista para el `src` de la imagen.
-   *
-   * El backend guarda la ruta relativa (`/uploads/logo-<uuid>.webp`), así que en
-   * desarrollo hay que prefijarla con el origen del server (`ASSETS_BASE`); en
-   * producción `ASSETS_BASE` es vacío y la ruta ya es del mismo origen.
-   * Devuelve cadena vacía cuando el expositor no tiene logo o falló la carga.
-   */
   exhibitorLogoUrl(ex: Expositor): string {
     const logo = ex.logo?.trim();
     if (!logo || this.brokenLogos().has(logo)) return '';
@@ -344,11 +347,6 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     return s;
   }
 
-  /**
-   * Retorna el texto formateado del badge para el expositor:
-   * - Un solo stand: "Stand {{ stand }} · {{ sector }}" (ej: "Stand A-12 · Pab. Minería" o "Stand E6 · Pab. Cubierto")
-   * - Múltiples stands: "Stands {{ stands }} · {{ sector }}" (ej: "Stands i1, i2, i3, i4 · Sector Externo")
-   */
   getStandBadgeText(ex: Expositor): string {
     if (ex.stands && ex.stands.length > 0) {
       if (ex.stands.length === 1) {
@@ -379,41 +377,49 @@ export class ExpositoresComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Clases CSS para el pastilla (pill badge) con fondo semitransparente, borde sutil y texto coloreado
-   */
   getStandBadgeClasses(ex: Expositor): string {
     switch (ex.category) {
-      case 'mineria':
-      case 'tecnologia':
-        return 'bg-cyan-500/10 text-cyan-700 border-cyan-500/25 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30';
-      case 'energia':
-        return 'bg-purple-500/10 text-purple-700 border-purple-500/25 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30';
-      case 'agro':
+      case 'agroindustria':
         return 'bg-emerald-500/10 text-emerald-700 border-emerald-500/25 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30';
-      case 'logistica':
+      case 'automotor':
+        return 'bg-orange-500/10 text-orange-700 border-orange-500/25 dark:bg-orange-500/15 dark:text-orange-300 dark:border-orange-500/30';
+      case 'construccion':
         return 'bg-amber-500/10 text-amber-700 border-amber-500/25 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30';
+      case 'mineria':
+        return 'bg-cyan-500/10 text-cyan-700 border-cyan-500/25 dark:bg-cyan-500/15 dark:text-cyan-300 dark:border-cyan-500/30';
+      case 'alimentos_bebidas':
+        return 'bg-red-500/10 text-red-700 border-red-500/25 dark:bg-red-500/15 dark:text-red-300 dark:border-red-500/30';
+      case 'medios_comunicacion':
+        return 'bg-purple-500/10 text-purple-700 border-purple-500/25 dark:bg-purple-500/15 dark:text-purple-300 dark:border-purple-500/30';
+      case 'educacion':
+        return 'bg-blue-500/10 text-blue-700 border-blue-500/25 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30';
+      case 'institucional':
+        return 'bg-indigo-500/10 text-indigo-700 border-indigo-500/25 dark:bg-indigo-500/15 dark:text-indigo-300 dark:border-indigo-500/30';
+      case 'comercio_servicios':
+        return 'bg-teal-500/10 text-teal-700 border-teal-500/25 dark:bg-teal-500/15 dark:text-teal-300 dark:border-teal-500/30';
+      case 'bazar_regaleria':
+        return 'bg-pink-500/10 text-pink-700 border-pink-500/25 dark:bg-pink-500/15 dark:text-pink-300 dark:border-pink-500/30';
+      case 'tecnologia_3d':
+        return 'bg-sky-500/10 text-sky-700 border-sky-500/25 dark:bg-sky-500/15 dark:text-sky-300 dark:border-sky-500/30';
       default:
         return 'bg-fuchsia-500/10 text-fuchsia-700 border-fuchsia-500/25 dark:bg-fuchsia-500/15 dark:text-fuchsia-300 dark:border-fuchsia-500/30';
     }
   }
 
-  /**
-   * Clases para el punto brillante interior de la pastilla
-   */
   getStandBadgeDotClasses(ex: Expositor): string {
     switch (ex.category) {
-      case 'mineria':
-      case 'tecnologia':
-        return 'bg-cyan-500';
-      case 'energia':
-        return 'bg-purple-500';
-      case 'agro':
-        return 'bg-emerald-500';
-      case 'logistica':
-        return 'bg-amber-500';
-      default:
-        return 'bg-fuchsia-500';
+      case 'agroindustria': return 'bg-emerald-500';
+      case 'automotor': return 'bg-orange-500';
+      case 'construccion': return 'bg-amber-500';
+      case 'mineria': return 'bg-cyan-500';
+      case 'alimentos_bebidas': return 'bg-red-500';
+      case 'medios_comunicacion': return 'bg-purple-500';
+      case 'educacion': return 'bg-blue-500';
+      case 'institucional': return 'bg-indigo-500';
+      case 'comercio_servicios': return 'bg-teal-500';
+      case 'bazar_regaleria': return 'bg-pink-500';
+      case 'tecnologia_3d': return 'bg-sky-500';
+      default: return 'bg-fuchsia-500';
     }
   }
 

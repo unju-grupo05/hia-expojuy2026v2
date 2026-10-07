@@ -3,7 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, expand, map, reduce } from 'rxjs/operators';
 import { API_URL } from '../core/api-url';
-import { BlenderPayload, CommercialStatus, PointOfInterest, SectorKey, StandApiResponse, StandBackendDto, StandData, StandType } from '../components/models/stand.model';
+import {
+  BlenderPayload,
+  CommercialStatus,
+  PointOfInterest,
+  SectorKey,
+  StandApiResponse,
+  StandBackendDto,
+  StandData,
+  StandType
+} from '../components/models/stand.model';
 import { SectorActivity } from '../components/models/sector-info.model';
 import { ExpositoresService } from './expositores.service';
 import { Expositor } from '../models/expositor.model';
@@ -77,7 +86,7 @@ export class MasterplanDataService {
     { id: "POI-ENT-SUR2", label: "Acceso Principal 2", sub: "Pabellón Cubierto (Sur)", x: 23.5, y: 4.2, z: 25.5, color: 0xa855f7, desc: "Segundo acceso principal sur frente a las parcelas de exposición automotriz y maquinaria pesada." },
     { id: "POI-ENT-ESTE", label: "Acceso Este", sub: "Pabellón Cubierto (Este)", x: 48.5, y: 4.2, z: -3.5, color: 0xa855f7, desc: "Puerta de acceso este para público y proveedores con salida directa hacia el playón exterior." },
     { id: "POI-SAME-NORTE", label: "SAME 107 (Norte)", sub: "Puesto Sanitario de Emergencia", x: -66.0, y: 5.2, z: -24.0, color: 0xef4444, desc: "Base operativa SAME Norte con ambulancia de alta complejidad, enfermería y triage médico." },
-    { id: "POI-SAME-SUR", label: "SAME 107 (Sur)", sub: "Puesto Sanitario de Emergencia", x: -62.0, y: 5.2, z: 120.0, color: 0xef4444, desc: "Base operativa SAME Sur contigua al sector gastronómico, shows y avenida principal." },
+    { id: "POI-SAME-SUR", label: "SAME 107 (Sur)", sub: "Puesto Sanitario de Emergencia", x: -72.0, y: 5.2, z: 120.0, color: 0xef4444, desc: "Base operativa SAME Sur contigua al sector gastronómico, shows y avenida principal." },
     { id: "POI-BOLETERIA", label: "Boleterías Oficiales", sub: "Venta & Canje de Entradas", x: -103.0, y: 5.6, z: 57.0, color: 0xf43f5e, desc: "Complejo de ventanillas y boletería informatizada con cobro QR, efectivo y tarjetas." },
     { id: "POI-ESCENARIO", label: "Escenario de Espectáculos", sub: "Shows en Vivo & Festivales", x: -80.0, y: 9.0, z: 95.0, color: 0x00f0ff, desc: "Escenario central techado con sonido line-array y pantalla LED para espectáculos culturales." },
     { id: "POI-PATIO-COMIDAS", label: "Patio de Comidas Central", sub: "Paseo Gastronómico", x: -18.0, y: 4.2, z: 92.0, color: 0xff7b00, desc: "Explanada peatonal con mesas de convivencia, puntos limpios y áreas de descanso al aire libre." },
@@ -86,6 +95,7 @@ export class MasterplanDataService {
     { id: "POI-FOOD-2", label: "Tinglado Food Trucks 2", sub: "Sector Gastronómico Techado", x: 1.46, y: 10.0, z: 121.36, color: 0xff7b00, desc: "Segunda nave cubierta con amplia oferta de parrilla, empanadas jujeñas y cafetería de especialidad." }
   ];
 
+  // Traslado completo de coordenadas y props exportados de Blender
   public readonly BLENDER_PAYLOAD: BlenderPayload = {
     portico: {
       id: "PORTICO-ENTRADA",
@@ -141,7 +151,18 @@ export class MasterplanDataService {
       });
   }
 
-
+  /**
+   * Adapter: Transforma el DTO oficial del backend en la interfaz StandData de Three.js / UI:
+   * - Mapea dto.estado a stand.status ('disponible' | 'reservado' | 'cedido')
+   * - Mapea dto.superficie a stand.area y stand.superficie
+   * - Asigna stand.company = dto.expositor.name y stand.desc = dto.expositor.description
+   * - Preserva coordenadas espaciales, dimensiones y color institucional (#8b5cf6 para cedidos)
+   */
+  /**
+ * Normaliza la orientación geométrica (rotY) y dimensiones (w, l) para los stands
+ * del pabellón cubierto (especialmente pasillos diagonales C y perimetrales),
+ * evitando colisiones y solapamientos, y orientándolos correctamente hacia sus pasillos.
+ */
   public normalizeStandGeometry(dto: { id: string; x?: number; z?: number; rotY?: number; w?: number; l?: number }): { rotY: number; w: number; l: number } {
     let rotY = dto.rotY || 0;
     let w = dto.w || 3.0;
@@ -152,7 +173,7 @@ export class MasterplanDataService {
     // Solo normalizar stands del Pabellón Cubierto; los exteriores (maquinaria, artesanos, corporativos) respetan su rotación original
     const rawId = (dto.id || '').toUpperCase();
     if (rawId.startsWith('MAQ-') || rawId.startsWith('EXT-P-') || rawId.startsWith('CORP-') ||
-        rawId.startsWith('H') || rawId.startsWith('G') || rawId.startsWith('F') || rawId.startsWith('I')) {
+        rawId.startsWith('H') || rawId.startsWith('G') || rawId.startsWith('F') || rawId.startsWith('I') || rawId.startsWith('K')) {
       return { rotY, w, l };
     }
 
@@ -312,10 +333,10 @@ export class MasterplanDataService {
     const t = (type || '').toLowerCase();
     const i = (id || '').toLowerCase();
 
-    if (s.includes('corporativo') || t.includes('corporativo') || i.startsWith('corp')) return 'corporativo';
+    if (s.includes('corporativo') || t.includes('corporativo') || i.startsWith('corp') || i.startsWith('g1') || i.startsWith('g2') || i.startsWith('g3') || i.startsWith('g4')) return 'corporativo';
     if (s.includes('artesano') || t.includes('artesano') || i.startsWith('ext-p')) return 'artesano';
     if (s.includes('maquinaria') || s.includes('descubierto') || t.includes('descubierto') || i.startsWith('maq')) return 'descubierto';
-    if (s.includes('gastronom') || t.includes('gastronom')) return 'gastronomico';
+    if (s.includes('gastronom') || t.includes('gastronom') || i.startsWith('k')) return 'gastronomico';
     return 'cubierto';
   }
 
