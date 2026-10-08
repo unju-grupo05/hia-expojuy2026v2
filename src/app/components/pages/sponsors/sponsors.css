@@ -97,58 +97,52 @@ html.dark .sponsors-fade-right {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ej-surface);
-  border: 1px solid var(--ej-border);
+  background: #f6f4fa;
+  border: 1px solid rgba(94, 58, 140, 0.12);
   border-radius: 1rem;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(94, 58, 140, 0.04);
+  box-shadow: 0 3px 12px rgba(94, 58, 140, 0.06);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 html.dark .sponsor-logo-card {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: none;
+  background: #f6f4fa;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .sponsor-logo-card:hover {
-  background: var(--ej-surface-low);
+  background: #ffffff;
   border-color: var(--ej-primary);
   transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 10px 24px rgba(94, 58, 140, 0.12);
+  box-shadow: 0 10px 24px rgba(94, 58, 140, 0.14);
 }
 
 html.dark .sponsor-logo-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 194, 209, 0.5);
-  box-shadow: 0 10px 25px rgba(0, 194, 209, 0.2);
+  background: #ffffff;
+  border-color: rgba(0, 194, 209, 0.6);
+  box-shadow: 0 12px 28px rgba(0, 194, 209, 0.25);
 }
 
-/* Logos en escala de grises por defecto -> color e iluminación al hacer hover */
+/* Logos a todo color por defecto con relieve y drop-shadow protector permanente */
 .sponsor-logo-img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: grayscale(100%) opacity(0.7);
-  transition: filter 0.3s ease, transform 0.3s ease;
+  filter: drop-shadow(0 0 1.5px rgba(20, 15, 35, 0.85))
+          drop-shadow(0 1px 2px rgba(20, 15, 35, 0.45));
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
 }
 
 html.dark .sponsor-logo-img {
-  filter: grayscale(100%) opacity(0.6);
+  filter: drop-shadow(0 0 1.5px rgba(20, 15, 35, 0.85))
+          drop-shadow(0 1px 2px rgba(20, 15, 35, 0.45));
 }
 
 .sponsor-logo-card:hover .sponsor-logo-img {
-  filter: grayscale(0%) opacity(1);
-  transform: scale(1.05);
-}
-
-/* En celular no existe hover: el logo se quedaria siempre en escala de grises.
-   Por eso en movil se muestran a color; el escritorio mantiene el efecto. */
-@media (max-width: 640px) {
-  .sponsor-logo-img,
-  html.dark .sponsor-logo-img {
-    filter: grayscale(0%) opacity(1);
-  }
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 1.5px rgba(20, 15, 35, 0.9))
+          drop-shadow(0 2px 4px rgba(20, 15, 35, 0.5));
 }
 
 /* ============ ESTILOS DEL MODAL ============ */
@@ -332,63 +326,149 @@ html.dark .sponsor-modal-btn:hover {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem;
-  background: rgba(18, 13, 36, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 1.25rem;
+  background: #f6f4fa; /* Fondo unificado claro (blanco suave tintado) para claro y oscuro */
+  border: 1px solid rgba(94, 58, 140, 0.12);
   border-radius: 1.25rem;
-  backdrop-filter: blur(8px);
-  min-height: 140px;
+  min-height: 148px;
   text-decoration: none;
+  box-shadow: 0 4px 18px rgba(30, 20, 50, 0.06);
   will-change: transform, border-color, box-shadow;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              box-shadow 0.25s ease;
+}
+
+/* En modo oscuro, mantiene el fondo claro unificado con borde nítido y sombra para resaltar del fondo espacial */
+html.dark .tier-card {
+  background: #f6f4fa;
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .tier-card-img-wrap {
   width: 100%;
-  height: 70px;
+  height: 75px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.25rem 0.5rem;
 }
 
 .tier-card-img-wrap img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  transition: transform 0.25s ease;
+  filter: drop-shadow(0 0 1.5px rgba(20, 15, 35, 0.85))
+          drop-shadow(0 1px 2px rgba(20, 15, 35, 0.45));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
 }
 
 .tier-card:hover .tier-card-img-wrap img {
-  transform: scale(1.08);
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 1.5px rgba(20, 15, 35, 0.9))
+          drop-shadow(0 2px 4px rgba(20, 15, 35, 0.5));
 }
 
+/* Fusión suave para logos con fondo blanco en archivo, eliminando el corte cuadrado */
+.tier-card img[src*="logo_ccgroup"],
+.tier-card img[src*="logo_atacama"],
+.tier-card img[src*="logo_madre_miga"],
+.tier-card img[src*="logo_palpetrol"],
+.tier-card img[src*="logo_byd"],
+.tier-card img[src*="logo_campa"],
+.tier-card img[src*="logo_hlq"],
+.tier-card img[src*="logo_exincor"],
+.tier-card img[src*="logo_melius"],
+.sponsor-logo-card img[src*="logo_ccgroup"],
+.sponsor-logo-card img[src*="logo_atacama"],
+.sponsor-logo-card img[src*="logo_madre_miga"],
+.sponsor-logo-card img[src*="logo_palpetrol"],
+.sponsor-logo-card img[src*="logo_byd"],
+.sponsor-logo-card img[src*="logo_campa"],
+.sponsor-logo-card img[src*="logo_hlq"],
+.sponsor-logo-card img[src*="logo_exincor"],
+.sponsor-logo-card img[src*="logo_melius"] {
+  mix-blend-mode: multiply;
+}
+
+/* Badges de nivel: tipografía nítida y alto contraste */
 .tier-badge {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.72rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.25rem 0.75rem;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
-  border: 1px solid;
+  border: 1px solid transparent;
   margin-top: 0.75rem;
-  background: rgba(0, 0, 0, 0.3);
+  line-height: 1.2;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Efectos Hover de Luces */
-.tier-card-red:hover {
-  border-color: #ef4444;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
-  transform: translateY(-3px);
+/* Platino / Principal (Cyan) */
+.tier-card-cyan .tier-badge,
+.tier-badge-cyan {
+  background: rgba(0, 163, 179, 0.12);
+  color: #007785;
+  border-color: rgba(0, 163, 179, 0.3);
 }
 
+/* Oro (Amarillo / Dorado) */
+.tier-card-gold .tier-badge,
+.tier-badge-gold {
+  background: rgba(202, 138, 4, 0.12);
+  color: #854d0e;
+  border-color: rgba(202, 138, 4, 0.32);
+}
+
+/* Organizadores (Rojo) */
+.tier-card-red .tier-badge,
+.tier-badge-red {
+  background: rgba(220, 38, 38, 0.12);
+  color: #991b1b;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+/* Efectos Hover por nivel en tarjeta y badge */
 .tier-card-cyan:hover {
-  border-color: #00f2ff;
-  box-shadow: 0 0 20px rgba(0, 242, 255, 0.35);
-  transform: translateY(-3px);
+  background: #ffffff;
+  border-color: #00c2d1;
+  box-shadow: 0 14px 32px rgba(0, 194, 209, 0.28), 0 0 0 1px #00c2d1;
+  transform: translateY(-4px);
+}
+
+.tier-card-cyan:hover .tier-badge {
+  background: #0098a6;
+  color: #ffffff;
+  border-color: #0098a6;
+  box-shadow: 0 2px 8px rgba(0, 152, 166, 0.35);
 }
 
 .tier-card-gold:hover {
+  background: #ffffff;
   border-color: #eab308;
-  box-shadow: 0 0 20px rgba(234, 179, 8, 0.35);
-  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(234, 179, 8, 0.28), 0 0 0 1px #eab308;
+  transform: translateY(-4px);
+}
+
+.tier-card-gold:hover .tier-badge {
+  background: #ca8a04;
+  color: #ffffff;
+  border-color: #ca8a04;
+  box-shadow: 0 2px 8px rgba(202, 138, 4, 0.35);
+}
+
+.tier-card-red:hover {
+  background: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 14px 32px rgba(239, 68, 68, 0.28), 0 0 0 1px #ef4444;
+  transform: translateY(-4px);
+}
+
+.tier-card-red:hover .tier-badge {
+  background: #dc2626;
+  color: #ffffff;
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35);
 }
