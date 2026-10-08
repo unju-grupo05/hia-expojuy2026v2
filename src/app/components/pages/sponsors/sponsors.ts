@@ -11,6 +11,7 @@ interface SponsorData {
   website: string;
   layerClass: string;
   category?: 'organizador' | 'platino' | 'oro';
+  hasLightContent?: boolean;
 }
 
 @Component({
@@ -49,7 +50,8 @@ export class Sponsors {
       img: './img/sponsors/logo_hlq.webp',
       website: 'https://hierroslaquiaca.com.ar/',
       layerClass: 'sponsor-layer-front',
-      category: 'platino'
+      category: 'platino',
+      hasLightContent: true
     },
     {
       id: 'madre-miga',
@@ -71,11 +73,12 @@ export class Sponsors {
       img: './img/sponsors/logo_viap.webp',
       website: 'https://www.viap.com.ar/',
       layerClass: 'sponsor-layer-front',
-      category: 'platino'
+      category: 'platino',
+      hasLightContent: true
     },
     {
       id: 'transporte-atacama',
-      name: 'TRASPORTE ATACAMA',
+      name: 'TRANSPORTE ATACAMA',
       role: '{PLATINUM SPONSOR}',
       badge: '{PLATINUM}',
       desc: 'Servicios de logística y transporte regional...',
@@ -165,7 +168,8 @@ export class Sponsors {
       img: './img/sponsors/logo_melius.webp',
       website: 'https://meliusfinanzas.com.ar/',
       layerClass: 'sponsor-layer-front',
-      category: 'oro'
+      category: 'oro',
+      hasLightContent: true
     },
     {
       id: 'solci media',

@@ -20,18 +20,18 @@
 
       <div class="marquee-track flex gap-8 items-center animate-marquee">
         <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
         <a *ngFor="let item of col2Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
 
         <!-- Duplicados para bucle continuo -->
         <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
         <a *ngFor="let item of col2Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
       </div>
     </div>
@@ -43,18 +43,18 @@
 
       <div class="marquee-track flex gap-8 items-center animate-marquee-reverse">
         <a *ngFor="let item of col3Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
         <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
 
         <!-- Duplicados -->
         <a *ngFor="let item of col3Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
         <a *ngFor="let item of col1Sponsors" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="sponsor-logo-card" aria-hidden="true" tabIndex="-1">
-          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" />
+          <img decoding="async" [src]="item.img" [alt]="item.name" loading="lazy" class="sponsor-logo-img" [class.logo-light-content]="item.hasLightContent" />
         </a>
       </div>
     </div>
@@ -89,9 +89,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
         <a *ngFor="let item of platino" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-cyan">
           <div class="tier-card-img-wrap">
-            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" [class.logo-light-content]="item.hasLightContent" />
           </div>
-          <span class="tier-badge text-cyan-300 border-cyan-500/30">{{ item.name }}</span>
+          <span class="tier-badge tier-badge-cyan">{{ item.name }}</span>
         </a>
       </div>
     </div>
@@ -107,9 +107,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
         <a *ngFor="let item of oro" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-gold">
           <div class="tier-card-img-wrap">
-            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" [class.logo-light-content]="item.hasLightContent" />
           </div>
-          <span class="tier-badge text-yellow-300 border-yellow-500/30">{{ item.name }}</span>
+          <span class="tier-badge tier-badge-gold">{{ item.name }}</span>
         </a>
       </div>
     </div>
@@ -125,9 +125,9 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-center">
         <a *ngFor="let item of organizadores" [href]="sponsorUrl(item)" target="_blank" rel="noopener noreferrer" class="tier-card tier-card-red">
           <div class="tier-card-img-wrap">
-            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" />
+            <img [src]="item.img" [alt]="item.name" loading="lazy" decoding="async" [class.logo-light-content]="item.hasLightContent" />
           </div>
-          <span class="tier-badge text-red-400 border-red-500/30">{{ item.name }}</span>
+          <span class="tier-badge tier-badge-red">{{ item.name }}</span>
         </a>
       </div>
     </div>
