@@ -1,0 +1,76 @@
+# Plantilla procesada por envsubst al arrancar el contenedor (solo variables BACKEND_*).
+
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    server_tokens off;
+    client_max_body_size 10m;
+
+    # DNS interno de Docker: resolver en cada request permite que Nginx arranque
+    # aunque el backend todavía no exista y que siga funcionando si se recrea.
+    resolver 127.0.0.11 valid=10s ipv6=off;
+    set $backend ${BACKEND_URL};
+
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml application/xml;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    location /api/ {
+        proxy_pass $backend;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_read_timeout 60s;
+    }
+
+    location /uploads/ {
+        proxy_pass $backend;
+        proxy_set_header Host $host;
+        expires 7d;
+        add_header Cache-Control "public";
+    }
+
+    # Archivos con hash generados por `ng build` (outputHashing: all).
+    location ~* \.(?:js|css|woff2?|ttf)$ {
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    location ~* \.(?:png|jpe?g|webp|avif|gif|svg|ico|mp4|webm)$ {
+        expires 1h;
+        add_header Cache-Control "public, max-age=3600, must-revalidate";
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache";
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

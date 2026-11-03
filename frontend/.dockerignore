@@ -1,0 +1,17 @@
+node_modules
+dist
+.angular
+coverage
+tmp
+out-tsc
+.git
+.github
+.gemini
+.vscode
+.idea
+*.md
+.env
+.env.*
+Dockerfile
+.dockerignore
+npm-debug.log
