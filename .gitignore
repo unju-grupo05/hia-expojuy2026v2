@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Dumps de la base: pueden contener datos sensibles
+infra/backups/
+
 # Sistema
 .DS_Store
 Thumbs.db
