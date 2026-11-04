@@ -1,0 +1,31 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+coverage/
+.nyc_output/
+
+# Archivos subidos dinámicamente
+uploads/*
+!uploads/.gitkeep
+
+# Archivos fuente de stands
+*.xlsx
+ARRAY-Blender.md

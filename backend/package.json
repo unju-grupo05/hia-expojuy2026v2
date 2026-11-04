@@ -1,0 +1,58 @@
+{
+  "name": "expojuy2026v2-Back",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "dev": "nodemon index.js",
+    "swagger": "node swagger.js",
+    "migrate:chatbot-search": "node src/migrations/run-migration-chatbot-search.js",
+    "migrate:logo": "node src/migrations/run-migration-logo.js",
+    "seed:stands": "node src/seeders/seed-stands-expositores.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "compression": "^1.8.2",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "googleapis": "^173.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.4.0",
+    "node-cron": "^4.6.0",
+    "nodemailer": "^9.0.3",
+    "pg": "^8.22.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.8",
+    "sharp": "^0.35.4",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "jest": "^30.5.2",
+    "nodemon": "^3.1.14"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/.kilo/"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.kilo/",
+      "<rootDir>/node_modules/"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 # ---------- Etapa 1: build de Angular ----------
-FROM node:22-alpine AS build
+FROM node:22.23.4-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
@@ -10,7 +10,7 @@ ARG NG_CONFIGURATION=production,docker
 RUN npx ng build --configuration ${NG_CONFIGURATION}
 
 # ---------- Etapa 2: Nginx sin root ----------
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.30.6-alpine AS runtime
 
 ENV BACKEND_URL=http://backend:3000 \
     NGINX_ENVSUBST_FILTER=^BACKEND_

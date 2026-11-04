@@ -1,0 +1,3958 @@
+{
+  "expositores": [
+    {
+      "id": "exp-4pe-impresiones-3d-productos-asiaticos",
+      "name": "4PE Impresiones 3D Productos asiaticos",
+      "stand": "E6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-agostini",
+      "name": "AGOSTINI",
+      "stand": "K7, i17",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-agustina-landa",
+      "name": "AGUSTINA LANDA",
+      "stand": "C66",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-alberdi",
+      "name": "ALBERDI",
+      "stand": "i1, i2, i3, i4",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-alex-stewart",
+      "name": "ALEX STEWART",
+      "stand": "C92",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-alperovich-sangong",
+      "name": "ALPEROVICH-SANGONG",
+      "stand": "H7",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-amor-y-mate",
+      "name": "AMOR Y MATE",
+      "stand": "E18",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-argencrops",
+      "name": "ARGENCROPS",
+      "stand": "C29, C30",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-asociacion",
+      "name": "ASOCIACIÓN",
+      "stand": "E2, E3, E4",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-avelino-alimentos-odilin",
+      "name": "AVELINO ALIMENTOS ODILIN",
+      "stand": "i10, i11",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-byd-cenoa",
+      "name": "BYD - CENOA",
+      "stand": "H4",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-canal7",
+      "name": "CANAL7",
+      "stand": "i14",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-cenoa",
+      "name": "CENOA",
+      "stand": "G9",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-chacra",
+      "name": "CHACRA",
+      "stand": "G7",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-club-san-jorge",
+      "name": "CLUB SAN JORGE",
+      "stand": "G8",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-construcciones-forbice",
+      "name": "CONSTRUCCIONES FORBICE",
+      "stand": "C2",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-copeerativa-de-tabacaleros",
+      "name": "COPEERATIVA DE TABACALEROS",
+      "stand": "C99",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-cordoba-joyas",
+      "name": "CORDOBA JOYAS",
+      "stand": "E1",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-cosalta",
+      "name": "COSALTA",
+      "stand": "C101",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-diagita",
+      "name": "DIAGITA",
+      "stand": "F1",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-el-mundo-de-las-herram",
+      "name": "EL MUNDO DE LAS HERRAM",
+      "stand": "G5 A",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-enviflex",
+      "name": "ENVIFLEX",
+      "stand": "C55",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-essen",
+      "name": "ESSEN",
+      "stand": "C46",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-fasta",
+      "name": "FASTA",
+      "stand": "C16",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ferre-gay",
+      "name": "FERRE GAY",
+      "stand": "i5",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ferrocarril-antofagasta",
+      "name": "FERROCARRIL ANTOFAGASTA",
+      "stand": "C5",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-fiad",
+      "name": "FIAD",
+      "stand": "C15",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-fiat-fadua",
+      "name": "FIAT FADUA",
+      "stand": "H5",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ford-pusetto",
+      "name": "FORD PUSETTO",
+      "stand": "G6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-gonzales-adriana-baile",
+      "name": "GONZALES ADRIANA BAILE",
+      "stand": "E15",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-industrias-plasticas",
+      "name": "INDUSTRIAS PLASTICAS",
+      "stand": "C88, C89",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ins-electr",
+      "name": "INS ELECTR",
+      "stand": "C87",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-iveco",
+      "name": "IVECO",
+      "stand": "i13",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-joyas-el-bolson",
+      "name": "JOYAS EL BOLSON",
+      "stand": "E17",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-jujenitos-alfajores",
+      "name": "JUJEÑITOS ALFAJORES",
+      "stand": "E8",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-kanva",
+      "name": "KANVA",
+      "stand": "C14",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-libreria-juan-pablo-ii",
+      "name": "LIBRERIA JUAN PABLO II",
+      "stand": "C61, C62",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-luna-nueva",
+      "name": "LUNA NUEVA",
+      "stand": "C45, E7",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-macro",
+      "name": "MACRO",
+      "stand": "H3",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-madre-miga-pm-factory",
+      "name": "MADRE MIGA PM FACTORY",
+      "stand": "C102",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-micro",
+      "name": "MICRO",
+      "stand": "C95, C96, C97, C98",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-mineria",
+      "name": "MINERIA",
+      "stand": "C35, C36, C37, C38, C39, C40, C41, C42",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ministerio-produccion",
+      "name": "MINISTERIO PRODUCCIÓN",
+      "stand": "A5",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-mononini",
+      "name": "MONONINI",
+      "stand": "C67",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-montilla-frutos-secos-chocolate",
+      "name": "MONTILLA \"FRUTOS SECOS & CHOCOLATE\"",
+      "stand": "E9",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-montilla-frutos-secos-cholocolate",
+      "name": "MONTILLA \"FRUTOS SECOS & CHOLOCOLATE\"",
+      "stand": "E14",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-multi",
+      "name": "MULTI",
+      "stand": "C31, C32",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-municipalidad-ssj",
+      "name": "MUNICIPALIDAD SSJ",
+      "stand": "B5, B6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-namoi-segio-gabriel-roldan-3d",
+      "name": "NAMOI - SEGIO GABRIEL ROLDAN 3D",
+      "stand": "E10, E11",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-neumaticos-pioli",
+      "name": "NEUMATICOS PIOLI",
+      "stand": "i6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-otito",
+      "name": "OTITO",
+      "stand": "C7",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-pauny",
+      "name": "PAUNY",
+      "stand": "H6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-policia-ejercito",
+      "name": "POLICIA/EJERCITO",
+      "stand": "G7-B",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-psa",
+      "name": "PSA",
+      "stand": "C68",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-quimica",
+      "name": "QUÍMICA",
+      "stand": "C4",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-rc-point",
+      "name": "RC POINT",
+      "stand": "C44",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-revista-energia",
+      "name": "REVISTA ENERGIA",
+      "stand": "C93",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-risen",
+      "name": "RISEN",
+      "stand": "C57",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-rossi",
+      "name": "ROSSI",
+      "stand": "C83, C84",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-saluso-diesel-luchini",
+      "name": "SALUSO-DIESEL LUCHINI",
+      "stand": "C94",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-sector-minero",
+      "name": "SECTOR MINERO",
+      "stand": "A6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-sercop",
+      "name": "SERCOP",
+      "stand": "C26",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-sermi",
+      "name": "SERMI",
+      "stand": "i12",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-serv-contable",
+      "name": "SERV CONTABLE",
+      "stand": "C91",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-seytec",
+      "name": "SEYTEC",
+      "stand": "C51, C52, C53",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-sthil",
+      "name": "STHIL",
+      "stand": "C6",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-trailing",
+      "name": "TRAILING",
+      "stand": "C43, C56",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-tribuno",
+      "name": "TRIBUNO",
+      "stand": "i15, i16",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-turismo-y-cultura",
+      "name": "TURISMO Y CULTURA",
+      "stand": "A1, A2",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-uces",
+      "name": "UCES",
+      "stand": "C50",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-villanueva",
+      "name": "VILLANUEVA",
+      "stand": "C1",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-vineria-san-juan",
+      "name": "VINERIA SAN JUAN?",
+      "stand": "C20",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-yaguar",
+      "name": "YAGUAR",
+      "stand": "C49",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-ypf-guillen",
+      "name": "YPF - GUILLEN",
+      "stand": "C18",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    },
+    {
+      "id": "exp-zol-alfajores-zymoseis",
+      "name": "ZOL ALFAJORES ZYMOSEIS",
+      "stand": "E5",
+      "category": "general",
+      "subtitle": "Expositor Oficial · ExpoJuy 2026",
+      "description": "Espacio institucional y comercial presentado en la ExpoJuy 2026.",
+      "origin": "Jujuy, Argentina",
+      "email": null
+    }
+  ],
+  "stands": [
+    {
+      "id": "A1",
+      "sector": "Pabellón Cubierto",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-turismo-y-cultura"
+    },
+    {
+      "id": "A2",
+      "sector": "Pabellón Cubierto",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-turismo-y-cultura"
+    },
+    {
+      "id": "A3",
+      "sector": "Pabellón Cubierto",
+      "superficie": "25 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "A4",
+      "sector": "Pabellón Cubierto",
+      "superficie": "25 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "A5",
+      "sector": "Pabellón Cubierto",
+      "superficie": "300 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-ministerio-produccion"
+    },
+    {
+      "id": "A6",
+      "sector": "Pabellón Cubierto",
+      "superficie": "142 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-sector-minero"
+    },
+    {
+      "id": "B1",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "B2",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "B3",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "B4",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "B5",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-municipalidad-ssj"
+    },
+    {
+      "id": "B6",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-municipalidad-ssj"
+    },
+    {
+      "id": "B7",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "B8",
+      "sector": "Pabellón Cubierto",
+      "superficie": "20 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C1",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-villanueva"
+    },
+    {
+      "id": "C10",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C100",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C101",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-cosalta"
+    },
+    {
+      "id": "C102",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-madre-miga-pm-factory"
+    },
+    {
+      "id": "C11",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C12",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C13",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C14",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-kanva"
+    },
+    {
+      "id": "C15",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-fiad"
+    },
+    {
+      "id": "C16",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-fasta"
+    },
+    {
+      "id": "C17",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C18",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-ypf-guillen"
+    },
+    {
+      "id": "C19",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C2",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-construcciones-forbice"
+    },
+    {
+      "id": "C20",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-vineria-san-juan"
+    },
+    {
+      "id": "C21",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C22",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C23",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C24",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C25",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C26",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-sercop"
+    },
+    {
+      "id": "C27",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C28",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C29",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-argencrops"
+    },
+    {
+      "id": "C3",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C30",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-argencrops"
+    },
+    {
+      "id": "C31",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-multi"
+    },
+    {
+      "id": "C32",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-multi"
+    },
+    {
+      "id": "C33",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C34",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C35",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C36",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C37",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C38",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C39",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C4",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-quimica"
+    },
+    {
+      "id": "C40",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C41",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C42",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mineria"
+    },
+    {
+      "id": "C43",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-trailing"
+    },
+    {
+      "id": "C44",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-rc-point"
+    },
+    {
+      "id": "C45",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-luna-nueva"
+    },
+    {
+      "id": "C46",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-essen"
+    },
+    {
+      "id": "C49",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-yaguar"
+    },
+    {
+      "id": "C5",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-ferrocarril-antofagasta"
+    },
+    {
+      "id": "C50",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-uces"
+    },
+    {
+      "id": "C51",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-seytec"
+    },
+    {
+      "id": "C52",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-seytec"
+    },
+    {
+      "id": "C53",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-seytec"
+    },
+    {
+      "id": "C55",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-enviflex"
+    },
+    {
+      "id": "C56",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-trailing"
+    },
+    {
+      "id": "C57",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-risen"
+    },
+    {
+      "id": "C58",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C59",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C6",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-sthil"
+    },
+    {
+      "id": "C60",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C61",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-libreria-juan-pablo-ii"
+    },
+    {
+      "id": "C62",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-libreria-juan-pablo-ii"
+    },
+    {
+      "id": "C66",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-agustina-landa"
+    },
+    {
+      "id": "C67",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-mononini"
+    },
+    {
+      "id": "C68",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-psa"
+    },
+    {
+      "id": "C69",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C7",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-otito"
+    },
+    {
+      "id": "C8",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C81",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C82",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C83",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-rossi"
+    },
+    {
+      "id": "C84",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-rossi"
+    },
+    {
+      "id": "C85",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C86",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C87",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-ins-electr"
+    },
+    {
+      "id": "C88",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-industrias-plasticas"
+    },
+    {
+      "id": "C89",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-industrias-plasticas"
+    },
+    {
+      "id": "C9",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C90",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "C91",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-serv-contable"
+    },
+    {
+      "id": "C92",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alex-stewart"
+    },
+    {
+      "id": "C93",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-revista-energia"
+    },
+    {
+      "id": "C94",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-saluso-diesel-luchini"
+    },
+    {
+      "id": "C95",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-micro"
+    },
+    {
+      "id": "C96",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-micro"
+    },
+    {
+      "id": "C97",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-micro"
+    },
+    {
+      "id": "C98",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-micro"
+    },
+    {
+      "id": "C99",
+      "sector": "Pabellón Cubierto",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-copeerativa-de-tabacaleros"
+    },
+    {
+      "id": "D1",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E1",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-cordoba-joyas"
+    },
+    {
+      "id": "E10",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-namoi-segio-gabriel-roldan-3d"
+    },
+    {
+      "id": "E11",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-namoi-segio-gabriel-roldan-3d"
+    },
+    {
+      "id": "E12",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E13",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E14",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-montilla-frutos-secos-cholocolate"
+    },
+    {
+      "id": "E15",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-gonzales-adriana-baile"
+    },
+    {
+      "id": "E16",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E17",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-joyas-el-bolson"
+    },
+    {
+      "id": "E18",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-amor-y-mate"
+    },
+    {
+      "id": "E19",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E2",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-asociacion"
+    },
+    {
+      "id": "E20",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E21",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E22",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "E3",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-asociacion"
+    },
+    {
+      "id": "E4",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-asociacion"
+    },
+    {
+      "id": "E5",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-zol-alfajores-zymoseis"
+    },
+    {
+      "id": "E6",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-4pe-impresiones-3d-productos-asiaticos"
+    },
+    {
+      "id": "E7",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-luna-nueva"
+    },
+    {
+      "id": "E8",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-jujenitos-alfajores"
+    },
+    {
+      "id": "E9",
+      "sector": "Pabellón Cubierto",
+      "superficie": "7,5 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-montilla-frutos-secos-chocolate"
+    },
+    {
+      "id": "F1",
+      "sector": "Sector Corporativo",
+      "superficie": "400 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-diagita"
+    },
+    {
+      "id": "F2",
+      "sector": "Sector Corporativo",
+      "superficie": "216 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G1",
+      "sector": "Sector Corporativo",
+      "superficie": "100 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G10",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G2",
+      "sector": "Sector Corporativo",
+      "superficie": "100 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G3",
+      "sector": "Sector Corporativo",
+      "superficie": "100 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G5 A",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "50 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": "exp-el-mundo-de-las-herram"
+    },
+    {
+      "id": "G5 B",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "50 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "G6",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "100 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-ford-pusetto"
+    },
+    {
+      "id": "G7",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-chacra"
+    },
+    {
+      "id": "G7-B",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-policia-ejercito"
+    },
+    {
+      "id": "G8",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "100 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-club-san-jorge"
+    },
+    {
+      "id": "G9",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "100 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-cenoa"
+    },
+    {
+      "id": "H3",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-macro"
+    },
+    {
+      "id": "H4",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-byd-cenoa"
+    },
+    {
+      "id": "H5",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-fiat-fadua"
+    },
+    {
+      "id": "H6",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-pauny"
+    },
+    {
+      "id": "H7",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alperovich-sangong"
+    },
+    {
+      "id": "H8",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "H9",
+      "sector": "Maquinaria y Gran Escala",
+      "superficie": "12 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "i1",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alberdi"
+    },
+    {
+      "id": "i10",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-avelino-alimentos-odilin"
+    },
+    {
+      "id": "i11",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-avelino-alimentos-odilin"
+    },
+    {
+      "id": "i12",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-sermi"
+    },
+    {
+      "id": "i13",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-iveco"
+    },
+    {
+      "id": "i14",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-canal7"
+    },
+    {
+      "id": "i15",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-tribuno"
+    },
+    {
+      "id": "i16",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "cedido",
+      "notas": null,
+      "expositorId": "exp-tribuno"
+    },
+    {
+      "id": "i17",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-agostini"
+    },
+    {
+      "id": "i2",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alberdi"
+    },
+    {
+      "id": "i3",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alberdi"
+    },
+    {
+      "id": "i4",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-alberdi"
+    },
+    {
+      "id": "i5",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-ferre-gay"
+    },
+    {
+      "id": "i6",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-neumaticos-pioli"
+    },
+    {
+      "id": "i7",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "i8",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "i9",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "disponible",
+      "notas": null,
+      "expositorId": null
+    },
+    {
+      "id": "K7",
+      "sector": "Sector Artesanos y PyMEs",
+      "superficie": "25 m²",
+      "estado": "reservado",
+      "notas": null,
+      "expositorId": "exp-agostini"
+    }
+  ],
+  "ubicaciones": [
+    {
+      "standId": "A1",
+      "x": -40.75,
+      "y": 1.9,
+      "z": -18.75,
+      "rotY": 0,
+      "w": 14.5,
+      "l": 12.5,
+      "h": 3.8,
+      "carpetColor": 1982639,
+      "type": "planta_libre"
+    },
+    {
+      "standId": "A2",
+      "x": -40.75,
+      "y": 1.9,
+      "z": -18.75,
+      "rotY": 0,
+      "w": 14.5,
+      "l": 12.5,
+      "h": 3.8,
+      "carpetColor": 1982639,
+      "type": "planta_libre"
+    },
+    {
+      "standId": "A3",
+      "x": -31.6,
+      "y": 1.14,
+      "z": -22.5,
+      "rotY": 0,
+      "w": 3.8,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "A4",
+      "x": -27.37,
+      "y": 1.14,
+      "z": -22.5,
+      "rotY": 0,
+      "w": 3.8,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "A5",
+      "x": 41,
+      "y": 1.9,
+      "z": -15.75,
+      "rotY": 0,
+      "w": 14,
+      "l": 18.5,
+      "h": 3.8,
+      "carpetColor": 1982639,
+      "type": "planta_libre"
+    },
+    {
+      "standId": "A6",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "B1",
+      "x": -9.8,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B2",
+      "x": -5.9,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B3",
+      "x": -1.99,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B4",
+      "x": 1.9,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B5",
+      "x": 5.89,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B6",
+      "x": 9.79,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B7",
+      "x": 13.69,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "B8",
+      "x": 17.59,
+      "y": 1.16,
+      "z": -22.52,
+      "rotY": 0,
+      "w": 3.46,
+      "l": 4.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C1",
+      "x": -31.29,
+      "y": 1.14,
+      "z": 7.95,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C10",
+      "x": -15.06,
+      "y": 1.14,
+      "z": -5.25,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C100",
+      "x": -46,
+      "y": 1.14,
+      "z": -3.57,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C101",
+      "x": -46,
+      "y": 1.14,
+      "z": -6.97,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C102",
+      "x": -46,
+      "y": 1.14,
+      "z": -10.37,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C11",
+      "x": -19.84,
+      "y": 1.14,
+      "z": -0.37,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C12",
+      "x": -17.72,
+      "y": 1.14,
+      "z": 1.75,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C13",
+      "x": -15.62,
+      "y": 1.14,
+      "z": 3.9,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C14",
+      "x": -13.48,
+      "y": 1.14,
+      "z": 6.04,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C15",
+      "x": -15.6,
+      "y": 1.14,
+      "z": 8.16,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C16",
+      "x": -17.74,
+      "y": 1.14,
+      "z": 6.03,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C17",
+      "x": -19.84,
+      "y": 1.14,
+      "z": 3.88,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C18",
+      "x": -21.97,
+      "y": 1.14,
+      "z": 1.75,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C19",
+      "x": -17.18,
+      "y": 1.14,
+      "z": -7.37,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C2",
+      "x": -29.16,
+      "y": 1.14,
+      "z": 5.83,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C20",
+      "x": -27.07,
+      "y": 1.14,
+      "z": -2.82,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C21",
+      "x": -15.06,
+      "y": 1.14,
+      "z": -9.48,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C22",
+      "x": -12.93,
+      "y": 1.14,
+      "z": -7.37,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C23",
+      "x": -10.81,
+      "y": 1.14,
+      "z": -5.25,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C24",
+      "x": -8.7,
+      "y": 1.14,
+      "z": -3.1,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C25",
+      "x": -6.57,
+      "y": 1.14,
+      "z": -0.96,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C26",
+      "x": -8.69,
+      "y": 1.14,
+      "z": 1.16,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C27",
+      "x": -10.83,
+      "y": 1.14,
+      "z": -0.97,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C28",
+      "x": -12.93,
+      "y": 1.14,
+      "z": -3.12,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C29",
+      "x": -2.04,
+      "y": 1.15,
+      "z": -13.12,
+      "rotY": -1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C3",
+      "x": -27.06,
+      "y": 1.14,
+      "z": 7.98,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C30",
+      "x": 1.12,
+      "y": 1.15,
+      "z": -13.12,
+      "rotY": 1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C31",
+      "x": 1.12,
+      "y": 1.15,
+      "z": -6.62,
+      "rotY": 1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C32",
+      "x": -2.04,
+      "y": 1.15,
+      "z": -6.62,
+      "rotY": -1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C33",
+      "x": -2.04,
+      "y": 1.15,
+      "z": -9.87,
+      "rotY": -1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3.22,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C34",
+      "x": 1.12,
+      "y": 1.15,
+      "z": -9.87,
+      "rotY": 1.5707963267948966,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3.22,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C35",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C36",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C37",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C38",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C39",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C4",
+      "x": -24.92,
+      "y": 1.14,
+      "z": 10.12,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C40",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C41",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C42",
+      "x": -0.07,
+      "y": 1.9,
+      "z": 10.15,
+      "rotY": 0,
+      "w": 23.89,
+      "l": 10.21,
+      "h": 3.8,
+      "carpetColor": 1920728,
+      "type": "triangular"
+    },
+    {
+      "standId": "C43",
+      "x": 5.75,
+      "y": 1.14,
+      "z": -0.15,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C44",
+      "x": 10.01,
+      "y": 1.14,
+      "z": -0.14,
+      "rotY": 0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C45",
+      "x": 12.15,
+      "y": 1.14,
+      "z": 1.98,
+      "rotY": 0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C46",
+      "x": 14.28,
+      "y": 1.14,
+      "z": 4.11,
+      "rotY": 0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C49",
+      "x": 16.39,
+      "y": 1.14,
+      "z": 6.27,
+      "rotY": 0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C5",
+      "x": -27.05,
+      "y": 1.14,
+      "z": 12.24,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C50",
+      "x": 18.54,
+      "y": 1.14,
+      "z": 8.42,
+      "rotY": 0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C51",
+      "x": 16.4,
+      "y": 1.14,
+      "z": 10.55,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C52",
+      "x": 14.26,
+      "y": 1.14,
+      "z": 8.4,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C53",
+      "x": 12.15,
+      "y": 1.14,
+      "z": 6.25,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C55",
+      "x": 10.01,
+      "y": 1.14,
+      "z": 4.11,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C56",
+      "x": 7.88,
+      "y": 1.14,
+      "z": 1.98,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C57",
+      "x": 12.77,
+      "y": 1.16,
+      "z": -10.41,
+      "rotY": 0,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C58",
+      "x": 12.56,
+      "y": 1.14,
+      "z": -13.2,
+      "rotY": 3.141592653589793,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C59",
+      "x": 16.01,
+      "y": 1.14,
+      "z": -13.2,
+      "rotY": 3.141592653589793,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C6",
+      "x": -29.19,
+      "y": 1.14,
+      "z": 10.1,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C60",
+      "x": 19.41,
+      "y": 1.14,
+      "z": -13.2,
+      "rotY": 3.141592653589793,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C61",
+      "x": 22.86,
+      "y": 1.14,
+      "z": -13.2,
+      "rotY": 3.141592653589793,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C62",
+      "x": 26.3,
+      "y": 1.14,
+      "z": -13.2,
+      "rotY": 3.141592653589793,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C66",
+      "x": 26.5,
+      "y": 1.16,
+      "z": -10.41,
+      "rotY": 0,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C67",
+      "x": 23.06,
+      "y": 1.16,
+      "z": -10.41,
+      "rotY": 0,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C68",
+      "x": 19.62,
+      "y": 1.16,
+      "z": -10.41,
+      "rotY": 0,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C69",
+      "x": 16.21,
+      "y": 1.16,
+      "z": -10.41,
+      "rotY": 0,
+      "w": 3.21,
+      "l": 2.58,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C7",
+      "x": -29.19,
+      "y": 1.14,
+      "z": -4.95,
+      "rotY": -0.7853981633974483,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C8",
+      "x": -27.07,
+      "y": 1.14,
+      "z": -7.07,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C81",
+      "x": 38.1,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C82",
+      "x": 34.64,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C83",
+      "x": 31.25,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C84",
+      "x": 27.84,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C85",
+      "x": 18.64,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C86",
+      "x": 15.25,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C87",
+      "x": 11.85,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C88",
+      "x": 0.17,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C89",
+      "x": -3.23,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C9",
+      "x": -24.93,
+      "y": 1.14,
+      "z": -4.95,
+      "rotY": 2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C90",
+      "x": -15.92,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C91",
+      "x": -19.32,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C92",
+      "x": -12.52,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C93",
+      "x": -31.43,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C94",
+      "x": -34.83,
+      "y": 1.14,
+      "z": 22.5,
+      "rotY": 3.141592653589793,
+      "w": 3.2,
+      "l": 3.4,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C95",
+      "x": -46,
+      "y": 1.14,
+      "z": 22.69,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C96",
+      "x": -46,
+      "y": 1.14,
+      "z": 19.29,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C97",
+      "x": -46,
+      "y": 1.14,
+      "z": 15.89,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C98",
+      "x": -46,
+      "y": 1.14,
+      "z": 12.49,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "C99",
+      "x": -46,
+      "y": 1.14,
+      "z": -0.17,
+      "rotY": 1.5707963267948966,
+      "w": 3.4,
+      "l": 3.2,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "D1",
+      "x": -18.49,
+      "y": 1.14,
+      "z": -10.39,
+      "rotY": -2.356194490192345,
+      "w": 2.9,
+      "l": 2.9,
+      "h": 3,
+      "carpetColor": 1483594,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E1",
+      "x": 30.05,
+      "y": 1.19,
+      "z": 15.3,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E10",
+      "x": 35.82,
+      "y": 1.19,
+      "z": 2.48,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E11",
+      "x": 38.67,
+      "y": 1.19,
+      "z": 2.48,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E12",
+      "x": 38.67,
+      "y": 1.19,
+      "z": 5.74,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E13",
+      "x": 35.8,
+      "y": 1.19,
+      "z": 5.74,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E14",
+      "x": 32.94,
+      "y": 1.19,
+      "z": 5.74,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E15",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 0.84,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E16",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 3.89,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E17",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 7.01,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E18",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 10.06,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E19",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 13.11,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E2",
+      "x": 30.05,
+      "y": 1.19,
+      "z": 12.05,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E20",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 16.15,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E21",
+      "x": 45.6,
+      "y": 1.19,
+      "z": 19.27,
+      "rotY": -1.5707963267948966,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E22",
+      "x": 43.25,
+      "y": 1.14,
+      "z": 22.51,
+      "rotY": 3.141592653589793,
+      "w": 7.11,
+      "l": 3.38,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E3",
+      "x": 32.9,
+      "y": 1.19,
+      "z": 12.05,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E4",
+      "x": 35.82,
+      "y": 1.19,
+      "z": 12.05,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E5",
+      "x": 38.67,
+      "y": 1.19,
+      "z": 12.05,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E6",
+      "x": 38.67,
+      "y": 1.19,
+      "z": 15.3,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E7",
+      "x": 35.8,
+      "y": 1.19,
+      "z": 15.3,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E8",
+      "x": 32.94,
+      "y": 1.19,
+      "z": 15.3,
+      "rotY": 0,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "E9",
+      "x": 32.95,
+      "y": 1.19,
+      "z": 2.48,
+      "rotY": 3.141592653589793,
+      "w": 2.7,
+      "l": 2.7,
+      "h": 3,
+      "carpetColor": 15357964,
+      "type": "cubierto"
+    },
+    {
+      "standId": "F1",
+      "x": -94.8,
+      "y": -0.12,
+      "z": -17.48,
+      "rotY": 0,
+      "w": 16,
+      "l": 15,
+      "h": 0,
+      "carpetColor": 14251782,
+      "type": "corporativo"
+    },
+    {
+      "standId": "F2",
+      "x": 66.64,
+      "y": 0,
+      "z": 78.76,
+      "rotY": 0,
+      "w": 20.64,
+      "l": 20.64,
+      "h": 0,
+      "carpetColor": 14251782,
+      "type": "corporativo"
+    },
+    {
+      "standId": "G1",
+      "x": -97.14,
+      "y": 0,
+      "z": -3.32,
+      "rotY": 1.5707963267948966,
+      "w": 11.12,
+      "l": 11.12,
+      "h": 0,
+      "carpetColor": 14251782,
+      "type": "corporativo"
+    },
+    {
+      "standId": "G10",
+      "x": 40.38,
+      "y": 0.73,
+      "z": 55.94,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G2",
+      "x": -97.14,
+      "y": 0,
+      "z": 8.94,
+      "rotY": 1.5707963267948966,
+      "w": 11.12,
+      "l": 11.12,
+      "h": 0,
+      "carpetColor": 14251782,
+      "type": "corporativo"
+    },
+    {
+      "standId": "G3",
+      "x": -97.14,
+      "y": 0,
+      "z": 21.8,
+      "rotY": 1.5707963267948966,
+      "w": 11.12,
+      "l": 11.12,
+      "h": 0,
+      "carpetColor": 14251782,
+      "type": "corporativo"
+    },
+    {
+      "standId": "G5 A",
+      "x": -10.66,
+      "y": 0.73,
+      "z": 42.36,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G5 B",
+      "x": -10.66,
+      "y": 0.73,
+      "z": 42.36,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G6",
+      "x": 7.54,
+      "y": 0.73,
+      "z": 39.69,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G7",
+      "x": 43.49,
+      "y": 0.73,
+      "z": 37.53,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G7-B",
+      "x": 43.49,
+      "y": 0.73,
+      "z": 37.53,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G8",
+      "x": -10.29,
+      "y": 0.73,
+      "z": 61.57,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "G9",
+      "x": 14.43,
+      "y": 0.74,
+      "z": 57.39,
+      "rotY": 3.141592653589793,
+      "w": 18.12,
+      "l": 7.12,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H3",
+      "x": -67.05,
+      "y": 0.74,
+      "z": 78.95,
+      "rotY": 0,
+      "w": 14.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H4",
+      "x": -50.17,
+      "y": 0.74,
+      "z": 78.98,
+      "rotY": 0,
+      "w": 14.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H5",
+      "x": -33.39,
+      "y": 0.73,
+      "z": 78.97,
+      "rotY": 3.141592653589793,
+      "w": 14.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H6",
+      "x": -10.64,
+      "y": 0.73,
+      "z": 79.03,
+      "rotY": 3.141592653589793,
+      "w": 13.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H7",
+      "x": 4.87,
+      "y": 0.74,
+      "z": 79.05,
+      "rotY": 3.141592653589793,
+      "w": 13.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H8",
+      "x": 20.43,
+      "y": 0.73,
+      "z": 78.96,
+      "rotY": 3.141592653589793,
+      "w": 13.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "H9",
+      "x": 36.31,
+      "y": 0.74,
+      "z": 78.95,
+      "rotY": 3.141592653589793,
+      "w": 14.12,
+      "l": 6.62,
+      "h": 3,
+      "carpetColor": 988970,
+      "type": "descubierto"
+    },
+    {
+      "standId": "i1",
+      "x": -69.19,
+      "y": 1.22,
+      "z": 13.49,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i10",
+      "x": -70.82,
+      "y": 1.22,
+      "z": 46.93,
+      "rotY": 0.1663,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i11",
+      "x": -64.25,
+      "y": 1.22,
+      "z": 45.89,
+      "rotY": 0.1663,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i12",
+      "x": -57.94,
+      "y": 1.22,
+      "z": 44.72,
+      "rotY": 0.1663,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i13",
+      "x": -39.16,
+      "y": 1.22,
+      "z": 38.31,
+      "rotY": 3.141592653589793,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i14",
+      "x": -34.33,
+      "y": 1.22,
+      "z": 40.71,
+      "rotY": 3.141592653589793,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i15",
+      "x": -48.61,
+      "y": 1.22,
+      "z": 62.7,
+      "rotY": 0.1682,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i16",
+      "x": -43.31,
+      "y": 1.22,
+      "z": 61.79,
+      "rotY": 3.141592653589793,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i17",
+      "x": -38.02,
+      "y": 1.22,
+      "z": 60.89,
+      "rotY": 3.141592653589793,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i2",
+      "x": -64.39,
+      "y": 1.22,
+      "z": 13.5,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i3",
+      "x": -69.19,
+      "y": 1.22,
+      "z": 18.86,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i4",
+      "x": -64.38,
+      "y": 1.22,
+      "z": 18.86,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i5",
+      "x": -69.14,
+      "y": 1.22,
+      "z": 24.17,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i6",
+      "x": -64.35,
+      "y": 1.22,
+      "z": 24.17,
+      "rotY": 1.5707963267948966,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i7",
+      "x": -71.78,
+      "y": 1.22,
+      "z": 41.59,
+      "rotY": -2.9666,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i8",
+      "x": -66.56,
+      "y": 1.22,
+      "z": 40.66,
+      "rotY": -2.9666,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "i9",
+      "x": -61.27,
+      "y": 1.22,
+      "z": 39.71,
+      "rotY": -2.9666,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    },
+    {
+      "standId": "K7",
+      "x": -38.02,
+      "y": 1.22,
+      "z": 60.89,
+      "rotY": 3.141592653589793,
+      "w": 4.8,
+      "l": 4,
+      "h": 3,
+      "carpetColor": 11817737,
+      "type": "artesano"
+    }
+  ]
+}
