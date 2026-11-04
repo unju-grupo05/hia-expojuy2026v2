@@ -23,6 +23,7 @@ docker compose up -d --build
 |---|---|
 | Web | http://localhost:8080 |
 | API (salud) | http://localhost:8080/api/health |
+| Panel de administración | http://localhost:8080/admin/login (credenciales: `ADMIN_INITIAL_*` del `.env`) |
 | pgAdmin | http://localhost:5050 (servidor: host `postgres`, puerto `5432`) |
 | PostgreSQL desde la PC | `localhost:5433` |
 
