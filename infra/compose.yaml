@@ -59,11 +59,44 @@ services:
     networks:
       - data
 
+  backend:
+    build:
+      context: ../backend
+    image: expojuy-backend:latest
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_INITIAL_EMAIL: ${ADMIN_INITIAL_EMAIL}
+      ADMIN_INITIAL_PASSWORD: ${ADMIN_INITIAL_PASSWORD}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      FRONTEND_URL: ${PUBLIC_URL:-http://localhost:8080}
+      CORS_ORIGIN: ${PUBLIC_URL:-http://localhost:8080}
+      # Confía en proxies de redes privadas (Nginx en Docker) para leer la IP real del cliente.
+      TRUST_PROXY: uniquelocal
+    volumes:
+      - uploads:/app/uploads
+    # Sin puerto publicado: solo se accede a través de Nginx (/api).
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app
+      - data
+
   frontend:
     build:
       context: ../frontend
     image: expojuy-frontend:latest
     restart: unless-stopped
+    environment:
+      BACKEND_URL: http://backend:3000
     ports:
       - "${FRONTEND_PORT:-8080}:8080"
     networks:
@@ -78,3 +111,4 @@ networks:
 volumes:
   pgdata:
   pgadmin-data:
+  uploads:
