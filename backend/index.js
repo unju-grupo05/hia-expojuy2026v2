@@ -73,14 +73,15 @@ try {
 
 const PORT = process.env.PORT || 3000;
 
-sequelize.sync({ force: true, alter: process.env.DB_SYNC_ALTER === 'true' })
+// `force` borra y recrea todas las tablas: solo se activa a pedido, nunca por defecto.
+sequelize.sync({ force: process.env.DB_SYNC_FORCE === 'true', alter: process.env.DB_SYNC_ALTER === 'true' })
   .then(async () => {
     console.log('Tablas sincronizadas con PostgreSQL.');
 
     try {
       await ensureB2BSchemaUpdates();
       await ensureNoticiasSchemaUpdates();
-      // `sync({ force: true })` acaba de borrar los índices propios: hay que
+      // Si `force` recreó las tablas, también borró los índices propios: hay que
       // recrearlos para que el chatbot no caiga en un sequential scan.
       await ensureChatbotSearchIndexes();
     } catch (schemaError) {
