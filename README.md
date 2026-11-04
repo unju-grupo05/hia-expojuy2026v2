@@ -5,7 +5,7 @@ Web de la ExpoJuy 2026 y su infraestructura completa, desarrollada como Práctic
 | Carpeta | Contenido |
 |---|---|
 | `frontend/` | App Angular 21 |
-| `backend/` | API Node.js + Express (pendiente de incorporar) |
+| `backend/` | API Node.js + Express |
 | `infra/` | Docker Compose del entorno |
 | `docs/` | Plan de trabajo, consigna y contexto del proyecto |
 

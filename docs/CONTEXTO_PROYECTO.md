@@ -26,9 +26,10 @@ gestión de incidencias, documentación, automatización con n8n y cibersegurida
 ```
 hia-expojuy2026v2/
 ├── frontend/        App Angular 21 (standalone components, Tailwind 4, Three.js, GSAP)
-│   ├── Dockerfile   Build multi-stage: Node 22 → nginx-unprivileged (puerto 8080)
+│   ├── Dockerfile   Build multi-stage: Node 22.23.4 → nginx-unprivileged 1.30.6 (puerto 8080)
 │   └── docker/nginx/default.conf.template
-├── backend/         VACÍO: falta incorporar el código (Node.js + Express 5 + Sequelize 6)
+├── backend/         API Node.js + Express 5 + Sequelize 6
+│   └── Dockerfile   Node 22.23.4 Alpine, usuario sin root (puerto 3000)
 ├── infra/           Docker Compose del entorno completo
 │   ├── compose.yaml
 │   └── .env.example Plantilla de variables (el .env real no se versiona)
@@ -41,12 +42,13 @@ hia-expojuy2026v2/
 | Capa | Tecnología |
 |---|---|
 | Frontend | Angular 21, TypeScript 5.9, Tailwind CSS 4, Three.js, GSAP, Vitest |
-| Backend (pendiente de incorporar) | Node.js, Express 5, Sequelize 6, JWT, bcryptjs, multer + sharp, nodemailer, Swagger |
+| Backend | Node.js 22, Express 5, Sequelize 6, JWT, bcrypt, multer + sharp, nodemailer, node-cron, Swagger, Jest |
 | Base de datos | PostgreSQL 17 con extensión pgvector disponible |
 | Contenedores | Docker + Docker Compose |
 | Servidor web | Nginx (dentro de la imagen del frontend) |
 
-Modelos del backend según el plan: `Stand`, `UbicacionStand`, `Expositor`, `Noticia`, `Galeria`,
+Versiones de Node y Nginx fijadas a releases con parches de seguridad (Node 22.23.4 es el release
+de seguridad del 20/10/2026). Modelos del backend: `Stand`, `UbicacionStand`, `Expositor`, `Noticia`, `Galeria`,
 `Agenda`, `Eje`, `Correo`, `Usuario`, `Media`, `ReunionB2B`, `AuditoriaAccion`, `HistorialAcceso`.
 
 ## 4. Infraestructura actual (`infra/compose.yaml`)
@@ -58,10 +60,11 @@ Proyecto Compose llamado `expojuy`. Se levanta desde `infra/` con `docker compos
 | `postgres` | `pgvector/pgvector:pg17` | `127.0.0.1:5433` | `data` | `pgdata` |
 | `pgadmin` | `dpage/pgadmin4:9` | `127.0.0.1:5050` | `data` | `pgadmin-data` |
 | `backup` | `prodrigestivill/postgres-backup-local:17` | — | `data` | `./backups` (fuera de Git) |
+| `backend` | build de `../backend` | — (solo vía Nginx en `/api`) | `app`, `data` | `uploads` |
 | `frontend` | build de `../frontend` | `0.0.0.0:8080` | `app` | — |
 
 **Redes:**
-- `app`: tráfico web (frontend y, cuando exista, backend).
+- `app`: tráfico web (frontend y backend).
 - `data`: base de datos y sus herramientas. Solo se conecta quien necesita la base.
   El frontend **no** está en `data` y no puede llegar a Postgres (verificado).
 
@@ -72,8 +75,13 @@ Proyecto Compose llamado `expojuy`. Se levanta desde `infra/` con `docker compos
 - Usuario, contraseña y nombre de la base se leen del `.env` **solo la primera vez** (volumen vacío).
   Cambiarlos después en el `.env` no tiene efecto; hay que hacerlo con SQL o borrar el volumen
   (`docker compose down -v`, **borra todos los datos**).
-- La base arranca **vacía**. Las tablas las crea el backend (Sequelize) o una migración de la
-  base existente. El compose no crea tablas.
+- Las tablas las crea el backend al arrancar (`sequelize.sync`, sin borrar datos) y el seeder carga
+  datos iniciales **solo si las tablas están vacías** (160 stands, noticias, agenda, ejes y el
+  administrador definido en `ADMIN_INITIAL_*`). Para reiniciar la base a propósito:
+  `DB_SYNC_FORCE=true` (**borra todo**).
+- El administrador inicial se crea una sola vez: cambiar `ADMIN_INITIAL_PASSWORD` después no
+  modifica un usuario existente.
+- Salud del backend: `GET /api/health` → 200 con base disponible, 503 sin conexión.
 - pgvector está disponible pero no activado: hace falta `CREATE EXTENSION vector;` en la base.
 - Backups: `pg_dump` con la frecuencia de `BACKUP_SCHEDULE` (por defecto diario), rotación de
   7 diarios, 4 semanales y 3 mensuales. Backup manual: `docker compose exec backup /backup.sh`.
@@ -85,7 +93,6 @@ Proyecto Compose llamado `expojuy`. Se levanta desde `infra/` con `docker compos
   `src/environments/environment.docker.ts` con `apiUrl: '/api'` (ruta relativa).
 - Nginx reenvía `/api/` y `/uploads/` al backend definido en `BACKEND_URL`
   (por defecto `http://backend:3000`). Mismo origen: sin CORS.
-- Mientras no exista el backend, `/api` responde **502**. Es lo esperado.
 - `environment.ts` y `environment.prod.ts` apuntan a `https://api.expojuy.com.ar/api` y no se tocaron.
 
 ## 5. Cómo levantar el entorno
@@ -166,13 +173,21 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
 ## 9. Estado actual y pendientes
 
 **Hecho:**
-- Monorepo con `frontend/`, `backend/` (vacío) e `infra/`.
+- Monorepo con `frontend/`, `backend/` e `infra/`.
 - Imagen Docker del frontend (86.6 MB, sin root, healthcheck en `/healthz`).
-- Compose base con Postgres, pgAdmin, backups y frontend, con pruebas de persistencia,
-  backup/restauración y aislamiento.
+- Imagen Docker del backend (sin root, healthcheck en `/api/health`).
+- Compose completo: Postgres, pgAdmin, backups, backend y frontend. Probado: persistencia,
+  backup/restauración, aislamiento de redes y la web consumiendo la API a través de Nginx.
+- Corregido: el backend usaba `sync({ force: true })` y **borraba todas las tablas en cada
+  arranque** (incidencia de pérdida de datos para Mantis).
+
+**Hallazgos pendientes (incidencias para Mantis):**
+- CORS acepta cualquier origen (`index.js`: ambas ramas del callback devuelven `true`). Seguridad.
+- Dependencias sin uso: `googleapis` y `xlsx` (esta última con vulnerabilidades conocidas).
+  Inflan la imagen del backend (716 MB). Seguridad y rendimiento.
+- `/api-docs` (Swagger) queda público. Evaluar restringirlo al publicar en Internet.
 
 **Pendiente (Integrante 1):**
-- Incorporar el backend a `backend/`, su Dockerfile y el servicio en el compose.
 - Publicación en Internet con **Tailscale Funnel** (decidido en lugar de Cloudflare Tunnel:
   no requiere dominio, da HTTPS automático y no abre puertos). La web será pública; pgAdmin y
   demás interfaces administrativas, solo accesibles para el equipo vía la red privada de Tailscale.
@@ -180,7 +195,6 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
   CI/CD apunta a esa máquina.
 
 **Preguntas abiertas:**
-- ¿Dónde está el repo del backend y quién tiene acceso?
 - ¿Existe una base real con datos (detrás de `api.expojuy.com.ar`) para migrar con `pg_dump`?
 
 ## 10. Resumen de la consigna (puntos del TP)
