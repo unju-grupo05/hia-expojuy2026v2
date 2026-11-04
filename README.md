@@ -15,13 +15,15 @@ Requisito: [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
 ```bash
 cd infra
-cp .env.example .env    # completar las contraseñas
-docker compose up -d
+cp .env.example .env    # completar contraseñas; JWT_SECRET de al menos 32 caracteres
+docker compose up -d --build
 ```
 
 | Servicio | URL |
 |---|---|
 | Web | http://localhost:8080 |
+| API (salud) | http://localhost:8080/api/health |
+| Panel de administración | http://localhost:8080/admin/login (credenciales: `ADMIN_INITIAL_*` del `.env`) |
 | pgAdmin | http://localhost:5050 (servidor: host `postgres`, puerto `5432`) |
 | PostgreSQL desde la PC | `localhost:5433` |
 
