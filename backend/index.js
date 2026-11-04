@@ -46,6 +46,16 @@ app.use(cors({
 // 3. Servir imágenes con caché de 1 año
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { maxAge: '1y', etag: true }));
 
+// Salud del servicio (healthcheck de Docker y monitoreo): responde 503 si no hay conexión a la base.
+app.get('/api/health', async (req, res) => {
+  try {
+    await sequelize.authenticate();
+    res.json({ status: 'ok', db: 'ok' });
+  } catch (error) {
+    res.status(503).json({ status: 'error', db: 'unreachable' });
+  }
+});
+
 // Rutas
 app.use('/api/noticias', require('./src/routes/noticia.route.js'));
 app.use('/api/galerias', require('./src/routes/galeria.route.js'));
@@ -102,4 +112,6 @@ sequelize.sync({ force: process.env.DB_SYNC_FORCE === 'true', alter: process.env
   })
   .catch(err => {
     console.error('Error al sincronizar con PostgreSQL:', err);
+    // Sin base el servidor no puede atender: terminar para que el orquestador lo reinicie.
+    process.exit(1);
   });
