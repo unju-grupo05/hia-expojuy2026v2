@@ -1,0 +1,715 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API ExpoJuy 2026",
+    "description": "Documentacion de los endpoints del backend de ExpoJuy 2026.",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Usuarios",
+      "description": "Operaciones relacionadas con los usuarios."
+    },
+    {
+      "name": "Publicaciones",
+      "description": "Operaciones relacionadas con las publicaciones."
+    },
+    {
+      "name": "Expositores",
+      "description": "Operaciones relacionadas con los expositores."
+    },
+    {
+      "name": "Agenda",
+      "description": "Operaciones relacionadas con el cronograma de actividades."
+    },
+    {
+      "name": "Correos",
+      "description": "Suscripciones a recordatorios de agenda."
+    },
+    {
+      "name": "Ejes",
+      "description": "Operaciones relacionadas con los ejes tematicos."
+    },
+    {
+      "name": "Galeria",
+      "description": "Operaciones relacionadas con la galeria de imagenes."
+    },
+    {
+      "name": "Medios",
+      "description": "Carga y administracion de archivos multimedia."
+    },
+    {
+      "name": "Reuniones B2B",
+      "description": "Solicitudes de reuniones entre clientes y expositores."
+    },
+    {
+      "name": "Stands",
+      "description": "Operaciones comerciales y estado de stands."
+    },
+    {
+      "name": "Ubicaciones 3D",
+      "description": "Coordenadas, geometría y dimensiones tridimensionales para Three.js."
+    }
+  ],
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                },
+                "id": {
+                  "example": "any"
+                },
+                "sector": {
+                  "example": "any"
+                },
+                "superficie": {
+                  "example": "any"
+                },
+                "estado": {
+                  "example": "any"
+                },
+                "notas": {
+                  "example": "any"
+                },
+                "expositorId": {
+                  "example": "any"
+                },
+                "ubicacion": {
+                  "example": "any"
+                },
+                "x": {
+                  "example": "any"
+                },
+                "y": {
+                  "example": "any"
+                },
+                "z": {
+                  "example": "any"
+                },
+                "rotY": {
+                  "example": "any"
+                },
+                "w": {
+                  "example": "any"
+                },
+                "l": {
+                  "example": "any"
+                },
+                "h": {
+                  "example": "any"
+                },
+                "carpetColor": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/{id}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                },
+                "expositorId": {
+                  "example": "any"
+                },
+                "sector": {
+                  "example": "any"
+                },
+                "superficie": {
+                  "example": "any"
+                },
+                "estado": {
+                  "example": "any"
+                },
+                "notas": {
+                  "example": "any"
+                },
+                "ubicacion": {
+                  "example": "any"
+                },
+                "x": {
+                  "example": "any"
+                },
+                "y": {
+                  "example": "any"
+                },
+                "z": {
+                  "example": "any"
+                },
+                "rotY": {
+                  "example": "any"
+                },
+                "w": {
+                  "example": "any"
+                },
+                "l": {
+                  "example": "any"
+                },
+                "h": {
+                  "example": "any"
+                },
+                "carpetColor": {
+                  "example": "any"
+                },
+                "type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/upload": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/disponibles": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "expositorId",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/{id}/asignar": {
+      "patch": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                },
+                "expositorId": {
+                  "example": "any"
+                },
+                "estado": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/{standId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "standId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "standId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "legajo": {
+                  "example": "any"
+                },
+                "where": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Iniciar sesión",
+        "description": "Autentica a un usuario usando su correo o legajo, y su contraseña.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Credenciales del usuario.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "identificador": {
+                  "type": "string",
+                  "example": "juan@example.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "password123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login exitoso, devuelve el token JWT."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Contraseña incorrecta."
+          },
+          "404": {
+            "description": "Usuario no encontrado."
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/login-verificacion": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Verificar el login de un usuario",
+        "description": "Verifica la sesión mediante el correo.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Correo del usuario a verificar.",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "correo": {
+                  "type": "string",
+                  "example": "juan@example.com"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Login verificado con éxito."
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/registro": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Registrar un nuevo usuario (requiere admin)",
+        "description": "Crea un nuevo usuario en el sistema. Debe ser admin.",
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Datos del nuevo usuario.",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Usuario"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente."
+          },
+          "400": {
+            "description": "El usuario ya existe."
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Publicacion": {
+      "type": "object",
+      "properties": {
+        "titulo": {
+          "type": "string",
+          "example": "Ejemplo de titulo"
+        },
+        "contenido": {
+          "type": "string",
+          "example": "Contenido de la publicación"
+        },
+        "imagenAsociada": {
+          "type": "string",
+          "example": "base64string..."
+        },
+        "fechaPublicacion": {
+          "type": "string",
+          "example": "2024-01-01"
+        },
+        "vigente": {
+          "type": "boolean",
+          "example": true
+        },
+        "usuarioLegajo": {
+          "type": "number",
+          "example": 123
+        }
+      }
+    },
+    "Usuario": {
+      "type": "object",
+      "properties": {
+        "legajo": {
+          "type": "number",
+          "example": 123
+        },
+        "nombre": {
+          "type": "string",
+          "example": "Juan"
+        },
+        "apellido": {
+          "type": "string",
+          "example": "Pérez"
+        },
+        "email": {
+          "type": "string",
+          "example": "juan@example.com"
+        }
+      }
+    }
+  }
+}
