@@ -70,6 +70,9 @@ app.use('/api/admin/media', require('./src/routes/media.route.js'));
 app.use('/api/media', require('./src/routes/media.route.js'));
 app.use('/api/reuniones-b2b', require('./src/routes/reunionB2B.route.js'));
 app.use('/api/chatbot', require('./src/routes/chatbot.route.js'));
+app.use('/api/visitas-stands', require('./src/routes/visitaStand.route.js'));
+app.use('/api/resenas-stands', require('./src/routes/resenaStand.route.js'));
+app.use('/api/asistencias-agenda', require('./src/routes/asistenciaAgenda.route.js'));
 
 iniciarCronRecordatorios();
 

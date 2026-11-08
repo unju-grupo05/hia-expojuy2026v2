@@ -2,6 +2,7 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../../config/database');
 const Expositor = require('./expositor.model');
 const UbicacionStand = require('./ubicacionStand.model');
+const Eje = require('./eje.model');
 
 const Stand = sequelize.define('Stand', {
     id: {
@@ -33,6 +34,14 @@ const Stand = sequelize.define('Stand', {
             model: Expositor,
             key: 'id'
         }
+    },
+    eje_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+            model: Eje,
+            key: 'id'
+        }
     }
 }, {
     tableName: 'stands',
@@ -45,6 +54,14 @@ if (!Stand.associations?.expositor) {
 }
 if (!Expositor.associations?.stands) {
   Expositor.hasMany(Stand, { foreignKey: 'expositorId', as: 'stands' });
+}
+
+// Asociación con Eje
+if (!Stand.associations?.eje) {
+  Stand.belongsTo(Eje, { foreignKey: 'eje_id', as: 'eje' });
+}
+if (!Eje.associations?.stands) {
+  Eje.hasMany(Stand, { foreignKey: 'eje_id', as: 'stands' });
 }
 
 // Asociación 1 a 1 estricta con UbicacionStand
