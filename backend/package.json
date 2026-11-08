@@ -12,7 +12,9 @@
     "swagger": "node swagger.js",
     "migrate:chatbot-search": "node src/migrations/run-migration-chatbot-search.js",
     "migrate:logo": "node src/migrations/run-migration-logo.js",
-    "seed:stands": "node src/seeders/seed-stands-expositores.js"
+    "seed:stands": "node src/seeders/seed-stands-expositores.js",
+    "seed:massive": "node src/seeders/seed-masivo-visitas.js",
+    "db:init": "node src/seeders/run-initial-sync.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

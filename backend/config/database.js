@@ -17,17 +17,59 @@ if (missingEnvVars.length > 0) {
     );
 }
 
-const sequelize = new Sequelize(
-    process.env.DB_NAME,
-    process.env.DB_USER,
-    process.env.DB_PASSWORD,
-    {
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
-        dialect: process.env.DB_DIALECT || 'postgres',
-        logging: false,
-    }
-);
+const poolOptions = {
+    max: 20,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+};
+
+let sequelize;
+
+if (process.env.DB_REPLICA_HOST && process.env.DB_REPLICA_HOST.trim() !== '') {
+    console.log(`[config/database] Configurando pool con Replicación Streaming (Write: ${process.env.DB_HOST}, Read: ${process.env.DB_REPLICA_HOST})`);
+    sequelize = new Sequelize(
+        process.env.DB_NAME,
+        process.env.DB_USER,
+        process.env.DB_PASSWORD,
+        {
+            dialect: process.env.DB_DIALECT || 'postgres',
+            logging: false,
+            pool: poolOptions,
+            replication: {
+                write: {
+                    host: process.env.DB_HOST,
+                    port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
+                    username: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: process.env.DB_NAME
+                },
+                read: [
+                    {
+                        host: process.env.DB_REPLICA_HOST,
+                        port: process.env.DB_REPLICA_PORT ? parseInt(process.env.DB_REPLICA_PORT, 10) : 5432,
+                        username: process.env.DB_USER,
+                        password: process.env.DB_PASSWORD,
+                        database: process.env.DB_NAME
+                    }
+                ]
+            }
+        }
+    );
+} else {
+    sequelize = new Sequelize(
+        process.env.DB_NAME,
+        process.env.DB_USER,
+        process.env.DB_PASSWORD,
+        {
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT ? parseInt(process.env.DB_PORT, 10) : 5432,
+            dialect: process.env.DB_DIALECT || 'postgres',
+            logging: false,
+            pool: poolOptions
+        }
+    );
+}
 
 sequelize.authenticate()
     .then(() => console.log('DB is connected to PostgreSQL'))

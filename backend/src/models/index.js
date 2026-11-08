@@ -13,6 +13,8 @@ const VisitaStand = require('./visitasStands.model');
 const ResenaStand = require('./resenasStands.model');
 const AsistenciaAgenda = require('./asistenciasAgenda.model');
 const LogChatbot = require('./logsChatbot.model');
+const HistorialAcceso = require('./historialAcceso.model');
+const AuditoriaAccion = require('./auditoriaAccion.model');
 
 // Asociaciones Stand <-> UbicacionStand (1 a 1 estricta con borrado en cascada)
 if (!Stand.associations?.ubicacion) {
@@ -101,5 +103,7 @@ module.exports = {
   VisitaStand,
   ResenaStand,
   AsistenciaAgenda,
-  LogChatbot
+  LogChatbot,
+  HistorialAcceso,
+  AuditoriaAccion
 };

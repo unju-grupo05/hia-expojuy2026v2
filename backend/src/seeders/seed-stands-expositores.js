@@ -30,9 +30,13 @@ async function ejecutarSeed(isStandalone = false) {
         await Expositor.bulkCreate(seedData.expositores, { transaction });
         console.log(`${seedData.expositores.length} expositores reales guardados en 'expositores'.`);
 
-        // 3. Carga de Stands reales
-        await Stand.bulkCreate(seedData.stands, { transaction });
-        console.log(`${seedData.stands.length} stands guardados en 'stands'.`);
+        // 3. Carga de Stands reales con asignación de Eje temático
+        const standsConEje = seedData.stands.map((s, idx) => ({
+            ...s,
+            eje_id: s.eje_id || ((idx % 6) + 1)
+        }));
+        await Stand.bulkCreate(standsConEje, { transaction });
+        console.log(`${standsConEje.length} stands guardados en 'stands'.`);
 
         // 4. Carga de Ubicaciones espaciales 3D (Normalización 3NF)
         await UbicacionStand.bulkCreate(seedData.ubicaciones, { transaction });
