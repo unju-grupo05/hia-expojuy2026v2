@@ -236,6 +236,34 @@ const QUERIES = [
       FROM afluencia_horaria
       ORDER BY afluencia DESC
       LIMIT 100;
+    `,
+    sqlOpt: `
+      EXPLAIN (ANALYZE, BUFFERS)
+      WITH afluencia_horaria AS (
+          SELECT 
+              stand_id,
+              date_trunc('hour', fecha_visita) AS hora_visita,
+              count(*) AS afluencia
+          FROM visitas_stands
+          WHERE fecha_visita BETWEEN '2026-10-10 10:00:00+00' AND '2026-10-12 22:00:00+00'
+          GROUP BY stand_id, date_trunc('hour', fecha_visita)
+      )
+      SELECT 
+          stand_id,
+          hora_visita,
+          afluencia,
+          round(avg(afluencia) OVER (
+              PARTITION BY stand_id 
+              ORDER BY hora_visita 
+              ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+          ), 2) AS media_movil_3h,
+          rank() OVER (
+              PARTITION BY stand_id 
+              ORDER BY afluencia DESC
+          ) AS ranking_pico
+      FROM afluencia_horaria
+      ORDER BY afluencia DESC
+      LIMIT 100;
     `
   },
   {
@@ -258,6 +286,32 @@ const QUERIES = [
           ) AS porcentaje_satisfaccion
       FROM logs_chatbot
       GROUP BY coalesce(intencion, 'sin_clasificar')
+      ORDER BY total_consultas DESC;
+    `,
+    sqlOpt: `
+      EXPLAIN (ANALYZE, BUFFERS)
+      WITH metricas_base AS (
+          SELECT 
+              COALESCE(intencion, 'sin_clasificar') AS intencion,
+              tiempo_respuesta_ms,
+              fue_util
+          FROM logs_chatbot
+      )
+      SELECT 
+          intencion,
+          count(*) AS total_consultas,
+          round(avg(tiempo_respuesta_ms), 2) AS latencia_promedio_ms,
+          percentile_cont(0.50) WITHIN GROUP (ORDER BY tiempo_respuesta_ms) AS mediana_ms,
+          percentile_cont(0.95) WITHIN GROUP (ORDER BY tiempo_respuesta_ms) AS p95_latencia_ms,
+          count(*) FILTER (WHERE fue_util = true) AS respuestas_utiles,
+          count(*) FILTER (WHERE fue_util = false) AS respuestas_no_utiles,
+          round(
+              (count(*) FILTER (WHERE fue_util = true)::numeric / 
+               NULLIF(count(*) FILTER (WHERE fue_util IS NOT NULL), 0)::numeric) * 100, 
+              2
+          ) AS porcentaje_satisfaccion
+      FROM metricas_base
+      GROUP BY intencion
       ORDER BY total_consultas DESC;
     `
   },
