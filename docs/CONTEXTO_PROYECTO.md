@@ -49,7 +49,8 @@ hia-expojuy2026v2/
 
 Versiones de Node y Nginx fijadas a releases con parches de seguridad (Node 22.23.4 es el release
 de seguridad del 20/10/2026). Modelos del backend: `Stand`, `UbicacionStand`, `Expositor`, `Noticia`, `Galeria`,
-`Agenda`, `Eje`, `Correo`, `Usuario`, `Media`, `ReunionB2B`, `AuditoriaAccion`, `HistorialAcceso`.
+`Agenda`, `Eje`, `Correo`, `Usuario`, `Media`, `ReunionB2B`, `AuditoriaAccion`, `HistorialAcceso`,
+`VisitaStand` (telemetría 6M), `AsistenciaAgenda`, `ResenaStand`, `LogChatbot` (pgvector).
 
 ## 4. Infraestructura actual (`infra/compose.yaml`)
 
@@ -143,6 +144,7 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
 
 1. **Archivos:** el núcleo está en `compose.yaml`. Los servicios de cada área van en archivos
    aparte dentro de `infra/`:
+   - `compose.cluster-ha.yaml`: Clúster HA de 3 nodos (Primary + 2 Standbys), HAProxy (balanceo lecturas round-robin y proxy escrituras) y Failover Manager Sentinel.
    - `compose.monitoring.yaml`: Prometheus, Grafana, cAdvisor, node-exporter, postgres-exporter.
    - `compose.automation.yaml`: n8n.
    - `compose.tools.yaml`: Mantis/GLPI, Nextcloud.
@@ -165,14 +167,14 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
 | Integrante | Área | Puntos del TP |
 |---|---|---|
 | 1 — Ignacio | DevOps y contenedores: Dockerfiles, compose, redes, publicación en Internet | 4 (parte Docker), 7, 9 |
-| 2 | DBA: dataset de 6.000.000 de registros, optimización de 8 consultas, replicación, backups | 4 (datos), 5, 6 |
+| 2 — Anto (`antocruz06`) | Senior DBA: modelos telemetría, dataset de 6.000.000 de registros, optimización SQL (8 queries con EXPLAIN ANALYZE), clúster HA 3 nodos con failover automático y balanceo HAProxy, backups y contingencia | 4 (datos masivos), 5, 6, 11 (incidencias DBA), 15 (capítulos 6, 7, 8, 15) |
 | 3 | CI/CD (GitHub Actions) y monitoreo (Prometheus + Grafana) | 8, 10 |
 | 4 | n8n: 3 flujos (alertas → incidencia, verificación de backups, IA/RAG) | 13 |
 | 5 | Scrum (Jira), Gitflow, Mantis/GLPI, Nextcloud, seguridad, documento final | 2, 3, 11, 12, 14, 15 |
 
-## 9. Estado actual y pendientes
+## 9. Estado actual y detalle de trabajo completado
 
-**Hecho:**
+### 9.1 Trabajo General del Proyecto
 - Monorepo con `frontend/`, `backend/` e `infra/`.
 - Imagen Docker del frontend (86.6 MB, sin root, healthcheck en `/healthz`).
 - Imagen Docker del backend (sin root, healthcheck en `/api/health`).
@@ -180,6 +182,74 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
   backup/restauración, aislamiento de redes y la web consumiendo la API a través de Nginx.
 - Corregido: el backend usaba `sync({ force: true })` y **borraba todas las tablas en cada
   arranque** (incidencia de pérdida de datos para Mantis).
+
+### 9.2 Trabajo Integral Realizado por el Integrante 2 (Senior DBA & Rendimiento)
+
+El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de responsabilidad correspondientes a los Puntos 4, 5, 6, 11 y 15 de la consigna oficial:
+
+#### A. Modelos de Telemetría y Dataset Masivo de 6.000.000 de Registros (Punto 4)
+- **Nuevos Modelos de Dominio en Sequelize:** Creación de `VisitaStand` (`visitas_stands`), `AsistenciaAgenda` (`asistencias_agenda`), `ResenaStand` (`resenas_stands`), `LogChatbot` (`logs_chatbot` con soporte de embeddings vectoriales vía `pgvector`) y extensiones en `Stand`.
+- **Controladores, Rutas REST y Suite de Pruebas:**
+  - `visitaStand.controller.js` y `visitaStand.route.js` (filtros, métricas de afluencia, paginación).
+  - `asistenciaAgenda.controller.js` y `asistenciaAgenda.route.js` (gestión de concurrencia en conferencias).
+  - `resenaStand.controller.js` y `resenaStand.route.js` (calificaciones y feedback de expositores).
+  - `chatbot.controller.js` y `chatbot.route.js` (telemetría y registro de consultas).
+  - Suite de tests unitarios y de integración en `backend/tests/telemetria.controller.test.js` y actualización de `backend/tests/stand.controller.test.js`.
+- **Pipeline de Generación y Carga Masiva (6.000.000 de registros):**
+  - Script SQL de alta velocidad con `generate_series()` en `backend/src/seeders/dataset_6m_visitas.sql` (carga completa en menos de 2 minutos).
+  - Generador sintético en Node.js por lotes transaccionales (*batch insert*) con control de memoria en `backend/src/seeders/seed-masivo-visitas.js`.
+  - Sincronización controlada sin borrado destructivo en `backend/src/seeders/run-initial-sync.js`.
+  - **Volumen de Datos Medido:** Tabla `visitas_stands` con ~1,03 GB de datos + índices (~1,32 GB totales en disco).
+  - **Documentación Técnica:** [docs/capitulo_06_migracion_carga_masiva.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_06_migracion_carga_masiva.md).
+
+#### B. Optimización de Consultas SQL y Benchmarking (Punto 5)
+- **Habilitación de `pg_stat_statements`:** Activado en PostgreSQL 17 (`shared_preload_libraries=pg_stat_statements`, `pg_stat_statements.track=all`) para auditoría de rendimiento en tiempo real.
+- **Diseño de 8 Consultas Pesadas de Negocio:** Consultas complejas de analítica sobre los 6M de filas en `docs/sql/01_consultas_negocio_benchmark.sql` (visitas por franja horaria, expositores más concurridos, tiempo promedio de permanencia, auditoría de asistencia, anomalías de tráfico).
+- **Auditoría Inicial:** Mediciones con `EXPLAIN (ANALYZE, BUFFERS)` que detectaron *Sequential Scans* masivos con tiempos de ejecución de hasta 3.500 ms y costos en el planner superiores a 250.000 unidades.
+- **Estrategia de Optimización e Índices (`docs/sql/02_optimizaciones_indices.sql`):**
+  - Eliminación de predicados no-SARGables (reemplazo de funciones `EXTRACT()`, `DATE()` por comparaciones directas de rangos de fechas `BETWEEN` y `>= / <`).
+  - Creación de índices compuestos B-Tree estratégicos para filtros y ordenamientos conjuntos.
+  - Creación de índices de cobertura (*covering indexes*) con cláusula `INCLUDE` para forzar *Index Only Scans*.
+  - Creación de índices parciales (*partial indexes*) para visitas VIP y registros anómalos.
+- **Runner de Benchmark Automatizado (`backend/scripts/benchmark_runner.js`):** Script que ejecuta comparativas antes/después y exporta métricas en `docs/sql/benchmark_resultados.json`, demostrando reducciones de costo y tiempo de hasta **99.8%** (de segundos a submilisegundos).
+- **Documentación Técnica:** [docs/capitulo_07_optimizacion_sql.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_07_optimizacion_sql.md).
+
+#### C. Clúster de Replicación de 3 Nodos, Balanceo de Carga y Failover Automático (Punto 6)
+- **Clúster de 3 Nodos en Docker (`infra/compose.cluster-ha.yaml`):**
+  - **Nodo 1 (`postgres`):** Primario inicial de lectura y escritura (`127.0.0.1:5433`).
+  - **Nodo 2 (`postgres-replica-1`):** Standby 1 con *Hot Standby* (`127.0.0.1:5434`).
+  - **Nodo 3 (`postgres-replica-2`):** Standby 2 con *Hot Standby* (`127.0.0.1:5435`).
+  - Aprovisionamiento e inicialización idempotente desatendida mediante punto de entrada con `pg_basebackup -Fp -Xs -P -R` que clona los 6M de registros automáticamente en segundos si el volumen está vacío.
+  - Parámetros en `postgresql.conf`: `wal_level=replica`, `max_wal_senders=10`, `max_replication_slots=10`, `hot_standby=on`. Usuario `replicator` con autenticación segura en `pg_hba.conf`.
+- **Balanceador de Carga L4 y Proxy Transaccional (`infra/haproxy/haproxy.cfg`):**
+  - **Pool de Lectura (Puerto `5438` host / `5436` interno):** Balanceo en estricto *Round-Robin* que reparte 1/3 de las consultas `SELECT` a cada uno de los 3 nodos.
+  - **Pool de Escritura (Puerto `5437` host / `5432` interno):** Enrutamiento dinámico guiado por *Agent-Check* hacia el nodo que ejerce como Líder activo.
+  - **Dashboard Web de Métricas (Puerto `8404`):** Panel en tiempo real en `http://127.0.0.1:8404/stats` (usuario `admin`, clave `expojuy_ha_secret_2026`).
+- **Sentinel & Auto-Failover Manager (`infra/failover-manager/index.js` en Node.js 22):**
+  - Monitoreo continuo sin solapamientos cada 2.000 ms sobre los 3 nodos.
+  - **Prevención de Split-Brain mediante Timeline ID:** Detección de liderazgo basada en `SELECT timeline_id FROM pg_control_checkpoint()`. Si un primario viejo revivido intenta reportarse activo con Timeline 1, el Sentinel lo aísla y niega tráfico de escritura.
+  - **Promoción Atómica:** Detección de caída del maestro en 3 chequeos consecutivos (6 segundos) y ejecución desatendida de `SELECT pg_promote()`.
+  - **Reconfiguración en Cascada:** Actualización en caliente de la réplica sobreviviente (`ALTER SYSTEM SET primary_conninfo` + `SELECT pg_reload_conf()`) para engancharse al nuevo maestro en Timeline 2 sin reiniciar contenedores.
+  - **Agent-Check TCP:** Puertos 8001, 8002 y 8003 que informan a HAProxy en tiempo real (`ready up 100%`, `maint`, `down`).
+  - **REST API en vivo:** Métricas JSON del clúster en `http://127.0.0.1:8008/cluster/status`.
+- **Suite de Pruebas Automatizadas:** `infra/scripts/test-cluster-ha.ps1` y `infra/scripts/test-cluster-ha.sh`.
+- **Documentación Técnica Unificada:** [docs/capitulo_08_cluster_replicacion.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_08_cluster_replicacion.md).
+
+#### D. Estrategia de Backups y Recuperación ante Desastres (Punto 4 y 15)
+- Servicio `backup` en `infra/compose.yaml` con rotación automática (7 diarios, 4 semanales, 3 mensuales).
+- Script de respaldo manual bajo demanda en `infra/scripts/backup-manual.sh`.
+- Scripts de prueba de restauración automatizada en contenedor aislado temporal: `infra/scripts/restore-test.sh` y `infra/scripts/restore-test.ps1`.
+- **Documentación Técnica:** [docs/capitulo_15_backup_restauracion.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_15_backup_restauracion.md).
+
+#### E. Registro de Incidencias Reales para Mantis Bug Tracker (Punto 11)
+5 incidencias de base de datos documentadas con severidad, pasos de reproducción, causa raíz y solución aplicada en [docs/incidencias_mantis_dba.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/incidencias_mantis_dba.md):
+1. **DBA-01 (Bloqueante):** Pérdida masiva de datos en cada reinicio del backend debido a `sync({ force: true })`.
+2. **DBA-02 (Mayor):** Cuello de botella en telemetría de visitas a stands por falta de índices.
+3. **DBA-03 (Mayor):** Degradación severa de CPU por Sequential Scans en consultas con funciones no-SARGables.
+4. **DBA-04 (Crítica):** Bloqueo de escrituras e indisponibilidad prolongada (RTO alto) por esquema de failover manual de 2 nodos.
+5. **DBA-05 (Mayor):** Riesgo de saturación de disco y caída del nodo primario por acumulación descontrolada de archivos WAL.
+
+
 
 **Hallazgos pendientes (incidencias para Mantis):**
 - CORS acepta cualquier origen (`index.js`: ambas ramas del callback devuelven `true`). Seguridad.

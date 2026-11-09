@@ -1,5 +1,9 @@
 jest.mock('../config/database', () => ({
-    define: jest.fn(),
+    define: jest.fn().mockReturnValue({
+        belongsTo: jest.fn(),
+        hasMany: jest.fn(),
+        hasOne: jest.fn()
+    }),
     transaction: jest.fn().mockImplementation(() => Promise.resolve({
         commit: jest.fn().mockResolvedValue(),
         rollback: jest.fn().mockResolvedValue()
@@ -9,18 +13,28 @@ jest.mock('../src/models/ubicacionStand.model', () => ({
     findAll: jest.fn(),
     findOne: jest.fn(),
     create: jest.fn(),
-    findOrCreate: jest.fn().mockResolvedValue([{ update: jest.fn() }])
+    findOrCreate: jest.fn().mockResolvedValue([{ update: jest.fn() }]),
+    belongsTo: jest.fn(),
+    hasOne: jest.fn(),
+    associations: {}
 }));
 jest.mock('../src/models/stand.model', () => ({
     findAll: jest.fn(),
     findByPk: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
-    destroy: jest.fn()
+    destroy: jest.fn(),
+    hasOne: jest.fn(),
+    belongsTo: jest.fn(),
+    hasMany: jest.fn(),
+    associations: {}
 }));
 jest.mock('../src/models/expositor.model', () => ({
     findByPk: jest.fn(),
-    findAll: jest.fn()
+    findAll: jest.fn(),
+    belongsTo: jest.fn(),
+    hasMany: jest.fn(),
+    associations: {}
 }));
 
 const Stand = require('../src/models/stand.model');

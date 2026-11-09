@@ -1,0 +1,12 @@
+{
+  "name": "expojuy-failover-manager",
+  "version": "1.0.0",
+  "description": "PostgreSQL 3-Node HA Cluster Sentinel and Auto-Failover Manager",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

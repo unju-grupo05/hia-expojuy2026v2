@@ -7,5 +7,7 @@ const router = Router();
 router.post('/query', chatbotLimiter, chatbotCtrl.consultar);
 router.get('/search', chatbotLimiter, chatbotCtrl.buscar);
 router.get('/sugerencias', chatbotCtrl.sugerencias);
+router.patch('/logs/:id/feedback', chatbotCtrl.registrarFeedback);
+router.get('/analitica', chatbotCtrl.obtenerAnalitica);
 
 module.exports = router;
