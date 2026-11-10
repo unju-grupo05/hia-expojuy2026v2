@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: "npm"
 
       # *****Testing Backend*****
       - name: Instalar dependencias Backend
@@ -73,7 +72,7 @@ jobs:
             echo "TAG=dev" >> $GITHUB_OUTPUT
           fi
 
-      #  *****Construcción y Publicación de Imágenes Docker (BACKEND)*****
+      # *****Construcción y Publicación de Imágenes Docker (BACKEND)*****
       - name: Build & Push Backend
         uses: docker/build-push-action@v5
         with:
@@ -84,7 +83,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ steps.vars.outputs.TAG }}
             ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ github.sha }}
 
-      #  *****Construcción y Publicación de Imágenes Docker (FRONTEND)*****
+      # *****Construcción y Publicación de Imágenes Docker (FRONTEND)*****
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
         with:
