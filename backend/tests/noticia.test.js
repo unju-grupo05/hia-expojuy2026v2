@@ -1,3 +1,5 @@
+jest.mock('../config/database', () => require('./helpers/db-mock'));
+
 const request = require('supertest');
 const app = require('../index.js');
 
