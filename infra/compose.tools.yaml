@@ -1,0 +1,69 @@
+name: expojuy
+
+services:
+  tools-db:
+    image: mariadb:10.11.10
+    container_name: expojuy-tools-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      MYSQL_ROOT_PASSWORD: ${TOOLS_DB_ROOT_PASSWORD}
+    volumes:
+      - tools_db_data:/var/lib/mysql
+      - ./scripts/sql/init-tools-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tools
+
+  mantis:
+    image: xlrl/mantisbt:2.28.4
+    container_name: expojuy-mantis
+    restart: unless-stopped
+    environment:
+      MANTIS_ENABLE_ADMIN: 1
+    ports:
+      - "127.0.0.1:${MANTIS_PORT:-8082}:80"
+    volumes:
+      - mantis_data:/var/www/html
+    depends_on:
+      tools-db:
+        condition: service_healthy
+    networks:
+      - tools
+      - app
+
+  nextcloud:
+    image: nextcloud:30.0.2-apache
+    container_name: expojuy-nextcloud
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${NEXTCLOUD_PORT:-8083}:80"
+    environment:
+      MYSQL_HOST: tools-db
+      MYSQL_DATABASE: nextcloud_db
+      MYSQL_USER: nc_user
+      MYSQL_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
+      NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_ADMIN_USER}
+      NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: localhost 127.0.0.1
+    volumes:
+      - nextcloud_data:/var/www/html
+    depends_on:
+      tools-db:
+        condition: service_healthy
+    networks:
+      - tools
+      - app
+
+volumes:
+  tools_db_data:
+  mantis_data:
+  nextcloud_data:
+
+networks:
+  tools:
+  app:
