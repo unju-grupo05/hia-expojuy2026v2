@@ -11,91 +11,66 @@ Web de la ExpoJuy 2026 y su infraestructura completa, desarrollada como Práctic
 
 ## Levantar el entorno
 
-Requisito: [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
+Requisitos previos: [Docker Desktop](https://www.docker.com/products/docker-desktop/) y Git.
+### 1. Preparar el entorno
 ```bash
-cd infra
-cp .env.example .env    # completar contraseñas; JWT_SECRET de al menos 32 caracteres
+git clone https://github.com/Ignacio367/hia-expojuy2026v2.git
+cd hia-expojuy2026v2/infra
+cp .env.example .env    # Configurar contraseñas locales (mínimo JWT_SECRET de 32 chars)
+```
+### 2. Modos de ejecución con Docker Compose
+Puedes levantar el entorno según el área que necesites evaluar:
+#### A. Entorno Núcleo de Aplicación (Desarrollo Web y API)
+Levanta Angular 21, API Node.js, PostgreSQL 17 base y pgAdmin:
+```bash
 docker compose up -d --build
 ```
-
-| Servicio | URL |
-|---|---|
-| Web | http://localhost:8080 |
-| API (salud) | http://localhost:8080/api/health |
-| Panel de administración | http://localhost:8080/admin/login (credenciales: `ADMIN_INITIAL_*` del `.env`) |
-| pgAdmin | http://localhost:5050 (servidor: host `postgres`, puerto `5432`) |
-| PostgreSQL desde la PC | `localhost:5433` |
-
-## Carga Masiva de Datos y Pruebas de Rendimiento (Puntos 4, 5 y 6 — DBA)
-
-Para replicar el entorno completo del Senior DBA con el dataset masivo de telemetría (6M de filas), optimizaciones SQL y clúster HA de 3 nodos:
-
-### 1. Cargar el Dataset Masivo de 6.000.000 de Registros (Punto 4)
-El repositorio incluye un script SQL optimizado con `generate_series()` que puebla la tabla `visitas_stands` en 1 a 2 minutos (~1,3 GB en disco):
-
-- **En PowerShell (Windows):**
-  ```powershell
-  cd infra
-  Get-Content ..\backend\src\seeders\dataset_6m_visitas.sql | docker compose exec -T postgres psql -U expojuy_app -d expojuy
-  ```
-- **En Bash (Linux / macOS):**
-  ```bash
-  cd infra
-  docker compose exec -T postgres psql -U expojuy_app -d expojuy < ../backend/src/seeders/dataset_6m_visitas.sql
-  ```
-
-*Verificar que se cargaron los 6 millones:*
+#### B. Entorno con Clúster HA de Alta Disponibilidad (3 Nodos + HAProxy + Sentinel)
+Levanta la arquitectura de resiliencia con replicación física y failover automático:
 ```bash
-docker compose exec -T postgres psql -U expojuy_app -d expojuy -c "SELECT count(*) FROM visitas_stands;"
+docker compose -f compose.yaml -f compose.cluster-ha.yaml up -d
 ```
 
-### 2. Aplicar Índices y Optimizaciones SQL (Punto 5)
-Aplica los índices B-Tree compuestos, de cobertura (`INCLUDE`), parciales y funcionales sobre el dataset:
-
-- **En PowerShell:**
-  ```powershell
-  Get-Content ..\docs\sql\02_optimizaciones_indices.sql | docker compose exec -T postgres psql -U expojuy_app -d expojuy
-  ```
-- **En Bash:**
-  ```bash
-  docker compose exec -T postgres psql -U expojuy_app -d expojuy < ../docs/sql/02_optimizaciones_indices.sql
-  ```
-
-### 3. Ejecutar el Benchmark Automatizado de Consultas SQL (Punto 5)
-Ejecuta la suite de 8 consultas pesadas de negocio comparando *Baseline* vs *Optimizado* con `EXPLAIN (ANALYZE, BUFFERS)`:
+#### C. Entorno de Soporte y Gestión (MantisBT + Nextcloud)
+Levanta las herramientas de soporte junto con su base de datos aislada MariaDB:
 ```bash
-cd backend
-npm install
-node scripts/benchmark_runner.js
+docker compose -f compose.yaml -f compose.tools.yaml up -d
 ```
-*(Los resultados y métricas de ganancia se exportan automáticamente en `docs/sql/benchmark_resultados.json`).*
+*(Las bases de datos y usuarios de Mantis y Nextcloud se crean automáticamente al iniciar gracias a `init-tools-db.sql`).*
 
-### 4. Levantar y Probar el Clúster HA de 3 Nodos y Auto-Failover (Punto 6)
-Para probar la alta disponibilidad con 3 nodos PostgreSQL (Primary + 2 Standbys), balanceo HAProxy y Sentinel Failover Manager:
+---
+##  Tabla de Servicios y Accesos Locales
+| Servicio | URL Local | Descripción | Credenciales por Defecto |
+|---|---|---|---|
+| **Frontend Web** | http://localhost:8080 | Portal público ExpoJuy 2026 | Libre |
+| **Backend API** | http://localhost:8080/api/health | Chequeo de salud del backend | — |
+| **Panel Admin Web** | http://localhost:8080/admin/login | Administración de stands y agenda | Ver `ADMIN_INITIAL_*` en `.env` |
+| **pgAdmin 4** | http://localhost:5050 | Interfaz web PostgreSQL | Ver `PGADMIN_*` en `.env` |
+| **PostgreSQL Host** | `localhost:5433` | Puerto directo para herramientas externas (DBeaver, psql) | Usuario en `POSTGRES_USER` |
+| **HAProxy Dashboard** | http://localhost:8404/stats | Métricas en tiempo real del Clúster HA | `admin` / `expojuy_ha_secret_2026` |
+| **Sentinel Status** | http://localhost:8008/cluster/status | API JSON del estado de réplicas y líder | — |
+| **Mantis Bug Tracker** | http://localhost:8082 | Gestión y seguimiento de incidencias | Asistente inicial / `mantis_user` |
+| **Nextcloud** | http://localhost:8083 | Repositorio documental y evidencias | Ver `NEXTCLOUD_ADMIN_*` en `.env` |
+---
 
-1. **Asegurar variables en `infra/.env`:** Copiar las variables de clúster desde `infra/.env.example` (`POSTGRES_REPLICA_1_PORT`, `HA_PROXY_*`, etc.).
-2. **Levantar el clúster HA:**
-   ```bash
-   cd infra
-   docker compose -f compose.yaml -f compose.cluster-ha.yaml up -d
-   ```
-3. **Ejecutar la suite automatizada de pruebas de failover:**
-   - En Windows (PowerShell):
-     ```powershell
-     cd infra
-     .\scripts\test-cluster-ha.ps1
-     ```
-   - En Linux / macOS:
-     ```bash
-     cd infra
-     ./scripts/test-cluster-ha.sh
-     ```
-4. **Interfaces de monitoreo del clúster:**
-   - Panel web de HAProxy: [http://localhost:8404/stats](http://localhost:8404/stats) (usuario `admin`, clave `expojuy_ha_secret_2026`).
-   - Estado JSON del Sentinel: [http://localhost:8008/cluster/status](http://localhost:8008/cluster/status).
-   - Puerto de escrituras balanceado (Líder activo): `localhost:5437`.
-   - Puerto de lecturas balanceado (Round-Robin entre 3 nodos): `localhost:5438`.
+## 📊 Dataset Masivo, Benchmark y Pruebas DBA (Puntos 4, 5 y 6)
+
+Para reproducir las pruebas del Senior DBA sobre el dataset de **6.000.000 de registros**, optimizaciones de consultas con `EXPLAIN ANALYZE` y simulación de caídas del clúster:
+
+> 📖 **Guía Completa de Datos y Benchmarks:** Consulta el documento técnico consolidado en **[docs/IMPLEMENTACION_ACTUAL.md](docs/IMPLEMENTACION_ACTUAL.md)** para el detalle paso a paso:
+> - [Carga masiva de 6M de visitas en telemetría](docs/IMPLEMENTACION_ACTUAL.md#2-telemetría-y-carga-masiva-capítulo-6)
+> - [Ejecución del benchmark automatizado de 8 consultas SQL](docs/IMPLEMENTACION_ACTUAL.md#3-medición-y-optimización-sql-capítulo-7)
+> - [Verificación y pruebas de failover automático del Clúster HA](docs/IMPLEMENTACION_ACTUAL.md#4-replicación-física-y-alta-disponibilidad-capítulo-8)
+> - [Pruebas de restauración y verificación de backups](docs/IMPLEMENTACION_ACTUAL.md#5-backup-restauración-y-verificación-capítulo-15)
+
+---
+
+## 📚 Mapa de Documentación del Proyecto
+
+* 🏛️ **Arquitectura, Roles y Reglas de Desarrollo:** [docs/CONTEXTO_PROYECTO.md](docs/CONTEXTO_PROYECTO.md)
+* 🗄️ **Base de Datos, Optimización y Clúster:** [docs/IMPLEMENTACION_ACTUAL.md](docs/IMPLEMENTACION_ACTUAL.md)
+* 📈 **Consultas SQL de Benchmark y Resultados:** [docs/sql/](docs/sql/)
+* 📋 **Plan General y Consigna del Trabajo Práctico:** [docs/PLAN_TRABAJO_INTEGRADOR_EXPOJUY_2026.md](docs/PLAN_TRABAJO_INTEGRADOR_EXPOJUY_2026.md)
 
 ## Cómo contribuir
 
