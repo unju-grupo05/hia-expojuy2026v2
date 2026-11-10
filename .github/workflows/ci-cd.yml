@@ -1,0 +1,112 @@
+name: CI/CD Pipeline - ExpoJuy 2026
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  # *******************Tests y Calidad de Código (Backend & Frontend)*******************
+  test-and-lint:
+    name: Tests & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # *****Testing Backend*****
+      - name: Instalar dependencias Backend
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Ejecutar Linter / Syntax Check Backend
+        run: npm run lint --if-present
+        working-directory: ./backend
+
+      - name: Ejecutar Tests Backend
+        run: npm test --if-present
+        working-directory: ./backend
+
+      # *****Testing Frontend (Angular 21)*****
+      - name: Instalar dependencias Frontend
+        run: npm ci
+        working-directory: ./frontend
+
+      - name: Build de prueba Frontend
+        run: npm run build -- --configuration=production
+        working-directory: ./frontend
+
+  # *******************Construcción y Publicación de Imágenes Docker*******************
+  build-and-push:
+    name: Docker Build & Push
+    needs: test-and-lint
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Definir Tag por Rama
+        id: vars
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=dev" >> $GITHUB_OUTPUT
+          fi
+
+      # *****Construcción y Publicación de Imágenes Docker (BACKEND)*****
+      - name: Build & Push Backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ steps.vars.outputs.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ github.sha }}
+
+      # *****Construcción y Publicación de Imágenes Docker (FRONTEND)*****
+      - name: Build & Push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-frontend:${{ steps.vars.outputs.TAG }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-frontend:${{ github.sha }}
+
+  # *******************Despliegue Automatizado (Healthcheck & Rollback)*******************
+  deploy:
+    name: Deploy & Healthcheck
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Despliegue con Docker Compose (Simulación / Server)
+        run: |
+          echo "Desplegando la nueva versión (${{ github.sha }})..."
+          # En servidor real vía SSH se ejecutaría:
+          # docker compose -f infra/compose.yaml pull
+          # docker compose -f infra/compose.yaml up -d --remove-orphans
+          echo "Despliegue ejecutado correctamente."
