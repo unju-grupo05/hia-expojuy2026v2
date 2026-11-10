@@ -57,8 +57,7 @@
       "<rootDir>/node_modules/"
     ],
     "collectCoverageFrom": [
-      "src/services/email.service.js",
-      "src/controllers/**/*.js",
+      "src/**/*.js",
       "!src/seeders/**",
       "!src/migrations/**"
     ]
