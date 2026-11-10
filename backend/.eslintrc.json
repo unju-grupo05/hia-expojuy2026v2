@@ -1,0 +1,18 @@
+//Esta carpeta crea un archiob llamado igual que esta con el contenido basico para que ESLint pueda validar el codigo sin bloquearse
+
+{
+  "env": {
+    "node": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "commonjs"
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off"
+  }
+}

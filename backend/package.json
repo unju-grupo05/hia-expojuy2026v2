@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "lint": "eslint .",
     "dev": "nodemon index.js",
     "swagger": "node swagger.js",
     "migrate:chatbot-search": "node src/migrations/run-migration-chatbot-search.js",
@@ -38,6 +39,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "eslint": "^8.57.0",
     "jest": "^30.5.2",
     "nodemon": "^3.1.14",
     "supertest": "^7.3.2"
@@ -55,7 +57,9 @@
       "<rootDir>/node_modules/"
     ],
     "collectCoverageFrom": [
-      "src/**/*.js"
+      "src/**/*.js",
+      "!src/seeders/**",
+      "!src/migrations/**"
     ]
   }
 }

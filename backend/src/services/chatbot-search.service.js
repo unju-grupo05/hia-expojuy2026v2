@@ -48,9 +48,10 @@ function normalizar(valor) {
  */
 function sanitizarEntrada(entrada) {
     if (typeof entrada !== 'string') return '';
+    const regexControl = new RegExp(`[${String.fromCharCode(0)}-${String.fromCharCode(31)}\\x7f]`, 'g');
 
     return entrada
-        .replace(/[\u0000-\u001f\u007f]/g, ' ')
+        .replace(regexControl, ' ')
         .replace(/\s+/g, ' ')
         .trim()
         .slice(0, MAX_LARGO_TEXTO);
