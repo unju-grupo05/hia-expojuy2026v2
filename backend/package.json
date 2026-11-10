@@ -7,7 +7,7 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "jest --detectOpenHandles --forceExit",
     "dev": "nodemon index.js",
     "swagger": "node swagger.js",
     "migrate:chatbot-search": "node src/migrations/run-migration-chatbot-search.js",
