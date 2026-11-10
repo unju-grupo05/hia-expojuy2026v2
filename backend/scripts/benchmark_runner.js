@@ -367,8 +367,8 @@ const QUERIES = [
 
 function extraerMetricas(planRows) {
   const fullText = planRows.map(r => r['QUERY PLAN']).join('\n');
-  const tiempoMatch = fullText.match(/Execution Time: ([\d\.]+) ms/);
-  const costoMatch = fullText.match(/cost=[\d\.]+\.\.([\d\.]+)/);
+  const tiempoMatch = fullText.match(/Execution Time: ([\d.]+) ms/);
+  const costoMatch = fullText.match(/cost=[\d.]+\.\.([\d.]+)/);
   const buffersHitMatch = fullText.match(/Buffers:.*hit=(\d+)/);
   const buffersReadMatch = fullText.match(/Buffers:.*read=(\d+)/);
 

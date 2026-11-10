@@ -7,8 +7,6 @@ const { enviarEmailReminder } = require('./email.service.js');
 const formatearFechaExpo = (fecha) => {
     const dia = String(fecha.getDate()).padStart(2, '0');
     const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    // Si guardas los meses en español en la BD (ej. 'Oct'), mapeamos los nombres:
-    const mesesEs = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     
     const mes = meses[fecha.getMonth()]; 
     const anio = fecha.getFullYear();
