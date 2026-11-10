@@ -33,6 +33,14 @@ jobs:
       - name: Ejecutar Tests Backend con Cobertura
         run: npm test -- --coverage --coverageThreshold='{"global":{"branches":50,"functions":50,"lines":50,"statements":50}}'
         working-directory: ./backend
+        env:
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          PORT: 3000
+          TRUST_PROXY: loopback
+          JWT_SECRET: secret_test_jwt_12345
 
       # *****Testing Frontend (Angular 21)*****
       - name: Instalar dependencias Frontend
