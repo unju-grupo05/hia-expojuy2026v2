@@ -27,11 +27,11 @@ jobs:
         working-directory: ./backend
 
       - name: Ejecutar Linter / Syntax Check Backend
-        run: npm run lint --if-present
+        run: npm run lint
         working-directory: ./backend
 
-      - name: Ejecutar Tests Backend
-        run: npm test --if-present
+      - name: Ejecutar Tests Backend con Cobertura
+        run: npm test -- --coverage --coverageThreshold='{"global":{"branches":50,"functions":50,"lines":50,"statements":50}}'
         working-directory: ./backend
 
       # *****Testing Frontend (Angular 21)*****
@@ -71,7 +71,6 @@ jobs:
           else
             echo "TAG=dev" >> $GITHUB_OUTPUT
           fi
-
       # *****Construcción y Publicación de Imágenes Docker (BACKEND)*****
       - name: Build & Push Backend
         uses: docker/build-push-action@v5
@@ -82,7 +81,6 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ steps.vars.outputs.TAG }}
             ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-backend:${{ github.sha }}
-
       # *****Construcción y Publicación de Imágenes Docker (FRONTEND)*****
       - name: Build & Push Frontend
         uses: docker/build-push-action@v5
@@ -106,7 +104,19 @@ jobs:
       - name: Despliegue con Docker Compose (Simulación / Server)
         run: |
           echo "Desplegando la nueva versión (${{ github.sha }})..."
-          # En servidor real vía SSH se ejecutaría:
-          # docker compose -f infra/compose.yaml pull
-          # docker compose -f infra/compose.yaml up -d --remove-orphans
           echo "Despliegue ejecutado correctamente."
+
+      #************************************************************
+      # PLANTILLA DE DESPLIEGUE REAL POR SSH (Descomentar cuando el servidor esté listo)
+      # **********************************
+      # - name: Ejecutar despliegue remoto por SSH
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.SERVER_HOST }}
+      #     username: ${{ secrets.SERVER_USER }}
+      #     key: ${{ secrets.SERVER_SSH_KEY }}
+      #     script: |
+      #       cd /ruta/de/tu/proyecto/en/el/servidor
+      #       git pull origin develop
+      #       docker compose -f infra/compose.yaml pull
+      #       docker compose -f infra/compose.yaml up -d --remove-orphans
