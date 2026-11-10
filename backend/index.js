@@ -74,8 +74,6 @@ app.use('/api/visitas-stands', require('./src/routes/visitaStand.route.js'));
 app.use('/api/resenas-stands', require('./src/routes/resenaStand.route.js'));
 app.use('/api/asistencias-agenda', require('./src/routes/asistenciaAgenda.route.js'));
 
-iniciarCronRecordatorios();
-
 try {
   const swaggerUi = require('swagger-ui-express');
   const swaggerDocument = require('./swagger_output.json');
@@ -86,35 +84,41 @@ try {
 
 const PORT = process.env.PORT || 3000;
 
-// `force` borra y recrea todas las tablas: solo se activa a pedido, nunca por defecto.
-sequelize.sync({ force: process.env.DB_SYNC_FORCE === 'true', alter: process.env.DB_SYNC_ALTER === 'true' })
-  .then(async () => {
-    console.log('Tablas sincronizadas con PostgreSQL.');
+if (process.env.NODE_ENV !== 'test') {
+  iniciarCronRecordatorios();
 
-    try {
-      await ensureB2BSchemaUpdates();
-      await ensureNoticiasSchemaUpdates();
-      // Si `force` recreó las tablas, también borró los índices propios: hay que
-      // recrearlos para que el chatbot no caiga en un sequential scan.
-      await ensureChatbotSearchIndexes();
-    } catch (schemaError) {
-      console.error('Error al actualizar el esquema B2B, Noticias o Chatbot:', schemaError);
-      throw schemaError;
-    }
+  // `force` borra y recrea todas las tablas: solo se activa a pedido, nunca por defecto.
+  sequelize.sync({ force: process.env.DB_SYNC_FORCE === 'true', alter: process.env.DB_SYNC_ALTER === 'true' })
+    .then(async () => {
+      console.log('Tablas sincronizadas con PostgreSQL.');
 
-    try {
-      await seedDatabase();
-      console.log('Base de datos poblada exitosamente.');
-    } catch (seedError) {
-      console.error('Error durante la ejecución del seeder:', seedError);
-    }
+      try {
+        await ensureB2BSchemaUpdates();
+        await ensureNoticiasSchemaUpdates();
+        // Si `force` recreó las tablas, también borró los índices propios: hay que
+        // recrearlos para que el chatbot no caiga en un sequential scan.
+        await ensureChatbotSearchIndexes();
+      } catch (schemaError) {
+        console.error('Error al actualizar el esquema B2B, Noticias o Chatbot:', schemaError);
+        throw schemaError;
+      }
 
-    app.listen(PORT, () => {
-      console.log(`Servidor corriendo en http://localhost:${PORT}`);
+      try {
+        await seedDatabase();
+        console.log('Base de datos poblada exitosamente.');
+      } catch (seedError) {
+        console.error('Error durante la ejecución del seeder:', seedError);
+      }
+
+      app.listen(PORT, () => {
+        console.log(`Servidor corriendo en http://localhost:${PORT}`);
+      });
+    })
+    .catch(err => {
+      console.error('Error al sincronizar con PostgreSQL:', err);
+      // Sin base el servidor no puede atender: terminar para que el orquestador lo reinicie.
+      process.exit(1);
     });
-  })
-  .catch(err => {
-    console.error('Error al sincronizar con PostgreSQL:', err);
-    // Sin base el servidor no puede atender: terminar para que el orquestador lo reinicie.
-    process.exit(1);
-  });
+}
+
+module.exports = app;
