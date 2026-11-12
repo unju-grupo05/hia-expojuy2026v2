@@ -2,12 +2,23 @@ const http = require('http');
 const net = require('net');
 const { Client } = require('pg');
 
+// Las credenciales nunca se embeben en el código: se exigen como variables
+// de entorno (definidas en infra/.env e inyectadas por Compose).
+function requireEnv(name) {
+  const value = process.env[name];
+  if (!value) {
+    console.error(`[HA-SENTINEL] FATAL: la variable de entorno ${name} es obligatoria y no está definida (completarla en infra/.env).`);
+    process.exit(1);
+  }
+  return value;
+}
+
 const CONFIG = {
   db: process.env.POSTGRES_DB || 'expojuy',
   user: process.env.POSTGRES_USER || 'expojuy_app',
-  password: process.env.POSTGRES_PASSWORD || 'G7Fw6Q2JDATv9N8sk0fmMxgia4XjRBIE',
+  password: requireEnv('POSTGRES_PASSWORD'),
   replUser: process.env.POSTGRES_REPLICATION_USER || 'replicator',
-  replPassword: process.env.POSTGRES_REPLICATION_PASSWORD || 'G7Fw6Q2JDATv9N8sk0fmMxgia4XjRBIE',
+  replPassword: requireEnv('POSTGRES_REPLICATION_PASSWORD'),
   checkIntervalMs: parseInt(process.env.CHECK_INTERVAL_MS || '2000', 10),
   failoverThreshold: parseInt(process.env.FAILOVER_THRESHOLD || '3', 10)
 };

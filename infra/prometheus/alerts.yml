@@ -1,0 +1,32 @@
+groups:
+  - name: expojuy_alerts
+    rules:
+      # 1. Alerta por uso elevado de CPU en el Host
+      - alert: HighCpuUsage
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)) > 85
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uso de CPU elevado en {{ $labels.instance }}"
+          description: "El uso de CPU supera el 85% durante más de 10 segundos."
+
+      # 2. Alerta de Caída de Base de Datos (Disponibilidad crítica)
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 5s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Base de datos PostgreSQL caída"
+          description: "El exportador no logra conectarse con la instancia de PostgreSQL."
+
+      # 3. Alerta por exceso de conexiones en PostgreSQL
+      - alert: PostgresHighConnections
+        expr: pg_stat_activity_count > 80
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alto número de conexiones activas en PostgreSQL"
+          description: "PostgreSQL registra más de 80 conexiones activas simultáneas."
