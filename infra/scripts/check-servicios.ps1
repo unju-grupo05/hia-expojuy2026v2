@@ -107,8 +107,9 @@ if ($modoActivo['B - Cluster HA']) {
     $checks.Add(@('HAProxy /stats', "http://127.0.0.1:$(Get-EnvValue 'HA_PROXY_STATS_PORT' '8404')/stats", '401', $false))
 }
 if ($modoActivo['C - Herramientas']) {
-    $checks.Add(@('Mantis', "http://127.0.0.1:$(Get-EnvValue 'MANTIS_PORT' '8082')/", '200|302', $false))
-    $checks.Add(@('Nextcloud', "http://127.0.0.1:$(Get-EnvValue 'NEXTCLOUD_PORT' '8083')/", '200|302', $false))
+    # 2xx o 3xx: segun su estado redirigen al login o al instalador (Mantis recien creado responde 307).
+    $checks.Add(@('Mantis', "http://127.0.0.1:$(Get-EnvValue 'MANTIS_PORT' '8082')/", '2\d\d|3\d\d', $false))
+    $checks.Add(@('Nextcloud', "http://127.0.0.1:$(Get-EnvValue 'NEXTCLOUD_PORT' '8083')/", '2\d\d|3\d\d', $false))
 }
 if ($modoActivo['D - Monitoreo']) {
     $checks.Add(@('Prometheus', 'http://127.0.0.1:9090/-/healthy', '200', $false))
