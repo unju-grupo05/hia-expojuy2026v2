@@ -170,3 +170,48 @@ Para reproducir las pruebas del Senior DBA sobre el dataset de **6.000.000 de re
 4. Nunca subir `.env`, contraseñas, tokens ni dumps de la base.
 
 Contexto completo, decisiones y reglas para agregar servicios: [`docs/CONTEXTO_PROYECTO.md`](docs/CONTEXTO_PROYECTO.md).
+
+---
+
+## Reiniciar todo desde cero
+
+⚠️ Borra **todos** los datos: base, réplicas, pgAdmin, Mantis, Nextcloud, Prometheus y Grafana. Comandos para PowerShell, desde `infra/`.
+
+**1. Bajar todo.** Un `docker compose down -v` sin los `-f` solo borra el modo A; el resto queda vivo con sus volúmenes.
+```powershell
+docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml -f compose.monitoring.yaml down -v --rmi local
+```
+`--rmi local` borra también las imágenes construidas localmente (backend, frontend, Sentinel); es opcional.
+
+**2. Comprobar que no quedó nada** (los tres sin filas):
+```powershell
+docker ps -a --filter name=expojuy
+docker volume ls --filter name=expojuy
+docker network ls --filter name=expojuy
+```
+
+**3. Levantar de nuevo, en este orden:**
+```powershell
+# A. Base
+docker compose up -d --build
+curl.exe -i http://localhost:8080/api/health
+
+# Requisito de B: la base es nueva, hay que volver a crear el rol replicator
+& 'C:\Program Files\Git\bin\bash.exe' -c 'export MSYS_NO_PATHCONV=1; set -a; source .env; set +a; bash scripts/setup-replication-primary.sh'
+
+# B. Clúster HA (si las réplicas dan "unhealthy" la primera vez, repetir este comando)
+docker compose -f compose.yaml -f compose.cluster-ha.yaml up -d
+
+# C. Herramientas (después hay que completar el instalador de Mantis)
+docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml up -d
+
+# D. Monitoreo (opcional)
+docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml -f compose.monitoring.yaml up -d
+```
+
+**4. Chequear:**
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check-servicios.ps1
+```
+
+No se tocan: `infra/.env`, los backups de `infra/backups/` (carpeta del host), las imágenes descargadas ni la configuración de Tailscale Funnel.
