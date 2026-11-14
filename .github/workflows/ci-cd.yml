@@ -101,30 +101,18 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/expojuy-frontend:${{ github.sha }}
 
   # *******************Despliegue Automatizado (Healthcheck & Rollback)*******************
-  deploy:
-    name: Deploy & Healthcheck
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout del código
-        uses: actions/checkout@v4
-
-      - name: Despliegue con Docker Compose (Simulación / Server)
-        run: |
-          echo "Desplegando la nueva versión (${{ github.sha }})..."
-          echo "Despliegue ejecutado correctamente."
-
-      #************************************************************
-      # PLANTILLA DE DESPLIEGUE REAL POR SSH (Descomentar cuando el servidor esté listo)
-      # **********************************
-      # - name: Ejecutar despliegue remoto por SSH
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.SERVER_HOST }}
-      #     username: ${{ secrets.SERVER_USER }}
-      #     key: ${{ secrets.SERVER_SSH_KEY }}
-      #     script: |
-      #       cd /ruta/de/tu/proyecto/en/el/servidor
-      #       git pull origin develop
-      #       docker compose -f infra/compose.yaml pull
-      #       docker compose -f infra/compose.yaml up -d --remove-orphans
+  # deploy:
+  #  name: Deploy & Healthcheck
+  # needs: build-and-push
+  #runs-on: ubuntu-latest
+  #steps:
+  # - name: Ejecutar despliegue remoto por SSH con rollback automático
+  #  uses: appleboy/ssh-action@master
+  # with:
+  #  host: ${{ secrets.SERVER_HOST }}
+  # username: ${{ secrets.SERVER_USER }}
+  #key: ${{ secrets.SERVER_SSH_KEY }}
+  #script: |
+  #        cd /ruta/de/tu/proyecto/en/el/servidor
+  #        git pull origin ${{ github.ref_name }}
+  #         ./infra/scripts/deploy-rollback.sh deploy ${{ steps.vars.outputs.TAG }}
