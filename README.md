@@ -115,6 +115,17 @@ docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml 
 ```
 Después de un `down -v` hay que volver a crear el rol `replicator` (requisito del modo B).
 
+#### Chequeo rápido de servicios
+Script de solo lectura que dice qué modos (A, B, C, D) están levantados, qué servicios faltan o fallan y si hay errores críticos:
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check-servicios.ps1
+```
+| Resultado | Significado | Código de salida |
+|---|---|---|
+| `todo OK` | Los modos levantados están completos y responden | `0` |
+| `OK con avisos` | Funciona, pero hay algo a revisar (servicio arrancando, frontend en `0.0.0.0`, backend fuera del clúster) | `1` |
+| `ERRORES CRITICOS` | Un servicio caído, `unhealthy` o en reinicio, la API sin responder o un puerto fuera de `127.0.0.1` | `2` |
+
 ---
 ##  Tabla de Servicios y Accesos Locales
 | Servicio | URL Local | Descripción | Credenciales por Defecto |
