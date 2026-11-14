@@ -8,9 +8,12 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     environment:
       MYSQL_ROOT_PASSWORD: ${TOOLS_DB_ROOT_PASSWORD}
+      # Las usa init-tools-db.sh para crear los usuarios con las mismas claves que leen Mantis y Nextcloud.
+      MANTIS_DB_PASSWORD: ${MANTIS_DB_PASSWORD}
+      NEXTCLOUD_DB_PASSWORD: ${NEXTCLOUD_DB_PASSWORD}
     volumes:
       - tools_db_data:/var/lib/mysql
-      - ./scripts/sql/init-tools-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./scripts/sql/init-tools-db.sh:/docker-entrypoint-initdb.d/init-tools-db.sh:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
