@@ -2,7 +2,7 @@ name: expojuy
 
 services:
   tools-db:
-    image: mariadb:10.11.10
+    image: mariadb:11.8.9
     container_name: expojuy-tools-db
     restart: unless-stopped
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
@@ -40,7 +40,7 @@ services:
       - app
 
   nextcloud:
-    image: nextcloud:30.0.2-apache
+    image: nextcloud:35.0.2-apache
     container_name: expojuy-nextcloud
     restart: unless-stopped
     ports:
