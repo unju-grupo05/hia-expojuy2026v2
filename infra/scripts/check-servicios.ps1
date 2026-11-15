@@ -55,7 +55,7 @@ $modos = [ordered]@{
     'A - Base'         = @('postgres', 'backend', 'frontend', 'pgadmin', 'backup')
     'B - Cluster HA'   = @('postgres-replica-1', 'postgres-replica-2', 'db-failover-manager', 'db-loadbalancer')
     'C - Herramientas' = @('tools-db', 'mantis', 'nextcloud')
-    'D - Monitoreo'    = @('prometheus', 'grafana', 'node-exporter', 'cadvisor', 'postgres-exporter')
+    'D - Monitoreo'    = @('prometheus', 'grafana', 'node-exporter', 'cadvisor', 'postgres-exporter-primary', 'postgres-exporter-replica-1', 'postgres-exporter-replica-2')
 }
 
 Write-Host "`n=== Modos ===" -ForegroundColor Cyan
