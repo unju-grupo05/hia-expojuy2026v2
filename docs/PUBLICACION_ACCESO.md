@@ -110,8 +110,10 @@ Ajustes que necesitan las aplicaciones para responder con la nueva dirección:
 
 | Aplicación | Ajuste |
 |---|---|
-| Nextcloud | Agregar `<maquina>.<tailnet>.ts.net` a `trusted_domains` y `overwriteprotocol=https` (`occ config:system:set`) |
-| Mantis | `$g_path` en `config/config_inc.php` está fijo en `http://127.0.0.1:8082/`: cambiarlo a la URL de Serve |
+| Nextcloud | Agregar el dominio `.ts.net` a `trusted_domains` y el gateway de Docker a `trusted_proxies` |
+| Mantis | `$g_path` en `config/config_inc.php` fijo en `http://127.0.0.1:8082/`: cambiarlo a la URL de Serve |
+
+Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 
 ### 5.4 Quién puede acceder
 - **Equipo:** invitación a la tailnet (consola de Tailscale → *Users* → *Invite*).
@@ -158,8 +160,9 @@ Ajustes que necesitan las aplicaciones para responder con la nueva dirección:
 |---|---|
 | Funnel `/` → `127.0.0.1:8080` | Verificado (13 al 15/11/2026) |
 | `PUBLIC_URL` con https | Pendiente |
-| Serve para las herramientas | Pendiente de configurar y probar |
-| Ajustes de Nextcloud y Mantis | Pendiente |
+| Serve para las 6 herramientas ("tailnet only") | Verificado 15/11/2026 desde la notebook |
+| Ajustes de Nextcloud y Mantis | Verificado 15/11/2026 |
+| Acceso desde otro dispositivo de la tailnet y rechazo desde fuera | Pendiente |
 | Frontend en `127.0.0.1` | Pendiente |
 | Panel de disponibilidad | Pendiente |
 | Evidencia de acceso externo | Pendiente |
