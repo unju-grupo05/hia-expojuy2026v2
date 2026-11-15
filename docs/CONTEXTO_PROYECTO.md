@@ -203,7 +203,7 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
   - Suite de tests unitarios y de integración en `backend/tests/telemetria.controller.test.js` y actualización de `backend/tests/stand.controller.test.js`.
 - **Pipeline de Generación y Carga Masiva (6.000.000 de registros):**
   - Script SQL de alta velocidad con `generate_series()` en `backend/src/seeders/dataset_6m_visitas.sql`.
-  - Generador sintético en Node.js por lotes transaccionales (*batch insert*) con control de memoria en `backend/src/seeders/seed-masivo-visitas.js`.
+  - Seeder Node en `backend/src/seeders/seed-masivo-visitas.js`: misma inserción con `generate_series()` más los datos auxiliares (reseñas, asistencias, logs del chatbot, historial de accesos). Es la forma recomendada de carga (`IMPLEMENTACION_ACTUAL.md` §2.2).
   - Sincronización controlada sin borrado destructivo en `backend/src/seeders/run-initial-sync.js`.
   - **Tiempos y tamaños medidos:** ver `IMPLEMENTACION_ACTUAL.md` §2.3.
   - **Documentación Técnica:** [IMPLEMENTACION_ACTUAL.md §2](IMPLEMENTACION_ACTUAL.md#2-telemetría-y-carga-masiva-capítulo-6).
