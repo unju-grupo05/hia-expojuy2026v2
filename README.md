@@ -90,7 +90,7 @@ docker compose -f compose.yaml -f compose.tools.yaml up -d
 *(Las bases de datos y usuarios de Mantis y Nextcloud se crean automáticamente al iniciar por `infra/scripts/sql/init-tools-db.sh`, con las claves `MANTIS_DB_PASSWORD` y `NEXTCLOUD_DB_PASSWORD` de `.env`. Solo corre con el volumen `tools_db_data` vacío: si se cambian esas claves, hay que borrar ese volumen).*
 
 #### D. Monitoreo (Prometheus + Grafana + exporters)
-Levanta Prometheus, Grafana, node-exporter, cAdvisor y postgres-exporter. Incluir los archivos de los modos que ya estén levantados (ejemplo con A + B + C):
+Levanta Prometheus, Grafana, node-exporter, cAdvisor y un postgres-exporter por nodo (primario y dos réplicas; los de las réplicas necesitan el modo B). Incluir los archivos de los modos que ya estén levantados (ejemplo con A + B + C):
 ```bash
 docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml -f compose.monitoring.yaml up -d
 ```
