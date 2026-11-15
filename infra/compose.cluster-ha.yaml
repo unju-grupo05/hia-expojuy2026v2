@@ -119,9 +119,10 @@ services:
   # Monitorea el estado de los 3 nodos y ejecuta la promoción automática ante fallas
   # ---------------------------------------------------------------------------
   db-failover-manager:
-    build:
-      context: ./failover-manager
-    image: expojuy-failover-manager:latest
+    # Imagen propia: el Dockerfile instala las dependencias (pg) con npm ci.
+    # Con la imagen de Node pelada y un bind mount, node_modules no existe y el proceso muere.
+    build: ./failover-manager
+    image: expojuy-failover-manager:1.0.0
     container_name: expojuy-db-failover-manager
     restart: unless-stopped
     environment:
@@ -137,7 +138,6 @@ services:
       FAILOVER_THRESHOLD: 3
     ports:
       - "127.0.0.1:${HA_SENTINEL_PORT:-8008}:8008"
-    command: ["node", "index.js"]
     networks:
       - data
     healthcheck:
@@ -165,6 +165,10 @@ services:
     restart: unless-stopped
     volumes:
       - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+    # haproxy.cfg expande estas variables en "stats auth": tienen que llegar al contenedor.
+    environment:
+      HA_PROXY_STATS_USER: ${HA_PROXY_STATS_USER}
+      HA_PROXY_STATS_PASSWORD: ${HA_PROXY_STATS_PASSWORD}
     ports:
       - "127.0.0.1:${HA_PROXY_WRITE_PORT:-5437}:5432"
       - "127.0.0.1:${HA_PROXY_READ_PORT:-5438}:5436"

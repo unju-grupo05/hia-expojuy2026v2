@@ -31,10 +31,14 @@ hia-expojuy2026v2/
 ├── backend/         API Node.js + Express 5 + Sequelize 6
 │   └── Dockerfile   Node 22.23.4 Alpine, usuario sin root (puerto 3000)
 ├── infra/           Docker Compose del entorno completo
-│   ├── compose.yaml
+│   ├── compose.yaml             Base: Postgres, pgAdmin, backup, backend, frontend
+│   ├── compose.cluster-ha.yaml  Réplicas, Sentinel y HAProxy
+│   ├── compose.tools.yaml       Mantis y Nextcloud
+│   ├── compose.monitoring.yaml  Prometheus, Grafana y exporters
+│   ├── scripts/                 Backups, pruebas del clúster, chequeo de servicios
 │   └── .env.example Plantilla de variables (el .env real no se versiona)
-├── docs/            Plan, consigna y este documento
-└── .github/         (futuro) workflows de GitHub Actions
+├── docs/            Plan, consigna y documentación técnica
+└── .github/         Workflow de GitHub Actions (ci-cd.yml)
 ```
 
 ## 3. Stack
@@ -101,7 +105,7 @@ Proyecto Compose llamado `expojuy`. Se levanta desde `infra/` con `docker compos
 Requisito: Docker Desktop.
 
 ```bash
-git clone https://github.com/Ignacio367/hia-expojuy2026v2.git
+git clone https://github.com/unju-grupo05/hia-expojuy2026v2.git
 cd hia-expojuy2026v2/infra
 cp .env.example .env        # completar contraseñas propias (es local, cada uno las suyas)
 docker compose up -d
@@ -145,9 +149,9 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
 1. **Archivos:** el núcleo está en `compose.yaml`. Los servicios de cada área van en archivos
    aparte dentro de `infra/`:
    - `compose.cluster-ha.yaml`: Clúster HA de 3 nodos (Primary + 2 Standbys), HAProxy (balanceo lecturas round-robin y proxy escrituras) y Failover Manager Sentinel.
-   - `compose.monitoring.yaml`: Prometheus, Grafana, cAdvisor, node-exporter, postgres-exporter.
-   - `compose.automation.yaml`: n8n.
-   - `compose.tools.yaml`: Mantis/GLPI, Nextcloud.
+   - `compose.monitoring.yaml`: Prometheus, Grafana, cAdvisor, node-exporter y un postgres-exporter por nodo.
+   - `compose.automation.yaml`: n8n (todavía no existe).
+   - `compose.tools.yaml`: Mantis, Nextcloud.
 
    Se combinan con varios `-f`, por ejemplo:
    `docker compose -f compose.yaml -f compose.monitoring.yaml up -d`.
@@ -182,6 +186,8 @@ Para que la integración final no sea un caos, todo servicio nuevo sigue estas r
   backup/restauración, aislamiento de redes y la web consumiendo la API a través de Nginx.
 - Corregido: el backend usaba `sync({ force: true })` y **borraba todas las tablas en cada
   arranque** (incidencia de pérdida de datos para Mantis).
+- Modos combinables (clúster HA, herramientas, monitoreo), con puertos y verificación en el
+  README y chequeo automático con `infra/scripts/check-servicios.ps1`.
 
 ### 9.2 Trabajo Integral Realizado por el Integrante 2 (Senior DBA & Rendimiento)
 
@@ -196,11 +202,11 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
   - `chatbot.controller.js` y `chatbot.route.js` (telemetría y registro de consultas).
   - Suite de tests unitarios y de integración en `backend/tests/telemetria.controller.test.js` y actualización de `backend/tests/stand.controller.test.js`.
 - **Pipeline de Generación y Carga Masiva (6.000.000 de registros):**
-  - Script SQL de alta velocidad con `generate_series()` en `backend/src/seeders/dataset_6m_visitas.sql` (carga completa en menos de 2 minutos).
-  - Generador sintético en Node.js por lotes transaccionales (*batch insert*) con control de memoria en `backend/src/seeders/seed-masivo-visitas.js`.
+  - Script SQL de alta velocidad con `generate_series()` en `backend/src/seeders/dataset_6m_visitas.sql`.
+  - Seeder Node en `backend/src/seeders/seed-masivo-visitas.js`: misma inserción con `generate_series()` más los datos auxiliares (reseñas, asistencias, logs del chatbot, historial de accesos). Es la forma recomendada de carga (`IMPLEMENTACION_ACTUAL.md` §2.2).
   - Sincronización controlada sin borrado destructivo en `backend/src/seeders/run-initial-sync.js`.
-  - **Volumen de Datos Medido:** Tabla `visitas_stands` con ~1,03 GB de datos + índices (~1,32 GB totales en disco).
-  - **Documentación Técnica:** [docs/capitulo_06_migracion_carga_masiva.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_06_migracion_carga_masiva.md).
+  - **Tiempos y tamaños medidos:** ver `IMPLEMENTACION_ACTUAL.md` §2.3.
+  - **Documentación Técnica:** [IMPLEMENTACION_ACTUAL.md §2](IMPLEMENTACION_ACTUAL.md#2-telemetría-y-carga-masiva-capítulo-6).
 
 #### B. Optimización de Consultas SQL y Benchmarking (Punto 5)
 - **Habilitación de `pg_stat_statements`:** Activado en PostgreSQL 17 (`shared_preload_libraries=pg_stat_statements`, `pg_stat_statements.track=all`) para auditoría de rendimiento en tiempo real.
@@ -212,7 +218,7 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
   - Creación de índices de cobertura (*covering indexes*) con cláusula `INCLUDE` para forzar *Index Only Scans*.
   - Creación de índices parciales (*partial indexes*) para visitas VIP y registros anómalos.
 - **Runner de Benchmark Automatizado (`backend/scripts/benchmark_runner.js`):** Script que ejecuta comparativas antes/después y exporta métricas en `docs/sql/benchmark_resultados.json`, demostrando reducciones de costo y tiempo de hasta **99.8%** (de segundos a submilisegundos).
-- **Documentación Técnica:** [docs/capitulo_07_optimizacion_sql.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_07_optimizacion_sql.md).
+- **Documentación Técnica:** [IMPLEMENTACION_ACTUAL.md §3](IMPLEMENTACION_ACTUAL.md#3-medición-y-optimización-sql-capítulo-7).
 
 #### C. Clúster de Replicación de 3 Nodos, Balanceo de Carga y Failover Automático (Punto 6)
 - **Clúster de 3 Nodos en Docker (`infra/compose.cluster-ha.yaml`):**
@@ -224,7 +230,7 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
 - **Balanceador de Carga L4 y Proxy Transaccional (`infra/haproxy/haproxy.cfg`):**
   - **Pool de Lectura (Puerto `5438` host / `5436` interno):** Balanceo en estricto *Round-Robin* que reparte 1/3 de las consultas `SELECT` a cada uno de los 3 nodos.
   - **Pool de Escritura (Puerto `5437` host / `5432` interno):** Enrutamiento dinámico guiado por *Agent-Check* hacia el nodo que ejerce como Líder activo.
-  - **Dashboard Web de Métricas (Puerto `8404`):** Panel en tiempo real en `http://127.0.0.1:8404/stats` (usuario `admin`, clave `expojuy_ha_secret_2026`).
+  - **Dashboard Web de Métricas (Puerto `8404`):** Panel en tiempo real en `http://127.0.0.1:8404/stats` (usuario y clave: ver `HA_PROXY_STATS_*` en `infra/.env`).
 - **Sentinel & Auto-Failover Manager (`infra/failover-manager/index.js` en Node.js 22):**
   - Monitoreo continuo sin solapamientos cada 2.000 ms sobre los 3 nodos.
   - **Prevención de Split-Brain mediante Timeline ID:** Detección de liderazgo basada en `SELECT timeline_id FROM pg_control_checkpoint()`. Si un primario viejo revivido intenta reportarse activo con Timeline 1, el Sentinel lo aísla y niega tráfico de escritura.
@@ -233,16 +239,16 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
   - **Agent-Check TCP:** Puertos 8001, 8002 y 8003 que informan a HAProxy en tiempo real (`ready up 100%`, `maint`, `down`).
   - **REST API en vivo:** Métricas JSON del clúster en `http://127.0.0.1:8008/cluster/status`.
 - **Suite de Pruebas Automatizadas:** `infra/scripts/test-cluster-ha.ps1` y `infra/scripts/test-cluster-ha.sh`.
-- **Documentación Técnica Unificada:** [docs/capitulo_08_cluster_replicacion.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_08_cluster_replicacion.md).
+- **Documentación Técnica Unificada:** [IMPLEMENTACION_ACTUAL.md §4](IMPLEMENTACION_ACTUAL.md#4-replicación-física-y-alta-disponibilidad-capítulo-8).
 
 #### D. Estrategia de Backups y Recuperación ante Desastres (Punto 4 y 15)
 - Servicio `backup` en `infra/compose.yaml` con rotación automática (7 diarios, 4 semanales, 3 mensuales).
 - Script de respaldo manual bajo demanda en `infra/scripts/backup-manual.sh`.
 - Scripts de prueba de restauración automatizada en contenedor aislado temporal: `infra/scripts/restore-test.sh` y `infra/scripts/restore-test.ps1`.
-- **Documentación Técnica:** [docs/capitulo_15_backup_restauracion.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/capitulo_15_backup_restauracion.md).
+- **Documentación Técnica:** [IMPLEMENTACION_ACTUAL.md §5](IMPLEMENTACION_ACTUAL.md#5-backup-restauración-y-verificación-capítulo-15).
 
 #### E. Registro de Incidencias Reales para Mantis Bug Tracker (Punto 11)
-5 incidencias de base de datos documentadas con severidad, pasos de reproducción, causa raíz y solución aplicada en [docs/incidencias_mantis_dba.md](file:///D:/APU/3ro/HIA/hia-expojuy2026v2/docs/incidencias_mantis_dba.md):
+5 incidencias de base de datos con severidad, pasos de reproducción, causa raíz y solución aplicada. El documento que las detallaba (`docs/incidencias_mantis_dba.md`) se eliminó en el commit `a6226bf` y está pendiente de restaurar:
 1. **DBA-01 (Bloqueante):** Pérdida masiva de datos en cada reinicio del backend debido a `sync({ force: true })`.
 2. **DBA-02 (Mayor):** Cuello de botella en telemetría de visitas a stands por falta de índices.
 3. **DBA-03 (Mayor):** Degradación severa de CPU por Sequential Scans en consultas con funciones no-SARGables.
@@ -257,10 +263,10 @@ El Integrante 2 ha implementado, probado y documentado al 100% sus áreas de res
   Inflan la imagen del backend (716 MB). Seguridad y rendimiento.
 - `/api-docs` (Swagger) queda público. Evaluar restringirlo al publicar en Internet.
 
-**Pendiente (Integrante 1):**
-- Publicación en Internet con **Tailscale Funnel** (decidido en lugar de Cloudflare Tunnel:
-  no requiere dominio, da HTTPS automático y no abre puertos). La web será pública; pgAdmin y
-  demás interfaces administrativas, solo accesibles para el equipo vía la red privada de Tailscale.
+**Publicación en Internet (Integrante 1):**
+- Publicada con **Tailscale Funnel** (elegido en lugar de Cloudflare Tunnel: no requiere
+  dominio, da HTTPS automático y no abre puertos). Solo se publica el frontend (puerto 8080);
+  pgAdmin y las demás interfaces administrativas escuchan en `127.0.0.1` y no salen de la máquina.
 - La integración final corre en **una sola máquina** (la que tiene el túnel). El despliegue del
   CI/CD apunta a esa máquina.
 

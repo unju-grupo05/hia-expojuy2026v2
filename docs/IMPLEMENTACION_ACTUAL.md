@@ -146,7 +146,8 @@ El seeder Node genera hasta 10.000 reseñas, 5.000 asistencias, 10.000 logs de c
 maestras y las restricciones presentes; el seeder no es una migración de esquema ni reemplaza
 la carga principal de visitas.
 
-Desde `backend/`, el seeder Node se ejecuta con:
+Desde `backend/`, con Node instalado y conexión directa al primario (no a través de HAProxy),
+el seeder Node se ejecuta con:
 
 ```sh
 npm run seed:massive
@@ -164,12 +165,76 @@ En PowerShell, definir las variables de entorno correspondientes o proporcionar 
 usuario y base con los valores locales de `infra/.env`. No ejecutar la carga en una base con
 datos que se necesiten conservar sin verificar primero el conteo.
 
+**Carga con Docker, sin Node ni `psql` instalados (recomendada).** Desde PowerShell, primero
+comprobar el estado de las tablas:
+
+```powershell
+docker exec expojuy-postgres-1 psql -U expojuy_app -d expojuy -c "SELECT (SELECT count(*) FROM stands) AS stands, (SELECT count(*) FROM visitas_stands) AS visitas, (SELECT count(*) FROM resenas_stands) AS resenas, (SELECT count(*) FROM asistencias_agenda) AS asistencias, (SELECT count(*) FROM logs_chatbot) AS logs_chatbot, (SELECT count(*) FROM historial_accesos) AS accesos;"
+```
+
+Con `stands = 160` y las tablas auxiliares en 0, ejecutar el seeder Node dentro del contenedor
+del backend. Carga visitas y tablas auxiliares en un solo paso:
+
+```powershell
+docker exec -e DB_HOST=postgres expojuy-backend-1 node src/seeders/seed-masivo-visitas.js
+```
+
+- `-e DB_HOST=postgres` conecta el seeder directo al primario. En modo HA el backend usa
+  `db-loadbalancer`, y HAProxy corta las conexiones sin tráfico a los 60 s
+  (`timeout server` en `haproxy.cfg`): la inserción de 6.000.000 filas tarda más que eso.
+- Ejecutarlo una sola vez: si `visitas_stands` ya tiene 6.000.000 filas, solo carga las
+  auxiliares, y algunas de ellas no evitan duplicados.
+
+**Alternativa: solo visitas, con el SQL.** Carga únicamente `visitas_stands` y suma 6.000.000
+filas cada vez que se ejecuta:
+
+```powershell
+docker cp ..\backend\src\seeders\dataset_6m_visitas.sql expojuy-postgres-1:/tmp/dataset_6m_visitas.sql
+docker exec expojuy-postgres-1 psql -U expojuy_app -d expojuy -v ON_ERROR_STOP=1 -f /tmp/dataset_6m_visitas.sql
+```
+
+`docker cp` evita el pipe `Get-Content | docker exec`, que en Windows PowerShell 5.1 cambia la
+codificación y muestra los acentos como `?`.
+
+Notas para ambas formas:
+
+- Usuario y base corresponden a `POSTGRES_USER` y `POSTGRES_DB` de `infra/.env`; ajustarlos si
+  difieren.
+- Con el clúster HA levantado, la carga se escribe en el primario y las réplicas la reciben por
+  WAL.
+- La inserción de visitas es una sola transacción: otras sesiones ven `count(*) = 0` hasta que
+  termina. No detener el primario mientras carga.
+- Para repetir la carga: `TRUNCATE visitas_stands;` (sin `CASCADE`) y volver a ejecutar.
+- No ejecutar `npm run seed:stands` sobre una base cargada: vacía `stands` con
+  `TRUNCATE ... CASCADE`, y `visitas_stands` y `resenas_stands` tienen clave foránea hacia
+  `stands`, por lo que también se vaciarían.
+
 ### 2.3 Evidencia de ejecución y persistencia
 
 El capítulo de carga registra una ejecución con seis millones de visitas, 42,38 segundos,
 141.576 filas por segundo, cero huérfanos y cobertura de 160 stands. También registra
 492 MB de datos heap, 543 MB de índices y 1.035 MB en total. Son valores de esa ejecución,
 no una garantía para otras máquinas, tamaños de caché o estados iniciales.
+
+Ejecuciones verificadas el 15/11/2026 con las formas de la sección 2.2, en una notebook con
+Docker Desktop (WSL2), clúster HA levantado (primario y dos réplicas en streaming) y stack de
+monitoreo activo, partiendo de `visitas_stands` vacía:
+
+| Métrica | Seeder Node | SQL |
+|---|---|---|
+| Visitas insertadas | 6.000.000 | 6.000.000 |
+| Tiempo | 202,44 s (3,37 min) | 233,63 s (3,89 min) |
+| Throughput | 29.638 filas/s | 25.681 filas/s |
+| Heap / índices / total | 492 / 237 / 729 MB | 492 / 236 / 729 MB |
+
+Después del seeder Node: 10.000 reseñas, 5.000 asistencias, 10.000 logs de chatbot y 5.000
+registros de historial de accesos; mismos conteos en las dos réplicas, retraso de replicación
+`0 bytes` y cero visitas sin stand.
+
+El heap coincide con la ejecución del capítulo. El mayor tiempo es esperable en este entorno:
+cada cambio se envía por WAL a dos réplicas y el disco es el virtual de WSL2. La tabla tenía
+solo los tres índices del modelo (clave primaria, `stand_id` y `fecha_visita`); los de
+`docs/sql/02_optimizaciones_indices.sql` no estaban aplicados.
 
 Para comparar tamaño en el servidor:
 
