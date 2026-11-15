@@ -9,24 +9,65 @@ groups:
           severity: warning
         annotations:
           summary: "Uso de CPU elevado en {{ $labels.instance }}"
-          description: "El uso de CPU supera el 85% durante más de 10 segundos."
+          description: "El uso de CPU del host supera el 85% durante más de 10 segundos."
 
-      # 2. Alerta de Caída de Base de Datos (Disponibilidad crítica)
-      - alert: PostgresDown
-        expr: pg_up == 0
+      # 2. Alertas individuales por caída de cada nodo PostgreSQL
+      - alert: PostgresPrimaryDown
+        expr: pg_up{node="postgres-primary"} == 0 or up{job="postgres-cluster", node="postgres-primary"} == 0
         for: 5s
         labels:
           severity: critical
+          node: "postgres-primary"
         annotations:
-          summary: "Base de datos PostgreSQL caída"
-          description: "El exportador no logra conectarse con la instancia de PostgreSQL."
+          summary: "Nodo Primario PostgreSQL caído (postgres)"
+          description: "El nodo principal postgres:5432 no responde o su exportador está inaccesible."
 
-      # 3. Alerta por exceso de conexiones en PostgreSQL
+      - alert: PostgresReplica1Down
+        expr: pg_up{node="postgres-replica-1"} == 0 or up{job="postgres-cluster", node="postgres-replica-1"} == 0
+        for: 5s
+        labels:
+          severity: critical
+          node: "postgres-replica-1"
+        annotations:
+          summary: "Nodo Réplica 1 PostgreSQL caído (postgres-replica-1)"
+          description: "El nodo secundario postgres-replica-1:5432 no responde o su exportador está inaccesible."
+
+      - alert: PostgresReplica2Down
+        expr: pg_up{node="postgres-replica-2"} == 0 or up{job="postgres-cluster", node="postgres-replica-2"} == 0
+        for: 5s
+        labels:
+          severity: critical
+          node: "postgres-replica-2"
+        annotations:
+          summary: "Nodo Réplica 2 PostgreSQL caído (postgres-replica-2)"
+          description: "El nodo secundario postgres-replica-2:5432 no responde o su exportador está inaccesible."
+
+      # 3. Alerta por retraso elevado en la replicación de streaming
+      - alert: PostgresReplicationLagHigh
+        expr: pg_stat_replication_bytes_lag > 10485760
+        for: 15s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Retraso de replicación elevado en {{ $labels.node }}"
+          description: "El lag de replicación supera los 10 MB durante más de 15 segundos."
+
+      # 4. Alerta por exceso de conexiones activas por nodo PostgreSQL
       - alert: PostgresHighConnections
         expr: pg_stat_activity_count > 80
         for: 10s
         labels:
           severity: warning
         annotations:
-          summary: "Alto número de conexiones activas en PostgreSQL"
-          description: "PostgreSQL registra más de 80 conexiones activas simultáneas."
+          summary: "Alto número de conexiones activas en {{ $labels.node }}"
+          description: "El nodo {{ $labels.node }} registra más de 80 conexiones activas simultáneas."
+
+      # 5. Alerta por reinicios frecuentes en contenedores Docker (cAdvisor)
+      - alert: ContainerFrequentRestarts
+        expr: changes(container_start_time_seconds{compose_service!=""}[5m]) > 2
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Reinicios frecuentes en contenedor {{ $labels.compose_service }}"
+          description: "El servicio {{ $labels.compose_service }} se ha reiniciado más de 2 veces en los últimos 5 minutos."
