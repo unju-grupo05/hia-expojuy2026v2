@@ -47,10 +47,15 @@ services:
       - app
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    # v0.54+ soporta el image store con containerd-snapshotter (Docker 29+);
+    # con versiones anteriores no registra los contenedores y no expone sus métricas.
+    image: ghcr.io/google/cadvisor:v0.60.5
     container_name: expojuy-cadvisor
     restart: unless-stopped
     privileged: true
+    command:
+      - '--store_container_labels=true'
+      - '--whitelisted_container_labels=com.docker.compose.service,com.docker.compose.project'
     devices:
       - /dev/kmsg
     volumes:
