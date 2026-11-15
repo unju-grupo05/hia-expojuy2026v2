@@ -164,12 +164,51 @@ En PowerShell, definir las variables de entorno correspondientes o proporcionar 
 usuario y base con los valores locales de `infra/.env`. No ejecutar la carga en una base con
 datos que se necesiten conservar sin verificar primero el conteo.
 
+**Variante Windows sin `psql` instalado** (usa el `psql` del contenedor del primario). Desde
+`infra/`, en PowerShell, primero comprobar que hay stands y que la tabla está vacía:
+
+```powershell
+docker exec expojuy-postgres-1 psql -U expojuy_app -d expojuy -c "SELECT (SELECT count(*) FROM stands) AS stands, (SELECT count(*) FROM visitas_stands) AS visitas;"
+```
+
+Si da `stands = 160` y `visitas = 0`, ejecutar la carga:
+
+```powershell
+docker cp ..\backend\src\seeders\dataset_6m_visitas.sql expojuy-postgres-1:/tmp/dataset_6m_visitas.sql
+docker exec expojuy-postgres-1 psql -U expojuy_app -d expojuy -v ON_ERROR_STOP=1 -f /tmp/dataset_6m_visitas.sql
+```
+
+- Usuario y base corresponden a `POSTGRES_USER` y `POSTGRES_DB` de `infra/.env`; ajustarlos si
+  difieren. La conexión es local dentro del contenedor, por eso `psql` no pide contraseña.
+- `docker cp` evita el pipe `Get-Content | docker exec`: Windows PowerShell 5.1 cambia la
+  codificación del texto y los acentos de los mensajes salen como `?`.
+- Con el clúster HA levantado, la carga se ejecuta en el primario (`postgres`); las réplicas la
+  reciben por WAL.
+- La inserción es una sola transacción: durante la carga, otras sesiones ven `count(*) = 0` y
+  las 6.000.000 filas aparecen juntas al confirmar. No detener el primario mientras carga.
+
 ### 2.3 Evidencia de ejecución y persistencia
 
 El capítulo de carga registra una ejecución con seis millones de visitas, 42,38 segundos,
 141.576 filas por segundo, cero huérfanos y cobertura de 160 stands. También registra
 492 MB de datos heap, 543 MB de índices y 1.035 MB en total. Son valores de esa ejecución,
 no una garantía para otras máquinas, tamaños de caché o estados iniciales.
+
+Ejecución verificada el 15/11/2026 con la variante Windows de la sección 2.2, en una notebook
+con Docker Desktop (WSL2), clúster HA levantado (primario y dos réplicas en streaming) y stack
+de monitoreo activo, partiendo de `visitas_stands` vacía:
+
+| Métrica | Valor |
+|---|---|
+| Filas insertadas | 6.000.000 |
+| Tiempo del bloque de carga | 233,63 s (3,89 min) |
+| Throughput | 25.681 filas/s |
+| Heap | 492 MB |
+| Índices | 236 MB |
+| Total | 729 MB |
+
+El heap coincide con la ejecución del capítulo. El mayor tiempo es esperable en este entorno:
+cada cambio se envía por WAL a dos réplicas y el disco es el virtual de WSL2.
 
 Para comparar tamaño en el servidor:
 
