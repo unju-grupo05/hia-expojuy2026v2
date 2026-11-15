@@ -159,6 +159,7 @@ Para reproducir las pruebas del Senior DBA sobre el dataset de **6.000.000 de re
 
 * 🏛️ **Arquitectura, Roles y Reglas de Desarrollo:** [docs/CONTEXTO_PROYECTO.md](docs/CONTEXTO_PROYECTO.md)
 * 🗄️ **Base de Datos, Optimización y Clúster:** [docs/IMPLEMENTACION_ACTUAL.md](docs/IMPLEMENTACION_ACTUAL.md)
+* 🔗 **Accesos (links de la web y de las herramientas):** [docs/ACCESOS.md](docs/ACCESOS.md)
 * 🌐 **Publicación y acceso desde Internet (Funnel, Serve, quién accede a qué):** [docs/PUBLICACION_ACCESO.md](docs/PUBLICACION_ACCESO.md)
 * 🔧 **Cambios en la infraestructura (alertas, targets, variables, servicios, después de un pull):** [docs/OPERACION_CAMBIOS.md](docs/OPERACION_CAMBIOS.md)
 * 📈 **Consultas SQL de Benchmark y Resultados:** [docs/sql/](docs/sql/)

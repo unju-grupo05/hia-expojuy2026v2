@@ -116,10 +116,13 @@ Ajustes que necesitan las aplicaciones para responder con la nueva dirección:
 Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 
 ### 5.4 Quién puede acceder
-- **Equipo:** invitación a la tailnet (consola de Tailscale → *Users* → *Invite*).
-- **Cátedra:** compartir la máquina (consola → *Machines* → *Share*). Ve solo esta máquina, no el resto de la tailnet.
+Links y pasos para el equipo: [`ACCESOS.md`](ACCESOS.md).
 
-## 6. Firewall y HTTPS
+- **Equipo y cátedra:** se comparte la notebook (consola → *Machines* → la máquina → *Share*).
+  Cada persona usa su propia cuenta de Tailscale y ve solo esta máquina, no el resto de la tailnet.
+- No se usa *Invite* (sumar miembros a la tailnet): daría acceso a todos los dispositivos.
+
+## 6. Firewall, ACL y HTTPS
 
 | Control | Cómo se cumple |
 |---|---|
@@ -127,6 +130,29 @@ Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 | HTTPS | Tailscale emite y renueva el certificado de `*.ts.net` (Funnel y Serve) |
 | Base de datos | No se publica: puertos solo en `127.0.0.1` y fuera de Funnel/Serve |
 | Administración | Solo por Serve (tailnet) y con login propio de cada herramienta |
+| Quién llega a qué puerto | ACL de la tailnet (mínimo privilegio, ver 6.1) |
+
+### 6.1 ACL de la tailnet
+Serve decide **qué** se publica; la ACL decide **quién** llega a cada puerto. Sin ACL, la regla por
+defecto de Tailscale (`src: *, dst: *`) deja que un usuario compartido llegue a **cualquier** puerto
+de la notebook, incluidos programas de Windows que escuchan en todas las interfaces (por ejemplo
+SMB en el 445 o un PostgreSQL instalado en Windows en el 5432).
+
+Política aplicada en la consola (*Access controls* → *JSON editor*), en lugar del "allow all":
+
+```jsonc
+"hosts": { "notebook-expojuy": "<IP de Tailscale de la notebook>" },  // tailscale ip -4
+"grants": [
+    // Miembros de la tailnet (el responsable y sus dispositivos): acceso completo
+    { "src": ["autogroup:member"], "dst": ["*"], "ip": ["*"] },
+    // Usuarios con la máquina compartida (equipo y cátedra): solo la web y las herramientas
+    { "src": ["autogroup:shared"], "dst": ["notebook-expojuy"],
+      "ip": ["tcp:443", "tcp:3001", "tcp:5050", "tcp:8082", "tcp:8083", "tcp:8404", "tcp:9090"] },
+],
+```
+
+Se mantienen sin cambios las secciones `ssh` y `nodeAttrs` (esta última habilita Funnel). Lo que
+no está en `grants` queda bloqueado. Funnel no pasa por la ACL: la web sigue siendo pública.
 
 ## 7. Disponibilidad y errores
 
@@ -144,6 +170,7 @@ Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 | `/api-docs` (Swagger) público | Expone la descripción de la API | Restringirlo en producción (punto 14) |
 | `/admin/login` público | Ataques de fuerza bruta | Claves fuertes; limitar intentos (punto 14) |
 | Frontend en `0.0.0.0` | Accesible desde la red local | Pasarlo a `127.0.0.1` |
+| Programas de Windows escuchando en todas las interfaces (SMB 445, PostgreSQL local 5432) | Alcanzables desde la red local y, sin ACL, desde la tailnet | ACL de la tailnet (6.1); detener el PostgreSQL local si no se usa |
 | Ancho de banda doméstico | Rendimiento limitado | Aceptado para la demostración |
 
 ## 9. Evidencias
@@ -152,6 +179,7 @@ Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 - [ ] Acceso desde un celular con datos móviles (fuera de la red local) a la web y a `/api/health`.
 - [ ] Captura de `tailscale serve status`.
 - [ ] Acceso a una herramienta desde otro dispositivo de la tailnet, y rechazo desde fuera.
+- [ ] Usuario compartido: abre una herramienta y no llega a un puerto fuera de la ACL (por ejemplo 445).
 - [ ] `docker ps` mostrando los puertos en `127.0.0.1`.
 
 ## 10. Estado
@@ -163,6 +191,8 @@ Comandos en [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
 | Serve para las 6 herramientas ("tailnet only") | Verificado 15/11/2026 desde la notebook |
 | Ajustes de Nextcloud y Mantis | Verificado 15/11/2026 |
 | Acceso desde otro dispositivo de la tailnet y rechazo desde fuera | Pendiente |
+| ACL de mínimo privilegio | Pendiente de aplicar y verificar con un usuario compartido |
+| Página de accesos para el equipo (`ACCESOS.md`) | Hecho |
 | Frontend en `127.0.0.1` | Pendiente |
 | Panel de disponibilidad | Pendiente |
 | Evidencia de acceso externo | Pendiente |
