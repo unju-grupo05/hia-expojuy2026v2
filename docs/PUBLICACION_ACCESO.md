@@ -90,6 +90,9 @@ PUBLIC_URL=https://<maquina>.<tailnet>.ts.net
 Después se recrea el backend (`up -d` con todos los `-f`, ver `OPERACION_CAMBIOS.md`).
 
 ### 5.3 Serve (herramientas restringidas)
+Paso a paso, en forma manual o con el script `infra/scripts/tailscale-publicar.ps1`:
+[`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md).
+
 Cada herramienta usa **su propio puerto**, nunca el 443. Funnel se habilita por puerto: una ruta
 agregada al 443 quedaría pública junto con la aplicación.
 
