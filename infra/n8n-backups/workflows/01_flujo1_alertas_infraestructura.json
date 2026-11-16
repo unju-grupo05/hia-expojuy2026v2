@@ -1,0 +1,386 @@
+{
+  "name": "Flujo 1 - Alertas de Infraestructura (Prometheus -> Mantis -> Nextcloud -> Telegram)",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-is-cluster-managed",
+              "leftValue": "={{ $json.isClusterManaged }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "85d4c00a-ad96-40d9-8697-78d704361b51",
+      "name": "¿Es Falla Manejable por RAG Clúster?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "kAD3xJissdT5KaVA",
+        "mode": "each",
+        "options": {}
+      },
+      "id": "a7fab4da-75d1-45e8-b6b7-12250d5ec66e",
+      "name": "Sub-Workflow: Diagnóstico & Runbook Clúster HA",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        416
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ .MANTIS_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"summary\": {{ JSON.stringify($json.mantisSummary) }},\n  \"description\": {{ JSON.stringify($json.mantisDescription) }},\n  \"project\": { \"name\": \"ExpoJuy\" },\n  \"category\": { \"name\": \"Infraestructura\" },\n  \"priority\": { \"name\": {{ JSON.stringify($json.mantisPriority) }} },\n  \"severity\": { \"name\": {{ JSON.stringify($json.mantisSeverity) }} }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "644c1c0e-40eb-40e0-843d-bbe68f2f837d",
+      "name": "Crear Ticket Estándar en Mantis BT",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        592
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Parsear Alerta y Mapear Mantis1').first().json;\nconst mantisResp = $input.first().json || {};\nconst issueId = mantisResp.issue?.id || mantisResp.id || 'PENDIENTE';\n\nconst emoji = prev.severity === 'critical' ? '🚨' : '⚠️';\n\nconst mensaje = `${emoji} *ALERTA DE INFRAESTRUCTURA (ESTÁNDAR) - EXPOJUY 2026*\\n\\n` +\n  `• *Alerta:* \\`${prev.alertName}\\`\\n` +\n  `• *Severidad:* \\`${prev.severity.toUpperCase()}\\`\\n` +\n  `• *Instancia:* \\`${prev.instance}\\`\\n` +\n  `• *Detalle:* ${prev.summary}\\n` +\n  `• *Ticket Mantis:* #${issueId}\\n` +\n  `• *Hora:* _${prev.startsAt}_\\n\\n` +\n  `_Esta alerta no corresponde a falla crítica de BD; registrada como incidencia estándar._`;\n\nreturn [{\n  json: {\n    ...prev,\n    ticketId: issueId,\n    telegramText: mensaje\n  }\n}];"
+      },
+      "id": "569bf1b3-4ad6-4121-85f7-f27ed7715081",
+      "name": "Formatear Mensaje Notificación Estándar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "alertmanager",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b325e932-7476-4f10-8e80-00916005be6c",
+      "name": "Webhook Prometheus Alertmanager1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        208,
+        608
+      ],
+      "webhookId": "prometheus-alert-webhook-expojuy"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalizador de Alertas de Alertmanager para Mantis, Sub-Workflow RAG y Telegram\nconst body = $input.first().json.body || $input.first().json;\nconst alerts = body.alerts || [];\n\nif (alerts.length === 0) {\n  return [{\n    json: {\n      hasAlerts: false,\n      message: 'No se recibieron alertas válidas en el payload.'\n    }\n  }];\n}\n\n// Catálogo de alertas que el Asistente RAG de Clúster de BD sabe diagnosticar y resolver\nconst clusterManagedAlerts = [\n  'PostgresPrimaryDown',\n  'PostgresReplica1Down',\n  'PostgresReplica2Down',\n  'PostgresReplicationLagHigh',\n  'PostgresHighConnections',\n  'ContainerFrequentRestarts'\n];\n\nconst resultados = alerts.map((alert) => {\n  const labels = alert.labels || {};\n  const annotations = alert.annotations || {};\n  const status = alert.status || body.status || 'firing';\n  \n  const alertName = labels.alertname || 'AlertaGeneral';\n  const severity = (labels.severity || 'warning').toLowerCase();\n  const instance = labels.instance || labels.container || labels.node || 'Servidor Central';\n  const node = labels.node || labels.compose_service || instance;\n  const summary = annotations.summary || annotations.message || `Anomalía detectada en ${alertName}`;\n  const description = annotations.description || 'Sin descripción provista por Prometheus.';\n  \n  // Evaluar si es un error que puede manejar el asistente RAG del clúster\n  const isClusterManaged = clusterManagedAlerts.includes(alertName) || (alertName.toLowerCase().includes('postgres') && severity === 'critical');\n  \n  // Mapeo a Severidad de Mantis Bug Tracker\n  let mantisSeverity = 'major';\n  let mantisPriority = 'high';\n  \n  if (severity === 'critical') {\n    mantisSeverity = 'crash';\n    mantisPriority = 'urgent';\n  } else if (severity === 'warning') {\n    mantisSeverity = 'major';\n    mantisPriority = 'high';\n  }\n  \n  const startsAt = alert.startsAt ? new Date(alert.startsAt).toLocaleString('es-AR', { timeZone: 'America/Argentina/Jujuy' }) : new Date().toLocaleString();\n  \n  return {\n    hasAlerts: true,\n    status,\n    alertName,\n    severity,\n    instance,\n    node,\n    summary,\n    description,\n    startsAt,\n    isClusterManaged,\n    mantisSummary: `[PROMETHEUS] ${alertName} en ${instance} (${severity.toUpperCase()})`,\n    mantisDescription: `Incidencia detectada automáticamente por Prometheus Alertmanager.\\n\\n• Métrica/Alerta: ${alertName}\\n• Instancia/Nodo: ${node}\\n• Severidad: ${severity.toUpperCase()}\\n• Resumen: ${summary}\\n• Detalle: ${description}\\n• Inicio: ${startsAt}\\n\\nAcción: Derivado a análisis automático.`,\n    mantisSeverity,\n    mantisPriority\n  };\n});\n\nreturn resultados.map(r => ({ json: r }));"
+      },
+      "id": "d8e84f82-694f-48c2-8b00-baff45ec916d",
+      "name": "Parsear Alerta y Mapear Mantis1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-status-firing",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "firing",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5be796ca-41ba-4474-bd09-0f933564df88",
+      "name": "¿Estado es FIRING?1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        656,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": true,\n  \"message\": \"Alerta procesada y clasificada exitosamente por n8n.\",\n  \"alertName\": \"{{ $json.alertName }}\",\n  \"status\": \"{{ $json.status }}\",\n  \"managedByRAG\": {{ $json.isClusterManaged || false }}\n}",
+        "options": {}
+      },
+      "id": "5bb6b555-6931-41b0-8710-93b06d1089aa",
+      "name": "Responder a Webhook1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1776,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "8873048301",
+        "text": "={{ $json.telegramText }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        592
+      ],
+      "id": "f6e90100-bf4e-4f6d-8ea5-6df40b49d827",
+      "name": "Enviar Alerta Estándar por Telegram",
+      "webhookId": "2c28326f-5ce5-4d99-93a2-c62b2e59ba41",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Parsear Alerta y Mapear Mantis1').first().json;\nconst mensaje = `✅ *ALERTA RESUELTA - EXPOJUY 2026*\\n\\n` +\n  `• *Alerta:* \\`${prev.alertName}\\`\\n` +\n  `• *Instancia:* \\`${prev.instance}\\`\\n` +\n  `• *Estado:* Normalizado a las ${new Date().toLocaleTimeString('es-AR')}\\n\\n` +\n  `_El servicio opera con normalidad._`;\n\nreturn [{\n  json: {\n    ...prev,\n    telegramText: mensaje\n  }\n}];"
+      },
+      "id": "df7cf206-2083-4502-ba0c-ea954bbf7643",
+      "name": "Formatear Notificación Recuperación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "8873048301",
+        "text": "={{ $json.telegramText }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1328,
+        768
+      ],
+      "id": "6ad596af-e815-4822-a86b-c2426d286284",
+      "name": "Enviar Recuperación Telegram",
+      "webhookId": "2c28326f-5ce5-4d99-93a2-c62b2e59ba41",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "¿Es Falla Manejable por RAG Clúster?": {
+      "main": [
+        [
+          {
+            "node": "Sub-Workflow: Diagnóstico & Runbook Clúster HA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear Ticket Estándar en Mantis BT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sub-Workflow: Diagnóstico & Runbook Clúster HA": {
+      "main": [
+        [
+          {
+            "node": "Responder a Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Ticket Estándar en Mantis BT": {
+      "main": [
+        [
+          {
+            "node": "Formatear Mensaje Notificación Estándar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Mensaje Notificación Estándar": {
+      "main": [
+        [
+          {
+            "node": "Enviar Alerta Estándar por Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Prometheus Alertmanager1": {
+      "main": [
+        [
+          {
+            "node": "Parsear Alerta y Mapear Mantis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Alerta y Mapear Mantis1": {
+      "main": [
+        [
+          {
+            "node": "¿Estado es FIRING?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Estado es FIRING?1": {
+      "main": [
+        [
+          {
+            "node": "¿Es Falla Manejable por RAG Clúster?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Formatear Notificación Recuperación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Alerta Estándar por Telegram": {
+      "main": [
+        [
+          {
+            "node": "Responder a Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Notificación Recuperación": {
+      "main": [
+        [
+          {
+            "node": "Enviar Recuperación Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Recuperación Telegram": {
+      "main": [
+        [
+          {
+            "node": "Responder a Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b9f027c0-78e8-4002-ab39-f8ff1e8be688",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5fe9c805b18747363ade04794d696366736a2790726f0a314b3f37ea06d50449"
+  },
+  "nodeGroups": [],
+  "id": "9JeJWDByhd7zVRlm",
+  "tags": []
+}

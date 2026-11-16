@@ -1,6 +1,17 @@
 name: expojuy
 
 services:
+  alertmanager:
+    image: prom/alertmanager:v0.27.0
+    container_name: expojuy-alertmanager
+    restart: unless-stopped
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    ports:
+      - "127.0.0.1:9093:9093"
+    networks:
+      - app
+
   prometheus:
     image: prom/prometheus:v2.54.1
     container_name: expojuy-prometheus

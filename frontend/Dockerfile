@@ -3,7 +3,7 @@ FROM node:22.23.4-alpine AS build
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN npm ci --no-audit --no-fund --fetch-timeout=300000 --fetch-retries=5
 
 COPY . .
 ARG NG_CONFIGURATION=production,docker
