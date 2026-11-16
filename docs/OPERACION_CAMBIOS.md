@@ -21,7 +21,8 @@ comandos son para PowerShell y se ejecutan desde `infra/`.
 2. **Nunca `down -v`** para aplicar un cambio: borra los volúmenes (base, dashboards, Mantis,
    Nextcloud).
 3. **Antes de aplicar, simular** con `--dry-run`: muestra qué contenedores crearía, recrearía
-   o borraría, sin hacerlo.
+   o borraría, sin hacerlo. Si cambió una imagen, correr antes `pull`: sin la imagen descargada,
+   el `--dry-run` falla con *"No such image"*.
 4. **Después de aplicar, chequear:** `powershell -ExecutionPolicy Bypass -File scripts/check-servicios.ps1`.
 5. **Secretos solo en `infra/.env`.** Toda variable nueva va también a `infra/.env.example`
    con un valor de ejemplo.
@@ -31,6 +32,7 @@ comandos son para PowerShell y se ejecutan desde `infra/`.
 | Qué cambió | Qué correr | Por qué |
 |---|---|---|
 | Un `compose.*.yaml` (imagen, variables, puertos, redes) | `up -d` | Compose compara la configuración y recrea solo los servicios que cambiaron |
+| La versión de una imagen con datos (Nextcloud, MariaDB, Postgres) | `pull`, `--dry-run` y `up -d`, después de leer las notas de actualización | Algunas no aceptan saltos grandes: Nextcloud sube de a una versión mayor por vez (ver `HERRAMIENTAS_GESTION_TOOLS.md`, incidencia 5) |
 | Código que se construye (backend, frontend, Sentinel) | `up -d --build <servicio>` | Sin `--build` sigue usando la imagen anterior |
 | Un archivo montado (`prometheus.yml`, `alerts.yml`, `haproxy.cfg`) | `restart <servicio>` | Compose no mira el contenido de los archivos montados |
 | Se borró o renombró un servicio | `up -d --remove-orphans` | Si no, el contenedor viejo queda corriendo huérfano |
