@@ -173,6 +173,7 @@ Para reproducir las pruebas del Senior DBA sobre el dataset de **6.000.000 de re
 * 🌐 **Publicación y acceso desde Internet (Funnel, Serve, quién accede a qué):** [docs/PUBLICACION_ACCESO.md](docs/PUBLICACION_ACCESO.md)
 * 🔧 **Cambios en la infraestructura (alertas, targets, variables, servicios, después de un pull):** [docs/OPERACION_CAMBIOS.md](docs/OPERACION_CAMBIOS.md)
 * 🚀 **Despliegue continuo (CD) y rollback:** [docs/CD_DESPLIEGUE.md](docs/CD_DESPLIEGUE.md)
+* 🔁 **Prueba de failover del clúster (tumbar y recuperar el primario):** [docs/PRUEBA_FAILOVER.md](docs/PRUEBA_FAILOVER.md)
 * 📈 **Consultas SQL de Benchmark y Resultados:** [docs/sql/](docs/sql/)
 * 📋 **Plan General y Consigna del Trabajo Práctico:** [docs/PLAN_TRABAJO_INTEGRADOR_EXPOJUY_2026.md](docs/PLAN_TRABAJO_INTEGRADOR_EXPOJUY_2026.md)
 
