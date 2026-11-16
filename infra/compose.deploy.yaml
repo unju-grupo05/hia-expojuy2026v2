@@ -1,0 +1,12 @@
+# =============================================================================
+# ExpoJuy 2026 - Despliegue continuo (CD)
+# Reemplaza las imagenes construidas en la notebook por las que publico el CI en
+# Docker Hub (tag = commit). Las variables las define infra/scripts/cd-deploy.ps1.
+# Ver docs/CD_DESPLIEGUE.md.
+# =============================================================================
+
+services:
+  backend:
+    image: ${BACKEND_IMAGE:?La define infra/scripts/cd-deploy.ps1}
+  frontend:
+    image: ${FRONTEND_IMAGE:?La define infra/scripts/cd-deploy.ps1}
