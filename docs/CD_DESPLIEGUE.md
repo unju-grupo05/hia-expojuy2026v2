@@ -69,7 +69,8 @@ también la necesita). Correrlo **desde la raíz del repo** (arma la ruta del sc
 
 ```powershell
 $script = (Resolve-Path infra\scripts\cd-deploy.ps1).Path
-$accion = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`" -Rama develop"
+# conhost --headless: corre sin abrir ninguna ventana (con -WindowStyle Hidden igual aparece un instante)
+$accion = New-ScheduledTaskAction -Execute 'conhost.exe' -Argument "--headless powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$script`" -Rama develop"
 $cada5 = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5)
 Register-ScheduledTask -TaskName 'ExpoJuy-CD' -Action $accion -Trigger $cada5 -Description 'Despliegue continuo ExpoJuy 2026'
 ```
