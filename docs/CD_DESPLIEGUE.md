@@ -64,17 +64,20 @@ docker compose -f compose.yaml -f compose.cluster-ha.yaml up -d --no-deps backen
 ## 4. Automático (tarea programada de Windows)
 
 Corre el script cada 5 minutos mientras la sesión de Windows esté abierta (Docker Desktop
-también la necesita). Reemplazar `<ruta>` por la carpeta del repo y la rama si corresponde:
+también la necesita). Correrlo **desde la raíz del repo** (arma la ruta del script solo); cambiar
+`develop` por `main` cuando `main` tenga imágenes del CI:
 
 ```powershell
-$accion = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument '-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "<ruta>\infra\scripts\cd-deploy.ps1" -Rama main'
+$script = (Resolve-Path infra\scripts\cd-deploy.ps1).Path
+$accion = New-ScheduledTaskAction -Execute 'powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File `"$script`" -Rama develop"
 $cada5 = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval (New-TimeSpan -Minutes 5)
 Register-ScheduledTask -TaskName 'ExpoJuy-CD' -Action $accion -Trigger $cada5 -Description 'Despliegue continuo ExpoJuy 2026'
 ```
 
 | Para | Comando |
 |---|---|
-| Ver estado y última ejecución | `Get-ScheduledTaskInfo -TaskName ExpoJuy-CD` |
+| Ejecutar ahora, sin esperar los 5 minutos | `Start-ScheduledTask -TaskName ExpoJuy-CD` |
+| Ver estado y última ejecución (`LastTaskResult` 0 = OK) | `Get-ScheduledTaskInfo -TaskName ExpoJuy-CD` |
 | Pausar (por ejemplo, para mantener un rollback manual) | `Disable-ScheduledTask -TaskName ExpoJuy-CD` |
 | Reanudar | `Enable-ScheduledTask -TaskName ExpoJuy-CD` |
 | Borrar | `Unregister-ScheduledTask -TaskName ExpoJuy-CD -Confirm:$false` |
@@ -107,7 +110,7 @@ Register-ScheduledTask -TaskName 'ExpoJuy-CD' -Action $accion -Trigger $cada5 -D
 | CI publica imágenes por commit en Docker Hub | Verificado 16/11/2026 (tags de los últimos commits de `develop`) |
 | `cd-deploy.ps1`: despliegue manual | Verificado 16/11/2026: `develop` (`613c9de`) desplegado en 50 s, `/api/health` ok, HA intacto |
 | Rollback automático | Pendiente de probar |
-| Tarea programada | Pendiente |
+| Tarea programada (`-Rama develop`, cada 5 min) | Verificado 16/11/2026: `LastTaskResult` 0 |
 | Commit de prueba de punta a punta | Pendiente |
 
 `infra/scripts/deploy-rollback.sh` (bash, para un servidor por SSH) y el job `deploy` comentado
