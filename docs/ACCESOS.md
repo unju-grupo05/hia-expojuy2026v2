@@ -35,6 +35,7 @@ y con acceso compartido a la notebook del proyecto.
 | Prometheus | https://ignacio-lenovo.taildd07d8.ts.net:9090 | Métricas y alertas |
 | pgAdmin | https://ignacio-lenovo.taildd07d8.ts.net:5050 | Administración de la base |
 | HAProxy | https://ignacio-lenovo.taildd07d8.ts.net:8404/stats | Estado del clúster de base de datos |
+| n8n | https://ignacio-lenovo.taildd07d8.ts.net:5679 | Automatizaciones (editor de flujos y credenciales) |
 
 Usuarios y claves: se piden por privado al Integrante 1. No se publican en el repositorio.
 

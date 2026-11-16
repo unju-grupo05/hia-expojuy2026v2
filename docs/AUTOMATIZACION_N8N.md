@@ -60,9 +60,11 @@ services:
       - N8N_HOST=127.0.0.1
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:${N8N_PORT:-5679}/
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5679/}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL:-http://localhost:5679/}
+      - N8N_PROXY_HOPS=1
       - NODE_ENV=production
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?Definir N8N_ENCRYPTION_KEY en infra/.env}
       - MANTIS_API_TOKEN=${MANTIS_API_TOKEN}
       - GENERIC_TIMEZONE=America/Argentina/Jujuy
       - TZ=America/Argentina/Jujuy
@@ -249,8 +251,8 @@ Durante las pruebas integrales de homologación de Integrante 4, se identificaro
 
 ### Incidente 2: Error 401 Unauthorized en Mantis Bug Tracker
 * **Síntoma:** Los nodos de creación de tickets en Mantis fallaban con `AxiosError: Request failed with status code 401`.
-* **Causa Raíz:** Discrepancia criptográfica en la base de datos `bugtracker.mantis_api_token_table`: el hash SHA-256 almacenado no correspondía al string del token `rk2CTmbt4l7nwouQigyLSt5R6Bq_KDp6` asignado en `infra/.env`. Además, existían errores tipográficos en los encabezados del flujo.
-* **Solución Aplicada:** Se actualizó el hash en MariaDB calculando `hash('sha256', 'rk2CTmbt4l7nwouQigyLSt5R6Bq_KDp6')` = `79bb66ff3fc0d58bef3ff10124545c767a59597fc88fc816be25433b9bb165ce` y se parametrizó la autorización mediante la variable de entorno `{{ $env.MANTIS_API_TOKEN }}`.
+* **Causa Raíz:** Discrepancia criptográfica en la base de datos `bugtracker.mantis_api_token_table`: el hash SHA-256 almacenado no correspondía al token asignado en `MANTIS_API_TOKEN` (ver `infra/.env`). Además, existían errores tipográficos en los encabezados del flujo.
+* **Solución Aplicada:** Se actualizó el hash en MariaDB con el SHA-256 del token y se parametrizó la autorización mediante la variable de entorno `{{ $env.MANTIS_API_TOKEN }}`.
 
 ### Incidente 3: Error 404 Category Not Found en Mantis API
 * **Síntoma:** Al enviar tickets con categorías como `Infraestructura` o `Infraestructura Clúster HA`, Mantis devolvía `STATUS: 404 - Category not found (code: 1502)`.
@@ -284,7 +286,7 @@ Conforme a las exigencias de ciberseguridad establecidas en el **Punto 13** y **
 
 | Requisito de la Cátedra | Medida Implementada en ExpoJuy 2026 | Estado |
 | :--- | :--- | :---: |
-| **Proteger la interfaz de administración** | n8n bindea su puerto exclusivamente a `127.0.0.1:5679` en el host. El acceso externo se gestiona mediante túnel autenticado (Tailscale / Cloudflare Tunnel). Acceso restringido con cuenta Owner y cifrado de sesión. | ✅ Cumplido |
+| **Proteger la interfaz de administración** | n8n bindea su puerto exclusivamente a `127.0.0.1:5679` en el host. El editor se publica solo en la tailnet (Tailscale Serve) y únicamente la ruta `/webhook` sale a Internet por Tailscale Funnel, para Telegram (ver [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md)). Acceso restringido con cuenta Owner. | ✅ Cumplido |
 | **Evitar secretos escritos en los flujos** | Los workflows exportados en Git no contienen contraseñas ni tokens. El token de Mantis se inyecta por entorno (`{{ $env.MANTIS_API_TOKEN }}`). Las credenciales externas están desvinculadas de los JSONs. | ✅ Cumplido |
 | **Restringir permisos de credenciales** | Las credenciales de bases de datos, APIs y bots están asignadas al ámbito `Personal` del Owner de automatización, aplicando el principio de mínimo privilegio. | ✅ Cumplido |
 | **Cifrado de credenciales en reposo** | Clave simétrica de 256 bits (`N8N_ENCRYPTION_KEY`) provista por variable de entorno, protegiendo la base interna de n8n ante copias no autorizadas. | ✅ Cumplido |
@@ -317,8 +319,14 @@ Para importar y poner en marcha los workflows en un entorno nuevo:
    docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml -f compose.monitoring.yaml -f compose.automation.yaml up -d
    ```
 2. **Acceder a la interfaz de n8n:**
-   Navegar a `http://localhost:5679` y registrar la cuenta de Administrador.
+   Navegar a `http://localhost:5679` (en la notebook) o `https://<maquina>.<tailnet>.ts.net:5679` (desde la tailnet) y registrar la cuenta de Administrador **antes** de compartir el acceso: la primera persona que entra queda como Owner.
 3. **Importar los Workflows:**
+   * **Por comando (los 6 de una vez):** la carpeta `infra/n8n-backups` está montada en `/backup` dentro del contenedor.
+     ```powershell
+     docker exec -u node expojuy-n8n n8n import:workflow --separate --input=/backup/workflows
+     ```
+     Quedan desactivados y sin credenciales (ver paso 4). Recargar el editor para verlos.
+   * **Desde la web, uno por uno:**
    * Menú superior izquierdo -> **Workflows** -> **Add Workflow**.
    * Menú de opciones (`...`) -> **Import from File**.
    * Seleccionar los archivos desde `infra/n8n-backups/workflows/` en el siguiente orden sugerido:
@@ -332,5 +340,5 @@ Para importar y poner en marcha los workflows en un entorno nuevo:
    * **Postgres:** Host `postgres` (o `db-loadbalancer`), puerto `5432`, base `expojuy`, usuario `expojuy_app`, clave de `.env`.
    * **Telegram:** Token provisto por @BotFather.
    * **Google Gemini:** API Key de Google AI Studio.
-   * **Nextcloud:** Host `http://nextcloud`, usuario `Santiago`, clave `ExpoJuy2026!`.
-   * **Redis:** Host `redis`, puerto `6379`.
+   * **Nextcloud:** Host `http://nextcloud`, usuario `Santiago`, clave propia del usuario (se entrega por privado).
+   * **Redis:** servicio en la nube (no hay contenedor de Redis); host, puerto y clave del proveedor.
