@@ -19,14 +19,19 @@ services:
       - N8N_HOST=127.0.0.1
       - N8N_PORT=5678
       - N8N_PROTOCOL=http
-      - WEBHOOK_URL=http://localhost:${N8N_PORT:-5679}/
+      # URLs públicas (ver docs/PUBLICAR_HERRAMIENTAS.md): editor por Tailscale Serve (tailnet)
+      # y webhooks por Tailscale Funnel (Telegram exige https). Sin valor en .env, quedan locales.
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5679/}
+      - N8N_EDITOR_BASE_URL=${N8N_EDITOR_BASE_URL:-http://localhost:5679/}
+      # Detrás de Tailscale (proxy): tomar la IP del cliente de X-Forwarded-For
+      - N8N_PROXY_HOPS=1
       - NODE_ENV=production
 
-      # Clave de cifrado compartida para el equipo (permite importar/exportar credenciales)
-      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-expojuy_n8n_secret_encryption_key_2026}
+      # Clave de cifrado de las credenciales: obligatoria, sin valor por defecto (repo público)
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:?Definir N8N_ENCRYPTION_KEY en infra/.env}
 
       # Tokens de servicios externos inyectados por entorno para evitar secretos en workflows
-      - MANTIS_API_TOKEN=${MANTIS_API_TOKEN:-rk2CTmbt4l7nwouQigyLSt5R6Bq_KDp6}
+      - MANTIS_API_TOKEN=${MANTIS_API_TOKEN:-}
 
       # Zona horaria unificada del proyecto (Jujuy, Argentina)
       - GENERIC_TIMEZONE=America/Argentina/Jujuy

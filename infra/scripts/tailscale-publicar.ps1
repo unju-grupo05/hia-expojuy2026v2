@@ -29,6 +29,7 @@ $Servicios = [ordered]@{
     prometheus = 9090
     pgadmin    = 5050
     haproxy    = 8404
+    n8n        = 5679   # solo el editor; los webhooks van por Funnel en el 8443 (ver PUBLICAR_HERRAMIENTAS.md)
 }
 
 if (-not (Get-Command tailscale -ErrorAction SilentlyContinue)) {

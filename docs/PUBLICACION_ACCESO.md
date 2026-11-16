@@ -7,7 +7,7 @@ con qué controles. Responsable: Integrante 1.
 
 | Nivel | Mecanismo | Quién accede | Servicios |
 |---|---|---|---|
-| **Público** | Tailscale **Funnel** | Cualquiera en Internet | La aplicación web (frontend + API en `/api`) |
+| **Público** | Tailscale **Funnel** | Cualquiera en Internet | La aplicación web (frontend + API en `/api`) y los webhooks de n8n (`/webhook`, para Telegram) |
 | **Restringido** | Tailscale **Serve** | Solo los miembros de la tailnet (equipo y cátedra invitados) | Interfaces administrativas |
 | **Local** | Ninguno | Solo la notebook | Base de datos y servicios internos del clúster |
 
@@ -28,6 +28,7 @@ Regla: la aplicación es pública, lo administrativo es privado y la base de dat
 ```mermaid
 flowchart LR
     U[Usuario en Internet] -->|HTTPS| F[Tailscale Funnel<br/>https://maquina.tailnet.ts.net]
+    TG[Telegram] -->|HTTPS :8443/webhook| F2[Tailscale Funnel :8443]
     T[Integrante o cátedra<br/>en la tailnet] -->|HTTPS| S[Tailscale Serve]
 
     subgraph NB[Notebook: Docker, puertos solo en 127.0.0.1]
@@ -35,10 +36,12 @@ flowchart LR
         BE[backend :3000]
         HA[HAProxy]
         PG[(Postgres primario<br/>+ 2 réplicas)]
-        ADM[Herramientas:<br/>Grafana, Prometheus, pgAdmin,<br/>Mantis, Nextcloud, HAProxy stats]
+        ADM[Herramientas:<br/>Grafana, Prometheus, pgAdmin,<br/>Mantis, Nextcloud, HAProxy stats,<br/>editor de n8n]
+        N8N[n8n :5679]
     end
 
     F -->|127.0.0.1:8080| FE
+    F2 -->|solo /webhook| N8N
     FE -->|/api| BE
     BE --> HA --> PG
     S --> ADM
@@ -55,6 +58,8 @@ flowchart LR
 | Prometheus | 9090 | **Serve** | Sin login propio: lo protege la tailnet |
 | pgAdmin | 5050 | **Serve** | `PGADMIN_*` |
 | HAProxy stats | 8404 | **Serve** | `HA_PROXY_STATS_*` |
+| n8n (editor) | 5679 | **Serve** | Cuenta Owner de n8n |
+| n8n (webhooks `/webhook`) | 5679 → Funnel 8443 | **Funnel** (solo esa ruta) | Sin login: cada flujo valida lo que recibe |
 | Sentinel (API de estado) | 8008 | Local | — |
 | Postgres primario / réplicas | 5433 / 5434, 5435 | Local | — |
 | HAProxy escritura / lectura | 5437 / 5438 | Local | — |
@@ -147,7 +152,7 @@ Política aplicada en la consola (*Access controls* → *JSON editor*), en lugar
     { "src": ["autogroup:member"], "dst": ["*"], "ip": ["*"] },
     // Usuarios con la máquina compartida (equipo y cátedra): solo la web y las herramientas
     { "src": ["autogroup:shared"], "dst": ["notebook-expojuy"],
-      "ip": ["tcp:443", "tcp:3001", "tcp:5050", "tcp:8082", "tcp:8083", "tcp:8404", "tcp:9090"] },
+      "ip": ["tcp:443", "tcp:3001", "tcp:5050", "tcp:5679", "tcp:8082", "tcp:8083", "tcp:8404", "tcp:9090"] },
 ],
 ```
 
@@ -169,6 +174,7 @@ no está en `grants` queda bloqueado. Funnel no pasa por la ACL: la web sigue si
 | Dependencia de Tailscale | Sin el servicio de Tailscale no hay acceso externo | Alternativa documentable: Cloudflare Tunnel |
 | `/api-docs` (Swagger) público | Expone la descripción de la API | Restringirlo en producción (punto 14) |
 | `/admin/login` público | Ataques de fuerza bruta | Claves fuertes; limitar intentos (punto 14) |
+| Webhooks de n8n públicos (`/webhook`) | Cualquiera puede disparar un flujo | Solo esa ruta por Funnel (el editor queda en la tailnet); cada flujo valida lo que recibe |
 | Frontend en `0.0.0.0` | Accesible desde la red local | Pasarlo a `127.0.0.1` |
 | Programas de Windows escuchando en todas las interfaces (SMB 445, PostgreSQL local 5432) | Alcanzables desde la red local y, sin ACL, desde la tailnet | ACL de la tailnet (6.1); detener el PostgreSQL local si no se usa |
 | Ancho de banda doméstico | Rendimiento limitado | Aceptado para la demostración |
@@ -195,4 +201,5 @@ no está en `grants` queda bloqueado. Funnel no pasa por la ACL: la web sigue si
 | Página de accesos para el equipo (`ACCESOS.md`) | Hecho |
 | Frontend en `127.0.0.1` | Pendiente |
 | Panel de disponibilidad | Pendiente |
+| n8n: editor por Serve (5679) y webhooks por Funnel (8443) | Verificado 16/11/2026 desde la notebook; falta desde fuera de la tailnet |
 | Evidencia de acceso externo | Pendiente |
