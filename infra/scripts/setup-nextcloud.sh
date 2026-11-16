@@ -103,6 +103,7 @@ docker exec -u www-data "$CONTAINER" php occ groupfolders:group "$ID4" "equipo-e
 
 ID5=$(ensure_folder "05-Seguridad-Auditorias-e-Incidencias")
 docker exec -u www-data "$CONTAINER" php occ groupfolders:group "$ID5" "qa-seguridad" write share delete >/dev/null 2>&1
+docker exec -u www-data "$CONTAINER" php occ groupfolders:group "$ID5" "automatizacion-n8n" write share delete >/dev/null 2>&1
 docker exec -u www-data "$CONTAINER" php occ groupfolders:group "$ID5" "equipo-expojuy" >/dev/null 2>&1
 
 ID6=$(ensure_folder "06-Entregables-Finales-y-Defensa")

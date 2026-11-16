@@ -110,6 +110,7 @@ $folders = @(
         name = "05-Seguridad-Auditorias-e-Incidencias"
         rules = @(
             @{ group = "qa-seguridad"; perms = "write share delete" },
+            @{ group = "automatizacion-n8n"; perms = "write share delete" },
             @{ group = "equipo-expojuy"; perms = "" }
         )
     },

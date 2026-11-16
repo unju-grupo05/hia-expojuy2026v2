@@ -1,0 +1,361 @@
+{
+  "name": "Flujo 1 - Sub-Workflow - RAG Diagnóstico & Runbook Clúster BD (Nextcloud + Mantis + Telegram)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "913fbed6-84cc-490c-b3dd-f0f13e701db7",
+      "name": "Disparador de Sub-Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ .MANTIS_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"summary\": {{ JSON.stringify($json.mantisSummary || ('[CRÍTICO] Falla en Clúster BD: ' + $json.alertName)) }},\n  \"description\": {{ JSON.stringify($json.mantisDescription || $json.description || 'Fallo detectado por Prometheus Alertmanager en el clúster de alta disponibilidad PostgreSQL.') }},\n  \"project\": { \"name\": \"ExpoJuy\" },\n  \"category\": { \"name\": \"Infraestructura Clúster HA\" },\n  \"priority\": { \"name\": \"urgent\" },\n  \"severity\": { \"name\": \"crash\" }\n}",
+        "options": {}
+      },
+      "id": "daa676a2-b7e6-442b-8fc4-76ae38206bc5",
+      "name": "Crear Ticket Urgente Mantis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        416
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $('Disparador de Sub-Workflow').first()?.json || {};\nconst mantisResp = $input.first()?.json || {};\nconst ticketId = mantisResp.issue?.id || mantisResp.id || ('INC-' + Math.floor(1000 + Math.random() * 9000));\n\nconst alertName = inputData.alertName || 'PostgresNodeDown';\nconst node = inputData.node || inputData.instance || 'nodo-desconocido';\nconst severity = inputData.severity || 'critical';\nconst summary = inputData.summary || 'Caída de nodo de clúster';\nconst description = inputData.description || 'El nodo no responde a healthchecks';\nconst startsAt = inputData.startsAt || new Date().toISOString();\n\nconst promptAnalisis = `Se ha producido una alerta crítica en la infraestructura de ExpoJuy 2026:\\n` +\n  `• Alerta: ${alertName}\\n` +\n  `• Nodo/Instancia afectada: ${node}\\n` +\n  `• Severidad: ${severity}\\n` +\n  `• Resumen: ${summary}\\n` +\n  `• Descripción de Prometheus: ${description}\\n` +\n  `• Ticket Mantis asociado: #${ticketId}\\n` +\n  `• Fecha/Hora de detección: ${startsAt}\\n\\n` +\n  `Consulta la herramienta de conocimiento \"runbooks_infraestructura_expojuy\" para recuperar los procedimientos oficiales de recuperación de PostgreSQL HA en Docker y redacta un INFORME TÉCNICO Y RUNBOOK DE REMEDIACIÓN estructurado en Markdown:\\n` +\n  `1. Diagnóstico de Causa Raíz y Radio de Impacto\\n` +\n  `2. Procedimiento de Remediación Paso a Paso con comandos docker compose y psql precisos\\n` +\n  `3. Verificación Post-Recuperación de la Replicación y Balanceador HAProxy\\n` +\n  `4. Medidas Preventivas para evitar recurrencia.`;\n\nreturn [{\n  json: {\n    ...inputData,\n    ticketId,\n    alertName,\n    node,\n    severity,\n    summary,\n    description,\n    promptAnalisis\n  }\n}];"
+      },
+      "id": "7c3a2273-3a96-4557-b8de-b6104ce60770",
+      "name": "Preparar Prompt de Diagnóstico",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.promptAnalisis }}",
+        "options": {
+          "systemMessage": "=Eres el Especialista SRE y Arquitecto de Base de Datos del clúster de alta disponibilidad de ExpoJuy 2026.\n\nDIRECTIVAS ESTRICTAS DE RAG:\n1. Utiliza OBLIGATORIAMENTE la herramienta \"runbooks_infraestructura_expojuy\" para consultar los manuales y procedimientos de recuperación técnica de PostgreSQL HA (failover, streaming replication, HAProxy y réplicas secundarias).\n2. No inventes procedimientos ajenos a la topología de contenedores de ExpoJuy (postgres primario, postgres-replica-1, postgres-replica-2, db-loadbalancer:5432 y expojuy-db-failover-manager).\n3. Redacta el informe post-mortem con comandos exactos y en formato Markdown estructurado y profesional."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2256,
+        416
+      ],
+      "id": "3c88e943-ad56-4f9c-925a-6dec01b4c106",
+      "name": "Asistente RAG - Especialista SRE Clúster"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Consulta manuales de procedimientos y runbooks oficiales de contingencia y recuperación para el clúster PostgreSQL de ExpoJuy.",
+        "tableName": "runbooks_infraestructura_expojuy",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        2320,
+        640
+      ],
+      "id": "d736f656-06ce-4eb4-8a39-59afdc14db79",
+      "name": "runbooks_infraestructura_expojuy",
+      "credentials": {
+        "postgres": {
+          "id": "aZI4WYVNCQgeT63L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        816
+      ],
+      "id": "55b9888e-aab3-4feb-99e0-a07cc1e5bc7b",
+      "name": "Embeddings Gemini SRE",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1zRNX68OoSgyfRky",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $('Preparar Prompt de Diagnóstico').first().json;\nconst agentOutput = $input.first().json.output || $input.first().json.text || 'Diagnóstico generado automáticamente por el sistema RAG.';\n\nconst fileName = `RUNBOOK_INCIDENTE_${prev.ticketId}_${prev.alertName}.md`;\n\nconst docHeader = `# INFORME DE INCIDENTE Y RUNBOOK DE OPERACIÓN - EXPOJUY 2026\\n\\n` +\n  `**Ticket Mantis:** #${prev.ticketId}  \\n` +\n  `**Alerta:** \\`${prev.alertName}\\`  \\n` +\n  `**Nodo/Instancia:** \\`${prev.node}\\`  \\n` +\n  `**Severidad:** \\`${prev.severity.toUpperCase()}\\`  \\n` +\n  `**Fecha de Detección:** ${prev.startsAt}  \\n` +\n  `**Generado por:** Asistente RAG SRE (n8n & Google Gemini)  \\n\\n` +\n  `---\\n\\n`;\n\nconst fullMarkdown = docHeader + agentOutput;\n\n// Resumen sintético para enviar por Telegram\nconst telegramAlert = `🚨 *INCIDENCIA CRÍTICA EN CLÚSTER DE BD* 🚨\\n\\n` +\n  `• *Alerta:* \\`${prev.alertName}\\`\\n` +\n  `• *Nodo afectado:* \\`${prev.node}\\`\\n` +\n  `• *Ticket Mantis:* #${prev.ticketId}\\n` +\n  `• *Diagnóstico RAG:* ${prev.summary}\\n` +\n  `• *Documentación:* Se subió runbook \\`${fileName}\\` a Nextcloud.\\n\\n` +\n  `_Revisar la carpeta de Documentos en Nextcloud para ejecutar los pasos de remediación._`;\n\nreturn [{\n  json: {\n    ...prev,\n    fileName,\n    fullMarkdown,\n    telegramAlert\n  }\n}];"
+      },
+      "id": "4b7419a5-4bb3-4b62-bccc-e335cbb69bfa",
+      "name": "Formatear Informe Markdown",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2592,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "path": "=/05-Seguridad-Auditorias-e-Incidencias/{{ $json.fileName }}",
+        "fileContent": "={{ $json.fullMarkdown }}"
+      },
+      "type": "n8n-nodes-base.nextCloud",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        416
+      ],
+      "id": "a5a91cf9-8368-44d7-be77-bf6984c3130d",
+      "name": "Upload a file",
+      "credentials": {
+        "nextCloudApi": {
+          "id": "w0v4L9cu9BFnBmpg",
+          "name": "NextCloud account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "8873048301",
+        "text": "={{ $('Formatear Informe Markdown').item.json.telegramAlert }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2976,
+        416
+      ],
+      "id": "f9134a83-55b5-4387-a683-0c825b9ff935",
+      "name": "Notificar Diagnóstico a Telegram",
+      "webhookId": "2c28326f-5ce5-4d99-93a2-c62b2e59ba41",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        704
+      ],
+      "id": "db4bb17d-f70b-4131-8222-26f30a265c75",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "pACTK0fhRXRFhlHP",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Disparador de Sub-Workflow": [
+      {
+        "json": {
+          "hasAlerts": true,
+          "status": "firing",
+          "alertName": "PostgresPrimaryDown",
+          "severity": "critical",
+          "instance": "postgres-exporter-primary:9187",
+          "node": "postgres-primary",
+          "summary": "Nodo Primario PostgreSQL caído (postgres)",
+          "description": "El nodo principal postgres:5432 no responde o su exportador está inaccesible.",
+          "startsAt": "16/11/2026, 12:54:10",
+          "isClusterManaged": true,
+          "mantisSummary": "[PROMETHEUS] PostgresPrimaryDown en postgres-exporter-primary:9187 (CRITICAL)",
+          "mantisDescription": "Incidencia detectada automáticamente por Prometheus Alertmanager.\n\n• Métrica/Alerta: PostgresPrimaryDown\n• Instancia/Nodo: postgres-primary\n• Severidad: CRITICAL\n• Resumen: Nodo Primario PostgreSQL caído (postgres)\n• Detalle: El nodo principal postgres:5432 no responde o su exportador está inaccesible.\n• Inicio: 16/11/2026, 12:54:10\n\nAcción: Derivado a análisis automático.",
+          "mantisSeverity": "crash",
+          "mantisPriority": "urgent"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Preparar Prompt de Diagnóstico": [
+      {
+        "json": {
+          "hasAlerts": true,
+          "status": "firing",
+          "alertName": "PostgresPrimaryDown",
+          "severity": "critical",
+          "instance": "postgres-exporter-primary:9187",
+          "node": "postgres-primary",
+          "summary": "Nodo Primario PostgreSQL caído (postgres)",
+          "description": "El nodo principal postgres:5432 no responde o su exportador está inaccesible.",
+          "startsAt": "16/11/2026, 12:54:10",
+          "isClusterManaged": true,
+          "mantisSummary": "[PROMETHEUS] PostgresPrimaryDown en postgres-exporter-primary:9187 (CRITICAL)",
+          "mantisDescription": "Incidencia detectada automáticamente por Prometheus Alertmanager.\n\n• Métrica/Alerta: PostgresPrimaryDown\n• Instancia/Nodo: postgres-primary\n• Severidad: CRITICAL\n• Resumen: Nodo Primario PostgreSQL caído (postgres)\n• Detalle: El nodo principal postgres:5432 no responde o su exportador está inaccesible.\n• Inicio: 16/11/2026, 12:54:10\n\nAcción: Derivado a análisis automático.",
+          "mantisSeverity": "crash",
+          "mantisPriority": "urgent",
+          "ticketId": "INC-5112",
+          "promptAnalisis": "Se ha producido una alerta crítica en la infraestructura de ExpoJuy 2026:\n• Alerta: PostgresPrimaryDown\n• Nodo/Instancia afectada: postgres-primary\n• Severidad: critical\n• Resumen: Nodo Primario PostgreSQL caído (postgres)\n• Descripción de Prometheus: El nodo principal postgres:5432 no responde o su exportador está inaccesible.\n• Ticket Mantis asociado: #INC-5112\n• Fecha/Hora de detección: 16/11/2026, 12:54:10\n\nConsulta la herramienta de conocimiento \"runbooks_infraestructura_expojuy\" para recuperar los procedimientos oficiales de recuperación de PostgreSQL HA en Docker y redacta un INFORME TÉCNICO Y RUNBOOK DE REMEDIACIÓN estructurado en Markdown:\n1. Diagnóstico de Causa Raíz y Radio de Impacto\n2. Procedimiento de Remediación Paso a Paso con comandos docker compose y psql precisos\n3. Verificación Post-Recuperación de la Replicación y Balanceador HAProxy\n4. Medidas Preventivas para evitar recurrencia."
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Disparador de Sub-Workflow": {
+      "main": [
+        [
+          {
+            "node": "Crear Ticket Urgente Mantis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Ticket Urgente Mantis": {
+      "main": [
+        [
+          {
+            "node": "Preparar Prompt de Diagnóstico",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preparar Prompt de Diagnóstico": {
+      "main": [
+        [
+          {
+            "node": "Asistente RAG - Especialista SRE Clúster",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "runbooks_infraestructura_expojuy": {
+      "ai_tool": [
+        [
+          {
+            "node": "Asistente RAG - Especialista SRE Clúster",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Gemini SRE": {
+      "ai_embedding": [
+        [
+          {
+            "node": "runbooks_infraestructura_expojuy",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Asistente RAG - Especialista SRE Clúster": {
+      "main": [
+        [
+          {
+            "node": "Formatear Informe Markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Formatear Informe Markdown": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Notificar Diagnóstico a Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Asistente RAG - Especialista SRE Clúster",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7a46315e-3cd6-4ad3-be17-6be87c0f875e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5fe9c805b18747363ade04794d696366736a2790726f0a314b3f37ea06d50449"
+  },
+  "nodeGroups": [],
+  "id": "kAD3xJissdT5KaVA",
+  "tags": []
+}

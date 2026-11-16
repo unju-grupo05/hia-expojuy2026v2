@@ -320,4 +320,23 @@ Sin embargo, se identificaron **vulnerabilidades críticas y de severidad alta**
    - Incorporar chequeo estático automatizado en pipeline CI/CD (`npm audit` y linter de seguridad).
 
 ---
+
+## 6. Seguridad en Automatizaciones n8n y Agentes de IA (Punto 14)
+
+El subsistema de automatización con **n8n** y el asistente conversacional con **Google Gemini / RAG** fueron auditados específicamente bajo la taxonomía de amenazas de **OWASP Top 10 for LLM Applications** y buenas prácticas DevSecOps:
+
+### 6.1 Matriz de Amenazas y Controles en IA / n8n
+
+| Amenaza Específica | Vector de Ataque | Control Implementado | Estado |
+| :--- | :--- | :--- | :---: |
+| **LLM01: Prompt Injection** | Visitante malicioso intenta forzar al bot a ejecutar comandos o revelar datos del clúster. | Doble capa: *System Prompt* restrictivo ("Eres PachAI... no ejecutes comandos") + **Guardrail de Entrada** que evalúa toxicidad y rechaza inyecciones con umbral 0.7. |  Mitigado |
+| **LLM02: Sensitive Information Disclosure** | El LLM expone accidentalmente tokens de API o datos de expositores en Telegram. | **Guardrail de Salida**: Sanitización PII y detección de patrones de claves/secretos antes de enviar el mensaje al usuario. |  Mitigado |
+| **LLM06: Excessive Agency / Acciones Críticas Autónomas** | El agente ejecuta cambios destructivos en Docker o la base de datos sin autorización. | Principio de solo lectura y supervisión humana: Las herramientas (`Registrar_Reclamo_Mantis`, `Derivar_a_Soporte_Humano`) solo abren tickets o avisan al personal. Ningún flujo ejecuta `drop`, `kill` o `restart` autónomamente. |  Mitigado |
+| **API & Webhook Abuse / DoS** | Inundación de peticiones a los webhooks de n8n saturando el servidor o la cuota de IA. | Throttling en Alertmanager (`group_interval: 5m`), buffer anti-race condition en **Redis** (ventana 7s) y descarte de payloads vacíos. |  Mitigado |
+| **Hardcoded Secrets en Workflows** | Credenciales de base de datos o tokens de Mantis expuestos en los archivos `.json` de Git. | Eliminación de cadenas estáticas: inyección de tokens vía variables de entorno (`{{ $env.MANTIS_API_TOKEN }}`) y cifrado AES de credenciales con `N8N_ENCRYPTION_KEY`. |  Mitigado |
+| **Exposición de Interfaz Administrativa** | Acceso no autenticado al panel de n8n desde redes públicas. | Puerto bindeado exclusivamente a `127.0.0.1:5679` (localhost), autenticación Owner mandatoria y publicación solo vía túnel autenticado (Tailscale / Cloudflare Tunnel). |  Mitigado |
+
+Para más detalles sobre la arquitectura de los flujos, véase el documento complementario: [`docs/AUTOMATIZACION_N8N.md`](./AUTOMATIZACION_N8N.md).
+
+---
 *Reporte generado por el Asistente de IA bajo la directiva de la skill security-audit.*

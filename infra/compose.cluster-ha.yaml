@@ -189,6 +189,15 @@ services:
       db-loadbalancer:
         condition: service_started
 
+  # En el modo HA, los backups automáticos extraen datos del líder activo vía HAProxy
+  backup:
+    environment:
+      POSTGRES_HOST: db-loadbalancer
+      POSTGRES_PORT: 5432
+    depends_on:
+      db-loadbalancer:
+        condition: service_started
+
 volumes:
   pgdata-replica-1:
   pgdata-replica-2:

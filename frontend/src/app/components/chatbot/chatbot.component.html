@@ -1,5 +1,18 @@
 <!-- PachAI: Asistente Virtual Flotante -->
 <div class="chatbot-root">
+  <!-- Botón Híbrido Telegram (App nativa o Telegram Web) -->
+  <a class="telegram-launcher" [class.is-hidden]="chatOpen()"
+    href="https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fresolve%3Fdomain%3Dexpojuy_ops_bot"
+    target="_blank" rel="noopener noreferrer"
+    (click)="abrirTelegram($event)"
+    aria-label="Abrir asistente en Telegram @expojuy_ops_bot" title="Chatear en Telegram con @expojuy_ops_bot">
+    <svg class="telegram-icon" viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+      <path fill="#ffffff"
+        d="M20.665 3.717l-17.73 6.837c-1.21.486-1.203 1.161-.222 1.462l4.552 1.42 10.532-6.645c.498-.303.953-.14.579.192l-8.533 7.701h-.002l-.313 4.673c.46 0 .663-.211.921-.46l2.211-2.15 4.6 3.398c.848.467 1.457.227 1.668-.785l3.019-14.228c.309-1.239-.473-1.8-1.282-1.417z" />
+    </svg>
+    <span class="telegram-tooltip">Chat en Telegram (@expojuy_ops_bot)</span>
+  </a>
+
   <button class="chatbot-launcher" id="chatbot-launcher" type="button" aria-haspopup="dialog"
     [attr.aria-expanded]="chatOpen()" aria-controls="chatbot-panel"
     aria-label="Abrir asistente virtual PachAI" (click)="toggleChatbot()">

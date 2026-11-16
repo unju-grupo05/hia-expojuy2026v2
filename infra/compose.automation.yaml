@@ -1,0 +1,73 @@
+# =============================================================================
+# ExpoJuy 2026 - Automatización con n8n & Asistente RAG (Punto 13)
+# Integrante 4: Automatización de Procesos (n8n & RAG)
+#
+# Uso individual con el entorno base:
+#   docker compose -f compose.yaml -f compose.automation.yaml up -d
+#
+# Uso en conjunto con HA:
+#   docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.automation.yaml up -d
+# =============================================================================
+
+services:
+  n8n:
+    image: n8nio/n8n:2.45.6
+    container_name: expojuy-n8n
+    restart: unless-stopped
+    environment:
+      # Configuración de red y URL base
+      - N8N_HOST=127.0.0.1
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:${N8N_PORT:-5679}/
+      - NODE_ENV=production
+
+      # Clave de cifrado compartida para el equipo (permite importar/exportar credenciales)
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-expojuy_n8n_secret_encryption_key_2026}
+
+      # Tokens de servicios externos inyectados por entorno para evitar secretos en workflows
+      - MANTIS_API_TOKEN=${MANTIS_API_TOKEN:-rk2CTmbt4l7nwouQigyLSt5R6Bq_KDp6}
+
+      # Zona horaria unificada del proyecto (Jujuy, Argentina)
+      - GENERIC_TIMEZONE=America/Argentina/Jujuy
+      - TZ=America/Argentina/Jujuy
+
+      # Funcionalidades avanzadas de IA & LangChain habilitadas para el Asistente RAG (Flujo 3)
+      - N8N_AI_ENABLED=true
+
+      # Permitir que los nodos Code usen los módulos fs y path para inspeccionar los archivos de backup
+      - NODE_FUNCTION_ALLOW_BUILTIN=fs,path
+
+      # Optimización de almacenamiento: purgar logs de ejecuciones antiguas cada 7 días
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+
+      # Exposición de métricas internas para Prometheus (Integrante 3: Monitoreo)
+      - N8N_METRICS=true
+
+    volumes:
+      # Almacenamiento persistente de configuraciones, workflows y credenciales
+      - n8n-data:/home/node/.n8n
+      # Directorio local para exportación/importación ágil de flujos y backups en JSON
+      - ./n8n-backups:/backup
+      # Acceso de solo lectura a los dumps generados por el contenedor de backups de PostgreSQL
+      - ./backups:/backups:ro
+
+    ports:
+      # Puerto 5679 en el host para evitar colisión con otras instancias de n8n (5678)
+      # Limitado a 127.0.0.1 por convención de seguridad del proyecto
+      - "127.0.0.1:${N8N_PORT:-5679}:5678"
+
+    networks:
+      # data: Acceso directo a PostgreSQL (pgvector) para embeddings del Asistente RAG y backups
+      - data
+      # app: Comunicación con Backend y Frontend para recibir y emitir Webhooks
+      - app
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  n8n-data:
+

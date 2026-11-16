@@ -3,8 +3,8 @@ groups:
     rules:
       # 1. Alerta por uso elevado de CPU en el Host
       - alert: HighCpuUsage
-        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100)) > 85
-        for: 10s
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100)) > 85
+        for: 45s
         labels:
           severity: warning
         annotations:

@@ -46,6 +46,50 @@ export class ChatbotComponent implements OnDestroy {
   private chatScrollFrame: number | null = null;
   private activeRecognition: SpeechRecognitionLike | null = null;
 
+  abrirTelegram(event?: MouseEvent): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    if (event) event.preventDefault();
+
+    const botUsername = 'expojuy_ops_bot';
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    if (isMobile) {
+      // En dispositivos móviles, la URL universal abre directamente la app oficial
+      window.open(`https://t.me/${botUsername}`, '_blank', 'noopener,noreferrer');
+    } else {
+      // En PC/Escritorio: intenta primero llamar al protocolo nativo de Telegram Desktop (tg://)
+      // y si en 400ms la app no interceptó, abre fluidamente Telegram Web en una nueva pestaña.
+      const telegramWebUrl = `https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fresolve%3Fdomain%3D${botUsername}`;
+      
+      const appIframe = document.createElement('iframe');
+      appIframe.style.display = 'none';
+      document.body.appendChild(appIframe);
+
+      let appOpened = false;
+      const onBlur = () => {
+        appOpened = true;
+      };
+      window.addEventListener('blur', onBlur, { once: true });
+
+      try {
+        appIframe.src = `tg://resolve?domain=${botUsername}`;
+      } catch {
+        // Ignorar si el navegador bloquea la asignación
+      }
+
+      setTimeout(() => {
+        window.removeEventListener('blur', onBlur);
+        if (appIframe.parentNode) {
+          appIframe.parentNode.removeChild(appIframe);
+        }
+        // Si no se abrió la app nativa (la ventana del navegador no perdió foco), abrir Telegram Web
+        if (!appOpened && !document.hidden) {
+          window.open(telegramWebUrl, '_blank', 'noopener,noreferrer');
+        }
+      }, 450);
+    }
+  }
+
   constructor() {
     effect(() => {
       this.chatMessages();

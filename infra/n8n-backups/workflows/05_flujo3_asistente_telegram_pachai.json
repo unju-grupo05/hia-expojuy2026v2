@@ -1,0 +1,1138 @@
+{
+  "name": "Flujo 3 - Asistente Conversacional Telegram PachAI (ExpoJuy 2026)",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "a352029e-ede6-475f-bafc-3693902911b2",
+      "name": "Telegram Trigger - Mensaje Entrante",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        1456
+      ],
+      "webhookId": "telegram-pachai-expojuy",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "cond-has-message",
+              "leftValue": "={{ $json.message ? true : false }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "49fad6a9-cf5b-4ffa-ac9b-c06c3bfa88c0",
+      "name": "¿Tiene Mensaje?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        912,
+        1456
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extraer datos unificados del mensaje de Telegram (Texto o Audio/Voz)\nconst msg = $input.first().json.message || {};\nconst chatId = (msg.chat?.id || '').toString();\nconst senderName = msg.from?.first_name || 'Visitante';\nconst username = msg.from?.username || '';\nconst rawText = msg.text || msg.caption || '';\nconst isVoice = !!(msg.voice || msg.audio);\nconst fileId = msg.voice?.file_id || msg.audio?.file_id || null;\nconst messageId = (msg.message_id || Date.now()).toString();\nconst timestamp = msg.date ? new Date(msg.date * 1000).toISOString() : new Date().toISOString();\n\nconst messageObj = {\n  message_id: messageId,\n  content: rawText,\n  content_type: isVoice ? 'audio' : 'text',\n  file_id: fileId,\n  timestamp: timestamp\n};\n\nreturn [{\n  json: {\n    chatId,\n    contact_id: chatId,\n    senderName,\n    username,\n    rawText,\n    isVoice,\n    fileId,\n    message: messageObj,\n    timestamp\n  }\n}];"
+      },
+      "id": "fbaef25a-c56e-4aee-a1e8-0bd613b1c7a8",
+      "name": "Extraer Datos Telegram",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        1456
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "push",
+        "list": "={{ $('Extraer Datos Telegram').item.json.chatId }}_buffer",
+        "messageData": "={{ JSON.stringify($json.message) }}",
+        "tail": true
+      },
+      "id": "4586175c-3ccc-4575-88b5-4a226672c77e",
+      "name": "Redis: Push Mensaje a Buffer",
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        1456
+      ],
+      "credentials": {
+        "redis": {
+          "id": "Cq7xtitBcFnpqLSn",
+          "name": "Redis account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "message",
+        "key": "={{ $('Extraer Datos Telegram').item.json.chatId }}_buffer",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        1456
+      ],
+      "id": "215c855c-dd55-40d9-9f77-1a2a62a001a6",
+      "name": "Get messages buffer",
+      "credentials": {
+        "redis": {
+          "id": "Cq7xtitBcFnpqLSn",
+          "name": "Redis account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ JSON.parse($json.message.last()).message_id }}",
+                    "rightValue": "={{ $('Extraer Datos Telegram').item.json.message.message_id }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "5698b386-0dd8-467e-a9ed-e2f325d9132d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "No hacer nada"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "62e46d35-89a1-4f33-a553-4a68ab0b6674",
+                    "leftValue": "={{ JSON.parse($json.message.last()).timestamp }}",
+                    "rightValue": "={{ $now.minus(7,'seconds') }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "before"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Seguir"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Esperar"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        1440
+      ],
+      "id": "a7e1de74-9acb-420d-a432-93173c834ea8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "amount": 7
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        1616
+      ],
+      "id": "8612aa22-89f3-490c-a786-5e756da37a21",
+      "name": "Wait",
+      "webhookId": "e885e5b7-e090-402e-b6d3-4ed22f9a588e"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        1296
+      ],
+      "id": "fdc595aa-0301-4a4d-82fc-3a6a73875698",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "={{ $('Extraer Datos Telegram').item.json.chatId }}_buffer"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        1456
+      ],
+      "id": "2cc4ad57-28bd-4abd-9bba-8bb873352c9e",
+      "name": "Delete message buffer",
+      "credentials": {
+        "redis": {
+          "id": "Cq7xtitBcFnpqLSn",
+          "name": "Redis account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "message",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        1456
+      ],
+      "id": "52b98985-cf78-4bef-80d3-914612934ea0",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ typeof $json.message === 'string' ? JSON.parse($json.message) : $json.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2528,
+        1664
+      ],
+      "id": "b3f84d95-df80-4155-9ea2-8d2d5bc5b024",
+      "name": "JSON parse"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c47a1fc0-63a6-4e42-8ba4-feeb1c58f621"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c8d6fa01-cf90-4513-b3d4-7e146ba1fa95",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Otro"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        176,
+        2000
+      ],
+      "id": "8df5da54-c20f-482d-b6b2-4d44ed556b37",
+      "name": "Definir tipo de mensaje"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "347dd8e8-2a6e-4d77-8758-581ed7666881",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "a74c4f3a-acaa-4c9e-b8e2-14048a9c3dfe",
+              "name": "timestamp",
+              "value": "={{ $json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        2080
+      ],
+      "id": "51d925e4-1ac1-41f6-ab77-bacaab6cb380",
+      "name": "Contenido Texto"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a0abfcb-657d-428d-bbd1-f1d8e2673260",
+              "name": "content",
+              "value": "={{ $json.text || 'Audio recibido' }}",
+              "type": "string"
+            },
+            {
+              "id": "a1827aef-8dde-4680-9791-468852bf9a94",
+              "name": "timestamp",
+              "value": "={{ $('JSON parse').item.json.timestamp }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        1872
+      ],
+      "id": "c1579c8a-542c-401f-9170-27a930042c8c",
+      "name": "Contenido audio"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1056,
+        1984
+      ],
+      "id": "9a7a7a58-e648-4988-8fd4-03069ca188ce",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "timestamp"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        1984
+      ],
+      "id": "2ae23d08-2baa-4843-860f-6b100a8e8f87",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "content",
+              "renameField": true,
+              "outputFieldName": "mensajes"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1504,
+        1984
+      ],
+      "id": "d1895215-61c3-499b-9f08-4fe589a19474",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a91be9e7-a885-4c4b-8829-8e5f94040b43",
+              "name": "text",
+              "value": "={{ $json.mensajes.join(' ') }}",
+              "type": "string"
+            },
+            {
+              "id": "chat-id-assign",
+              "name": "chatId",
+              "value": "={{ $('Extraer Datos Telegram').item.json.chatId }}",
+              "type": "string"
+            },
+            {
+              "id": "sender-name-assign",
+              "name": "senderName",
+              "value": "={{ $('Extraer Datos Telegram').item.json.senderName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1712,
+        1984
+      ],
+      "id": "5d0310b0-2cdc-4aeb-8bb9-50ca3dfb45dd",
+      "name": "Chat input"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.text }}",
+        "guardrails": {
+          "nsfw": {
+            "value": {
+              "threshold": 0.7
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        1952,
+        1984
+      ],
+      "id": "844907cb-8ccc-4b95-bd12-202302eb4c39",
+      "name": "Guardrail Entrada (NSFW / Moderación)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "=# IDENTIDAD Y ROL\nEres PachAI, el asistente virtual inteligente oficial de la ExpoJuy 2026 (organizada por la Cámara de Comercio Exterior de Jujuy en el Predio Ferial Ciudad Cultural, San Salvador de Jujuy).\nTu misión es orientar a visitantes, turistas, expositores y empresarios de manera cálida, servicial, profesional y con la identidad del norte argentino.\n\n# PILARES DE CONOCIMIENTO (Consulta SIEMPRE con \"base_conocimiento_expojuy\")\nDispones de información oficial exhaustiva indexada en tu base de conocimiento sobre:\n1. INFORMACIÓN GENERAL Y LOGÍSTICA:\n   - Fechas: Viernes 09 al Lunes 12 de Octubre de 2026 (fin de semana largo).\n   - Horarios: Pabellones de 11:00 a 23:00 hs; Rondas B2B de 10:00 a 18:00 hs; Patio Gastronómico de 12:00 a medianoche; Shows en vivo desde las 19:30 hs.\n   - Ubicación y transporte: Ciudad Cultural (Alto Padilla), accesos por RN 9 y Av. Bolivia, colectivos a Av. de las Carrozas y paradas de taxis.\n   - Entradas: Venta digital anticipada en OpenTickets (https://opentickets.live/events/1) con código QR, y boleterías presenciales (efectivo y tarjetas).\n   - Sectores: Pabellón Cubierto, Sector Corporativo y Minero, Playón de Maquinaria Pesada, Paseo de Artesanos y Sector Gastronómico.\n2. MAPA INTERACTIVO 3D:\n   - Cómo usar el visor web: Rotación (clic izquierdo/un dedo), Paneo (clic derecho/dos dedos), Zoom (+/- o rueda) y Pantalla completa.\n   - Modos de cámara: 3D Isométrico, 2D Cenital (plano guía), Vista de Entrada y botón Techo ON/OFF para ver el interior del Pabellón Cubierto.\n   - Búsqueda y Filtros por 11 rubros (Minería & Litio, Agroindustria, Automotor, Gastronomía, Tecnología, etc.).\n   - Códigos de color de stands: Verde (Disponible), Ámbar (Reservado), Violeta (Cedido/Asignado).\n   - Puntos de interés y emergencias: Boleterías, Sanitarios y Puestos SAME 107 (SAME Norte con ambulancia y SAME Sur).\n3. EXPOSITORES Y NEGOCIOS B2B:\n   - Catálogo de expositores y botón \"Agendar B2B\" en el portal oficial para pactar reuniones del 9 al 12 de octubre.\n   - Ficha técnica de stands: tomas monofásicos 220V, trifásicos 380V, Wi-Fi 6 y luminarias LED.\n   - Niveles de patrocinio y WhatsApp oficial de la feria (+54 388 4212955).\n\n# POLÍTICA DE USO DE HERRAMIENTAS\n- base_conocimiento_expojuy: Úsala OBLIGATORIAMENTE para responder dudas sobre stands, empresas, accesos, colectivos, horarios, precios de entradas o funciones del mapa 3D.\n- Registrar_Reclamo_Mantis: Úsala cuando un expositor o visitante reporte un problema físico, técnico o reclamo de servicio en el predio (ej: corte de luz en un stand, sanitario sin agua, stand sucio, falla de sonido). Pídele los detalles y bríndale el ID del ticket generado.\n- Derivar_a_Soporte_Humano: Úsala de inmediato si el usuario reporta una emergencia médica (guíalo también a las bases SAME 107), un incidente de seguridad, extravío de personas, o si exige expresamente ser atendido por un organizador humano.\n\n# REGLAS DE RESPUESTA\n- Saludo inicial: Si el usuario solo saluda, responde con cordialidad jujeña (\"¡Hola! Te doy la bienvenida a la ExpoJuy 2026...\") y sugiérele temas (horarios, plano del predio, stands de litio/agro, gastronomía o entradas).\n- Formato Telegram: Respuestas ágiles, estructuradas con viñetas, negritas clave y emojis discretos. Evita bloques interminables de texto.\n- Fidelidad (Anti-alucinación): No inventes datos que no estén en la base de conocimiento. Si un expositor o dato específico no figura, indícalo con amabilidad y sugiere consultar en el Stand Central de Informes o por WhatsApp al +54 388 4212955."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2352,
+        1968
+      ],
+      "id": "5cd65864-a357-4a66-ae5c-0fb63fc5115d",
+      "name": "PachAI - Agente Conversacional Telegram"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.3
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        2224
+      ],
+      "id": "59bf3e5a-6d99-4fc0-bbf5-116b35c16523",
+      "name": "Google Gemini Chat Model TG",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1zRNX68OoSgyfRky",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Chat input').item.json.chatId }}",
+        "tableName": "chatbot_conversaciones_tg",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        2352,
+        2224
+      ],
+      "id": "24a445e7-1831-4061-924c-aadd8d2baadb",
+      "name": "Postgres Chat Memory TG",
+      "credentials": {
+        "postgres": {
+          "id": "aZI4WYVNCQgeT63L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Busca stands, expositores, conferencias de la agenda y preguntas frecuentes en la base vectorial de ExpoJuy 2026.",
+        "tableName": "base_conocimiento_expojuy",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        2480,
+        2224
+      ],
+      "id": "b3370c0f-4597-4f1b-aded-47d6cb8a1966",
+      "name": "base_conocimiento_expojuy",
+      "credentials": {
+        "postgres": {
+          "id": "aZI4WYVNCQgeT63L",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2464,
+        2384
+      ],
+      "id": "d7053495-8d40-4c7b-b0d7-339d64402614",
+      "name": "Embeddings Google Gemini TG",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1zRNX68OoSgyfRky",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mantis/api/rest/issues",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "Authorization",
+              "valueProvider": "fieldValue",
+              "value": "rk2CTMbt4l7nwouQigyLSt5R6Bq_KDp6 "
+            },
+            {
+              "name": "Content-Type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"summary\": \"[RECLAMO TELEGRAM] Incidencia reportada por usuario en feria\",\n  \"description\": \"Reclamo recibido vía Telegram PachAI:\\n• Stand/Detalle: {{$fromAI('stand_o_detalle')}}\\n• Contacto Telegram: \" + {{ JSON.stringify($('Chat input').item.json.senderName) }},\n  \"project\": { \"name\": \"ExpoJuy\" },\n  \"category\": { \"name\": \"Atención al Expositor\" },\n  \"priority\": { \"name\": \"high\" },\n  \"severity\": { \"name\": \"major\" }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        2752,
+        2224
+      ],
+      "id": "fc1117b0-d065-4ed3-b374-c49c3b90835c",
+      "name": "Registrar_Reclamo_Mantis"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.output }}",
+        "guardrails": {
+          "pii": {
+            "value": {
+              "type": "all"
+            }
+          },
+          "secretKeys": {
+            "value": {
+              "permissiveness": "balanced"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        1968
+      ],
+      "id": "beb83b00-35ce-4e45-b075-6cc40f65344b",
+      "name": "Guardrail Salida (Sanitización PII)"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "Gemini 2.5 Flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        1872
+      ],
+      "id": "64b25645-6de4-4760-8437-7b21df382e53",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "1zRNX68OoSgyfRky",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        400,
+        1872
+      ],
+      "id": "74584e0f-6563-4ddf-8a0b-3bd5480e390e",
+      "name": "Get a file",
+      "webhookId": "edbf0e02-b0b3-492a-9e14-9c7431caac66",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Envía un aviso urgente al equipo de organizadores de ExpoJuy cuando un visitante solicite atención humana o tenga una emergencia.",
+        "chatId": "8873048301",
+        "text": "=👤 *SOLICITUD DE ASISTENCIA HUMANA EN EXPOJUY*\n\n• *Usuario:* {{ $('Chat input').item.json.senderName }}\n• *Detalle:* {{ $fromAI('motivo_asistencia') }}\n\n_Acercarse al visitante o responder a la brevedad._",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        2912,
+        2224
+      ],
+      "id": "dc5c505c-da7c-413c-8a87-017c0fa1664f",
+      "name": "Derivar_a_Soporte_Humano",
+      "webhookId": "7832525c-db71-4ceb-a7cf-41b8bacfbf27",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Chat input').item.json.chatId }}",
+        "text": "={{ $json.guardrailsInput || $json.text || $json.output || 'Disculpa, no pude procesar tu mensaje. ¿Podrías reiterarlo?' }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2976,
+        1968
+      ],
+      "id": "6f2f27a6-ca6b-4a94-af6c-e906e354d5a5",
+      "name": "Enviar Respuesta a Telegram",
+      "webhookId": "7403ecd1-a632-4551-9dc0-1923f96ec82c",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Chat input').item.json.chatId }}",
+        "text": "=🛡️ *Mensaje no procesado*\n\nEstimado/a visitante, como asistente oficial de la **ExpoJuy 2026**, no puedo responder mensajes con lenguaje ofensivo, inapropiado o solicitudes ajenas al evento.\n\nCon gusto puedo ayudarte con:\n📍 Ubicación de stands y sectores en el mapa 3D\n🎟️ Compra de entradas y horarios de la feria\n🚌 Cómo llegar a la Ciudad Cultural y transporte\n🤝 Rondas de negocios B2B y expositores\n\n_¿Qué información de la ExpoJuy te gustaría consultar?_",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2144,
+        2208
+      ],
+      "id": "fe21aef7-aaeb-4824-a80f-8cbd9bbc9906",
+      "name": "Respuesta Bloqueo Moderación Telegram",
+      "webhookId": "7403ecd1-a632-4551-9dc0-1923f96ec82c",
+      "credentials": {
+        "telegramApi": {
+          "id": "V71OzSNA8hkMNtkh",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger - Mensaje Entrante": {
+      "main": [
+        [
+          {
+            "node": "¿Tiene Mensaje?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Tiene Mensaje?": {
+      "main": [
+        [
+          {
+            "node": "Extraer Datos Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Datos Telegram": {
+      "main": [
+        [
+          {
+            "node": "Redis: Push Mensaje a Buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis: Push Mensaje a Buffer": {
+      "main": [
+        [
+          {
+            "node": "Get messages buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get messages buffer": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete message buffer",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get messages buffer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete message buffer": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "JSON parse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON parse": {
+      "main": [
+        [
+          {
+            "node": "Definir tipo de mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Definir tipo de mensaje": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Contenido Texto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contenido Texto": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Contenido audio": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Chat input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat input": {
+      "main": [
+        [
+          {
+            "node": "Guardrail Entrada (NSFW / Moderación)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model TG": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Guardrail Entrada (NSFW / Moderación)",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrail Entrada (NSFW / Moderación)": {
+      "main": [
+        [
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta Bloqueo Moderación Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory TG": {
+      "ai_memory": [
+        [
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base_conocimiento_expojuy": {
+      "ai_tool": [
+        [
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini TG": {
+      "ai_embedding": [
+        [
+          {
+            "node": "base_conocimiento_expojuy",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar_Reclamo_Mantis": {
+      "ai_tool": [
+        [
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PachAI - Agente Conversacional Telegram": {
+      "main": [
+        [
+          {
+            "node": "Guardrail Salida (Sanitización PII)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardrail Salida (Sanitización PII)": {
+      "main": [
+        [
+          {
+            "node": "Enviar Respuesta a Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Contenido audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Derivar_a_Soporte_Humano": {
+      "ai_tool": [
+        [
+          {
+            "node": "PachAI - Agente Conversacional Telegram",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "ab8bb1a4-9a59-4798-b6f0-256c6a927edc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5fe9c805b18747363ade04794d696366736a2790726f0a314b3f37ea06d50449"
+  },
+  "nodeGroups": [],
+  "id": "tDwbJ0mIPuYU2vLU",
+  "tags": []
+}
