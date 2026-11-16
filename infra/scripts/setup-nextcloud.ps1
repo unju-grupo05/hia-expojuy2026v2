@@ -25,10 +25,24 @@ if ($containerStatus -ne "true") {
 }
 Write-Host "[OK] Contenedor $CONTAINER activo y saludable." -ForegroundColor Green
 
-# 2. Habilitar la aplicación Group Folders (Carpetas de Grupo)
-Write-Host "`n[Paso 2/5] Habilitando aplicacion oficial 'groupfolders'..." -ForegroundColor Yellow
-docker exec -u www-data $CONTAINER php occ app:enable groupfolders 2>&1 | Out-Null
-Write-Host "[OK] Modulo 'groupfolders' activo en Nextcloud." -ForegroundColor Green
+# 2. Instalar y activar Team Folders (id interno: groupfolders), requerido por el paso 5.
+#    No viene en la imagen de Nextcloud: si falta, se descarga de la tienda de apps.
+Write-Host "`n[Paso 2/5] Verificando la aplicacion 'Team Folders' (groupfolders)..." -ForegroundColor Yellow
+$apps = docker exec -u www-data $CONTAINER php occ app:list --output=json | ConvertFrom-Json
+if ($apps.enabled.PSObject.Properties.Name -contains "groupfolders") {
+    Write-Host "[OK] 'groupfolders' ya esta activa." -ForegroundColor Green
+} else {
+    if ($apps.disabled.PSObject.Properties.Name -contains "groupfolders") {
+        docker exec -u www-data $CONTAINER php occ app:enable groupfolders
+    } else {
+        docker exec -u www-data $CONTAINER php occ app:install groupfolders
+    }
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[ERROR] No se pudo instalar 'groupfolders'. Instalala desde Apps > 'Team Folders' y volve a correr el script." -ForegroundColor Red
+        exit 1
+    }
+    Write-Host "[OK] 'groupfolders' instalada y activa." -ForegroundColor Green
+}
 
 # 3. Crear Grupos de Trabajo por Área de Responsabilidad
 Write-Host "`n[Paso 3/5] Creando grupos de roles del proyecto..." -ForegroundColor Yellow

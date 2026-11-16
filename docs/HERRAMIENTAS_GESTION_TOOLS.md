@@ -145,6 +145,8 @@ Para que los demás integrantes del equipo dispongan de las mismas incidencias y
 
 Para estandarizar instantáneamente las carpetas, cuentas y permisos en la PC de cualquier compañero sin configurar nada a mano, se implementaron los scripts [`infra/scripts/setup-nextcloud.ps1`](../infra/scripts/setup-nextcloud.ps1) y [`infra/scripts/setup-nextcloud.sh`](../infra/scripts/setup-nextcloud.sh).
 
+Las carpetas de grupo usan la app **Team Folders** (id `groupfolders`), que no viene en la imagen de Nextcloud: el script la instala y activa si falta (el contenedor necesita salida a Internet). Si no puede, corta con error.
+
 **Ejecución (un solo comando):**
 ```powershell
 # En PowerShell (Windows):
@@ -155,13 +157,13 @@ bash infra/scripts/setup-nextcloud.sh
 ```
 
 **Matriz de Roles y Permisos Configurada:**
-- **Clave inicial común:** `Expojuy2026!` (se autogeneran las 5 cuentas: `ignacio`, `antocruz06`, `integrante3`, `integrante4`, `maxi`).
+- **Cuentas:** se crean 5 (`Ignacio`, `Antonella`, `Lautaro`, `Santiago`, `Maxi`) con una clave inicial común definida en el script. Cambiarla después de correrlo (`occ user:resetpassword`) y entregar cada clave por privado.
 - **Política de acceso:**
   - `01-Gestion-y-Actas` y `06-Entregables-Finales-y-Defensa`: **Escritura y lectura para todos** (`equipo-expojuy`).
-  - `02-Infraestructura-y-DevOps`: Escritura solo para `devops` (`ignacio`); **solo lectura** para el resto.
-  - `03-Base-de-Datos-y-Telemetria`: Escritura solo para `dba` (`antocruz06`); **solo lectura** para el resto.
-  - `04-Monitoreo-CI-CD-y-Automatizacion`: Escritura para `monitoreo-cicd` e `integrante4`; **solo lectura** para el resto.
-  - `05-Seguridad-Auditorias-e-Incidencias`: Escritura solo para `qa-seguridad` (`maxi`); **solo lectura** para el resto.
+  - `02-Infraestructura-y-DevOps`: Escritura solo para `devops` (`Ignacio`); **solo lectura** para el resto.
+  - `03-Base-de-Datos-y-Telemetria`: Escritura solo para `dba` (`Antonella`); **solo lectura** para el resto.
+  - `04-Monitoreo-CI-CD-y-Automatizacion`: Escritura para `monitoreo-cicd` (`Lautaro`) y `automatizacion-n8n` (`Santiago`); **solo lectura** para el resto.
+  - `05-Seguridad-Auditorias-e-Incidencias`: Escritura solo para `qa-seguridad` (`Maxi`); **solo lectura** para el resto.
 
 **Verificación de Acceso Automatizada:**
 El script concluye ejecutando internamente `php occ groupfolders:list` y `php occ user:list`, auditando en pantalla la tabla de carpetas activas, los permisos asignados (máscara `31` para lectura/escritura y `1` para solo lectura) y la pertenencia de cada usuario a su grupo, garantizando el aislamiento de privilegios.
@@ -187,3 +189,12 @@ El script concluye ejecutando internamente `php occ groupfolders:list` y `php oc
 ### Incidencia 4: Contenedor huérfano fuera de Compose (`friendly_wilbur`)
 - **Causa:** Un contenedor de prueba ejecutado manualmente con `docker run` quedó activo en segundo plano con nombre aleatorio y sin pertenecer al proyecto `expojuy`.
 - **Solución:** Se purgó el contenedor mediante `docker rm -f friendly_wilbur`, manteniendo la lista de contenedores limpia y gestionada exclusivamente por Docker Compose.
+
+### Incidencia 5: Nextcloud 30 → 35 sobre una instalación existente
+- **Causa:** la imagen de Nextcloud solo actualiza de a una versión mayor por vez (30 → 31 → …), así que la 35 no arranca sobre un volumen con la 30 instalada. No se llegó a probar: se reinstaló antes de levantarla.
+- **Solución (Nextcloud sin datos):** reinstalar. Borrar el contenedor y el volumen `expojuy_nextcloud_data`, vaciar la base `nextcloud_db` y levantar de nuevo con `docker compose -f compose.tools.yaml up -d`. Con datos, habría que subir de a una versión mayor.
+- **Después de reinstalar:** repetir los ajustes de acceso por Tailscale (`trusted_domains`, `trusted_proxies`; ver [`PUBLICAR_HERRAMIENTAS.md`](PUBLICAR_HERRAMIENTAS.md)), porque se guardan dentro del volumen.
+
+### Incidencia 6: `setup-nextcloud` no creaba las carpetas de grupo
+- **Causa:** la app Team Folders (`groupfolders`) no viene en la imagen de Nextcloud y el script solo intentaba activarla, ocultando el error.
+- **Solución:** el script la instala si falta y corta con error si no puede.

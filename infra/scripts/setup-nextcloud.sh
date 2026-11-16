@@ -25,10 +25,23 @@ if [ "$(docker inspect --format '{{.State.Running}}' "$CONTAINER" 2>/dev/null)" 
 fi
 echo "[OK] Contenedor $CONTAINER activo y saludable."
 
-# 2. Habilitar la aplicación Group Folders
-echo -e "\n[Paso 2/5] Habilitando aplicacion oficial 'groupfolders'..."
-docker exec -u www-data "$CONTAINER" php occ app:enable groupfolders >/dev/null 2>&1 || true
-echo "[OK] Modulo 'groupfolders' activo en Nextcloud."
+# 2. Instalar y activar Team Folders (id interno: groupfolders), requerido por el paso 5.
+#    No viene en la imagen de Nextcloud: si falta, se descarga de la tienda de apps.
+echo -e "\n[Paso 2/5] Verificando la aplicacion 'Team Folders' (groupfolders)..."
+if docker exec -u www-data "$CONTAINER" php occ app:list --enabled | grep -q "groupfolders:"; then
+    echo "[OK] 'groupfolders' ya esta activa."
+else
+    if docker exec -u www-data "$CONTAINER" php occ app:list --disabled | grep -q "groupfolders:"; then
+        ACCION="app:enable"
+    else
+        ACCION="app:install"
+    fi
+    if ! docker exec -u www-data "$CONTAINER" php occ "$ACCION" groupfolders; then
+        echo "[ERROR] No se pudo instalar 'groupfolders'. Instalala desde Apps > 'Team Folders' y volve a correr el script."
+        exit 1
+    fi
+    echo "[OK] 'groupfolders' instalada y activa."
+fi
 
 # 3. Crear Grupos de Trabajo por Área de Responsabilidad
 echo -e "\n[Paso 3/5] Creando grupos de roles del proyecto..."
