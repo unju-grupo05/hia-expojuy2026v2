@@ -9,6 +9,10 @@ node_modules/
 # Dumps de la base: pueden contener datos sensibles
 infra/backups/
 
+# Registro local del despliegue continuo (scripts/cd-deploy.ps1)
+infra/cd-deploy.log
+infra/cd-fallidos.txt
+
 # Sistema
 .DS_Store
 Thumbs.db
