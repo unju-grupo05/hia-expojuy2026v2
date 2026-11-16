@@ -35,9 +35,11 @@ hia-expojuy2026v2/
 │   ├── compose.cluster-ha.yaml  Réplicas, Sentinel y HAProxy
 │   ├── compose.tools.yaml       Mantis y Nextcloud
 │   ├── compose.monitoring.yaml  Prometheus, Grafana y exporters
+│   ├── compose.automation.yaml  n8n automatización y asistente RAG
+│   ├── n8n-backups/             Workflows sanitizados exportados y guía de importación
 │   ├── scripts/                 Backups, pruebas del clúster, chequeo de servicios
 │   └── .env.example Plantilla de variables (el .env real no se versiona)
-├── docs/            Plan, consigna y documentación técnica
+├── docs/            Plan, consigna y documentación técnica (AUTOMATIZACION_N8N.md, etc.)
 └── .github/         Workflow de GitHub Actions (ci-cd.yml)
 ```
 

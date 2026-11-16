@@ -104,6 +104,14 @@ Accesos:
 
 Los exporters no publican puertos: Prometheus los consulta por la red interna. Grafana arranca sin dashboards; para importar uno: *Dashboards → New → Import* con un ID de grafana.com (por ejemplo `1860` Node Exporter Full, `9628` PostgreSQL). Los dashboards importados quedan en el volumen de Grafana, no en el repo.
 
+#### E. Automatización y Asistente RAG con n8n (Punto 13 & 14)
+Levanta la plataforma de orquestación de flujos `expojuy-n8n`, conectada al clúster PostgreSQL (PGVector), herramientas de gestión (Mantis, Nextcloud), monitoreo (Alertmanager) y Redis:
+```bash
+docker compose -f compose.yaml -f compose.cluster-ha.yaml -f compose.tools.yaml -f compose.monitoring.yaml -f compose.automation.yaml up -d
+```
+Acceso: http://localhost:5679 (creación inicial de cuenta Owner).  
+Workflows oficiales y guía de importación: [`infra/n8n-backups/`](infra/n8n-backups/). Documentación técnica: [`docs/AUTOMATIZACION_N8N.md`](docs/AUTOMATIZACION_N8N.md).
+
 #### Combinar modos y apagar
 Compose no recuerda qué archivos se usaron: cada comando (`up`, `ps`, `logs`, `down`) aplica solo los `-f` que recibe. Usar siempre los mismos archivos que en el `up`.
 
@@ -141,6 +149,7 @@ powershell -ExecutionPolicy Bypass -File scripts/check-servicios.ps1
 | **Nextcloud** | http://localhost:8083 | Repositorio documental y evidencias | Ver `NEXTCLOUD_ADMIN_*` en `.env` |
 | **Prometheus** | http://localhost:9090 | Métricas, targets y alertas | — |
 | **Grafana** | http://localhost:3001 | Dashboards de monitoreo | Ver `GF_SECURITY_ADMIN_*` en `.env` |
+| **n8n Automatización & RAG** | http://localhost:5679 | Orquestación de flujos, alertas, backups y asistente PachAI | Registro inicial Owner |
 ---
 
 ## 📊 Dataset Masivo, Benchmark y Pruebas DBA (Puntos 4, 5 y 6)
@@ -158,6 +167,7 @@ Para reproducir las pruebas del Senior DBA sobre el dataset de **6.000.000 de re
 ## 📚 Mapa de Documentación del Proyecto
 
 * 🏛️ **Arquitectura, Roles y Reglas de Desarrollo:** [docs/CONTEXTO_PROYECTO.md](docs/CONTEXTO_PROYECTO.md)
+* 🤖 **Automatización con n8n y Asistente RAG PachAI:** [docs/AUTOMATIZACION_N8N.md](docs/AUTOMATIZACION_N8N.md)
 * 🗄️ **Base de Datos, Optimización y Clúster:** [docs/IMPLEMENTACION_ACTUAL.md](docs/IMPLEMENTACION_ACTUAL.md)
 * 🔗 **Accesos (links de la web y de las herramientas):** [docs/ACCESOS.md](docs/ACCESOS.md)
 * 🌐 **Publicación y acceso desde Internet (Funnel, Serve, quién accede a qué):** [docs/PUBLICACION_ACCESO.md](docs/PUBLICACION_ACCESO.md)
