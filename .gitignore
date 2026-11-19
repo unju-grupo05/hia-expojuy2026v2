@@ -16,3 +16,5 @@ infra/cd-fallidos.txt
 # Sistema
 .DS_Store
 Thumbs.db
+
+out/
