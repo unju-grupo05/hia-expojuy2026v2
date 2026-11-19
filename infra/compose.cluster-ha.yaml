@@ -13,14 +13,6 @@ services:
     image: pgvector/pgvector:pg17
     container_name: expojuy-postgres-replica-1
     restart: unless-stopped
-    command: >
-      postgres
-      -c shared_preload_libraries=pg_stat_statements
-      -c pg_stat_statements.track=all
-      -c wal_level=replica
-      -c max_wal_senders=10
-      -c max_replication_slots=10
-      -c hot_standby=on
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -30,6 +22,7 @@ services:
       PGUSER: ${POSTGRES_USER}
     volumes:
       - pgdata-replica-1:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     ports:
       - "127.0.0.1:${POSTGRES_REPLICA_1_PORT:-5434}:5432"
     depends_on:
@@ -58,7 +51,7 @@ services:
           chown -R postgres:postgres /var/lib/postgresql/data
           echo ">>> [STANDBY-1] Clonación completada."
         fi
-        exec docker-entrypoint.sh postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10 -c hot_standby=on
+        exec docker-entrypoint.sh postgres -c config_file=/etc/postgresql/postgresql.conf
 
   # ---------------------------------------------------------------------------
   # NODO ESCLAVO 2 (Standby Replica 2)
@@ -67,14 +60,6 @@ services:
     image: pgvector/pgvector:pg17
     container_name: expojuy-postgres-replica-2
     restart: unless-stopped
-    command: >
-      postgres
-      -c shared_preload_libraries=pg_stat_statements
-      -c pg_stat_statements.track=all
-      -c wal_level=replica
-      -c max_wal_senders=10
-      -c max_replication_slots=10
-      -c hot_standby=on
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -84,6 +69,7 @@ services:
       PGUSER: ${POSTGRES_USER}
     volumes:
       - pgdata-replica-2:/var/lib/postgresql/data
+      - ./postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
     ports:
       - "127.0.0.1:${POSTGRES_REPLICA_2_PORT:-5435}:5432"
     depends_on:
@@ -112,7 +98,7 @@ services:
           chown -R postgres:postgres /var/lib/postgresql/data
           echo ">>> [STANDBY-2] Clonación completada."
         fi
-        exec docker-entrypoint.sh postgres -c shared_preload_libraries=pg_stat_statements -c pg_stat_statements.track=all -c wal_level=replica -c max_wal_senders=10 -c max_replication_slots=10 -c hot_standby=on
+        exec docker-entrypoint.sh postgres -c config_file=/etc/postgresql/postgresql.conf
 
   # ---------------------------------------------------------------------------
   # SENTINEL & AUTO-FAILOVER MANAGER
