@@ -43,15 +43,43 @@ histórica `compose.db-replica.yaml`. No confundir esa réplica única con los s
 ### 1.2 PostgreSQL base
 
 `infra/compose.yaml` define el servicio `postgres` con la imagen `pgvector/pgvector:pg17`,
-volumen nombrado `pgdata`, healthcheck `pg_isready` y estos parámetros:
+volumen nombrado `pgdata` y healthcheck `pg_isready`.
 
-```text
-shared_preload_libraries=pg_stat_statements
-pg_stat_statements.track=all
-wal_level=replica
-max_wal_senders=10
-max_replication_slots=10
+La configuración del motor está en `infra/postgres/postgresql.conf`. El archivo se monta como
+solo lectura en `/etc/postgresql/postgresql.conf` y Postgres lo usa porque el servicio arranca con
+`postgres -c config_file=/etc/postgresql/postgresql.conf`. El `postgresql.conf` que genera `initdb`
+dentro de la carpeta de datos sigue existiendo, pero no se lee. Cada parámetro tiene un comentario
+con su motivo en el propio archivo.
+
+| Grupo | Parámetros |
+|---|---|
+| Conexiones | `listen_addresses = '*'` |
+| Estadísticas | `shared_preload_libraries = 'pg_stat_statements'`, `pg_stat_statements.track = all` |
+| Replicación | `wal_level = replica`, `max_wal_senders = 10`, `max_replication_slots = 10`, `hot_standby = on` |
+| Rendimiento | `shared_buffers = 1GB`, `effective_cache_size = 3GB`, `work_mem = 32MB`, `maintenance_work_mem = 512MB`, `random_page_cost = 1.1` |
+
+`listen_addresses = '*'` es necesario para que el backend, pgAdmin y las réplicas se conecten
+dentro de la red Docker; la base sigue sin publicarse fuera de `127.0.0.1`. Los valores de
+rendimiento están pensados para un host de 16 GB de RAM con unos 8 GB para Docker, compartidos
+con el resto de los contenedores.
+
+El archivo se monta fuera de `/var/lib/postgresql/data` porque `initdb` (al crear la base) y
+`pg_basebackup` (al crear una réplica) exigen que esa carpeta esté vacía.
+
+Para comprobar la configuración activa:
+
+```sql
+SHOW config_file;   -- /etc/postgresql/postgresql.conf
+SELECT name, current_setting(name) AS valor, source
+FROM pg_settings
+WHERE source IN ('configuration file', 'override')
+ORDER BY name;
 ```
+
+Después de editar el archivo, `shared_buffers`, `shared_preload_libraries` y `listen_addresses`
+exigen reiniciar el contenedor (`docker compose restart postgres`); el resto se aplica con
+`SELECT pg_reload_conf();`. No agregar parámetros con `-c` en el compose: tienen prioridad sobre
+el archivo.
 
 PostgreSQL escucha en el puerto 5432 dentro de Docker. El puerto del host se enlaza a
 `127.0.0.1` (por defecto, 5433). pgAdmin también se limita a loopback (por defecto, 5050);
@@ -265,7 +293,7 @@ preservar la base.
 ### 3.1 Instrumentación
 
 PostgreSQL carga `pg_stat_statements` al iniciar, mediante `shared_preload_libraries` y
-`pg_stat_statements.track=all`. La migración
+`pg_stat_statements.track=all` en `infra/postgres/postgresql.conf`. La migración
 `backend/src/migrations/habilitar_pg_stat_statements.sql` crea, si faltan, las extensiones
 `pg_stat_statements`, `vector` y `pg_trgm`.
 
@@ -464,8 +492,11 @@ de ejemplo antes de cualquier entorno compartido y no publicarlo fuera de localh
 ### 4.2 Inicialización y replicación
 
 Los dos servicios standby usan la misma imagen PostgreSQL 17 que el primario, volúmenes
-independientes y `hot_standby=on`. Sus parámetros incluyen `wal_level=replica`,
-`max_wal_senders=10`, `max_replication_slots=10` y `pg_stat_statements`.
+independientes y el mismo `infra/postgres/postgresql.conf`, montado igual que en el primario
+(sección 1.2). Como las réplicas tienen un `entrypoint` propio, el archivo se indica en la línea
+`exec docker-entrypoint.sh postgres -c config_file=...` de ese script. `hot_standby=on` solo tiene
+efecto en las réplicas, y los datos de conexión al primario que escribe `pg_basebackup -R` quedan
+en `postgresql.auto.conf`, dentro de la carpeta de datos, que Postgres lee igual.
 `max_replication_slots` define capacidad, pero la orden `pg_basebackup` actual no solicita
 crear una ranura con `-C`; no se debe asumir que existen ranuras dedicadas para cada réplica.
 Tampoco se declara `wal_keep_size` en la configuración mostrada. Tras una interrupción larga,
